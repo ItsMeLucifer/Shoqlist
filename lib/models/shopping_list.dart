@@ -1,4 +1,4 @@
-enum Importance { normal, important, urgent }
+enum Importance { small, normal, important, urgent }
 
 class ShoppingList {
   final String name;
