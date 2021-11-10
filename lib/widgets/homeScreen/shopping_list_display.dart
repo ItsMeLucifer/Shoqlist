@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/main.dart';
+import 'package:shoqlist/models/shopping_list.dart';
+import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/widgets/homeScreen/add_new_item.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
@@ -42,30 +44,8 @@ class ShoppingListDisplay extends ConsumerWidget {
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: shoppingListsVM
-                            .shoppingList[shoppingListsVM.currentListIndex]
-                            .list
-                            .length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            height: 50,
-                            child: Row(
-                              children: [
-                                Icon(Icons.crop_square),
-                                SizedBox(width: 5),
-                                Text(shoppingListsVM
-                                    .shoppingList[
-                                        shoppingListsVM.currentListIndex]
-                                    .list[index]
-                                    .itemName),
-                              ],
-                            ),
-                          );
-                        }),
-                  ),
+                      padding: const EdgeInsets.all(8.0),
+                      child: shoppingList(shoppingListsVM)),
                 ),
               ],
             ),
@@ -73,5 +53,39 @@ class ShoppingListDisplay extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget shoppingList(ShoppingListsViewModel shoppingListsVM) {
+    ShoppingList shoppingList =
+        shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex];
+    return ListView.builder(
+        shrinkWrap: true,
+        itemCount: shoppingList.list.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              shoppingListsVM.editListElement(
+                  null,
+                  !shoppingList.list[index].gotItem,
+                  shoppingListsVM.currentListIndex,
+                  index);
+            },
+            child: Card(
+              color: Color.fromRGBO(0, 0, 0, 0.001),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    shoppingList.list[index].gotItem
+                        ? Icon(Icons.radio_button_checked)
+                        : Icon(Icons.radio_button_off),
+                    SizedBox(width: 5),
+                    Text(shoppingList.list[index].itemName),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 }

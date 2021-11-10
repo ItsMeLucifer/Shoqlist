@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 
 class ShoppingListsViewModel extends ChangeNotifier {
-  List<ShoppingList> shoppingList = [
+  List<ShoppingList> _shoppingList = [
     ShoppingList(
         "Biedronka",
         [
@@ -49,6 +49,17 @@ class ShoppingListsViewModel extends ChangeNotifier {
         ],
         Importance.small)
   ];
+  List<ShoppingList> get shoppingList => _shoppingList;
+
+  void editListElement(
+      String itemName, bool gotItem, int listIndex, int itemIndex) {
+    if (itemName != null)
+      _shoppingList[listIndex].list[itemIndex].itemName = itemName;
+    if (gotItem != null)
+      _shoppingList[listIndex].list[itemIndex].gotItem = gotItem;
+    notifyListeners();
+  }
+
   int _currentListIndex = 0;
   int get currentListIndex => _currentListIndex;
   set currentListIndex(int value) {

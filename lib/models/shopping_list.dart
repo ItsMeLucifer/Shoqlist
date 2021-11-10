@@ -9,8 +9,8 @@ class ShoppingList {
 }
 
 class Item {
-  final String itemName;
-  final bool gotItem;
+  String itemName;
+  bool gotItem;
 
   Item(this.itemName, this.gotItem);
 }
