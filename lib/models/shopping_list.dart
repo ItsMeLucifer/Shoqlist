@@ -10,7 +10,7 @@ class ShoppingList {
 
 class Item {
   String itemName;
-  bool gotItem;
-
-  Item(this.itemName, this.gotItem);
+  bool gotItem = false;
+  Importance importance = Importance.normal;
+  Item(this.itemName, this.gotItem, this.importance);
 }

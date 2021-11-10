@@ -6,9 +6,9 @@ import 'package:shoqlist/models/shopping_list.dart';
 
 class AddNewItem extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
-    TextEditingController nameController;
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
+    TextEditingController nameController;
     return AlertDialog(
       content: Container(
           height: 300,
@@ -37,6 +37,9 @@ class AddNewItem extends ConsumerWidget {
                             autocorrect: false,
                             obscureText: false,
                             controller: nameController,
+                            onChanged: (String value) {
+                              toolsVM.newItemName = value;
+                            },
                             style: TextStyle(fontWeight: FontWeight.bold),
                             decoration: InputDecoration(
                               hintText: "Item name",
@@ -73,32 +76,40 @@ class AddNewItem extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    DropdownButton<Importance>(
-                      value: toolsVM.newItemImportance,
-                      icon:
-                          Icon(Icons.keyboard_arrow_down, color: Colors.black),
-                      iconSize: 24,
-                      elevation: 16,
-                      underline: Container(
-                        height: 2,
-                        color: Colors.white,
-                      ),
-                      onChanged: (Importance imp) {
-                        toolsVM.newItemImportance = imp;
-                      },
-                      items: <Importance>[
-                        Importance.small,
-                        Importance.normal,
-                        Importance.important,
-                        Importance.urgent
-                      ].map<DropdownMenuItem<Importance>>((Importance value) {
-                        return DropdownMenuItem<Importance>(
-                          value: value,
-                          child: Text(
-                            value.toString(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text("Importance:"),
+                        DropdownButton<Importance>(
+                          value: toolsVM.newItemImportance,
+                          icon: Icon(Icons.keyboard_arrow_down,
+                              color: Colors.black),
+                          iconSize: 24,
+                          elevation: 16,
+                          underline: Container(
+                            height: 2,
+                            color: Colors.white,
                           ),
-                        );
-                      }).toList(),
+                          onChanged: (Importance imp) {
+                            toolsVM.newItemImportance = imp;
+                          },
+                          items: <Importance>[
+                            Importance.small,
+                            Importance.normal,
+                            Importance.important,
+                            Importance.urgent
+                          ].map<DropdownMenuItem<Importance>>(
+                              (Importance value) {
+                            return DropdownMenuItem<Importance>(
+                              value: value,
+                              child: Text(
+                                toolsVM.getImportanceLabel(value),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -106,6 +117,11 @@ class AddNewItem extends ConsumerWidget {
               FlatButton(
                   color: Color.fromRGBO(0, 0, 0, 0.2),
                   onPressed: () {
+                    if (toolsVM.newItemName != "")
+                      shoppingListsVM
+                          .shoppingList[shoppingListsVM.currentListIndex].list
+                          .add(Item(toolsVM.newItemName, false,
+                              toolsVM.newItemImportance));
                     Navigator.of(context).pop();
                   },
                   child: Text(

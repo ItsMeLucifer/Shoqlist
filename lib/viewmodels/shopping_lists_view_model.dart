@@ -6,57 +6,54 @@ class ShoppingListsViewModel extends ChangeNotifier {
     ShoppingList(
         "Biedronka",
         [
-          Item("Ziemniaki", false),
-          Item("Siemię lniane", false),
-          Item("Płatki", false),
-          Item("Herbata", false),
-          Item("Chleb", false),
-          Item("Ziemniaki", false),
-          Item("Siemię lniane", false),
-          Item("Płatki", false),
-          Item("Herbata", false),
-          Item("Chleb", false),
-          Item("Ziemniaki", false),
-          Item("Siemię lniane", false),
-          Item("Płatki", false),
-          Item("Herbata", false),
-          Item("Chleb", false),
-          Item("Ziemniaki", false),
-          Item("Siemię lniane", false),
-          Item("Płatki", false),
-          Item("Herbata", false),
-          Item("Chleb", false),
+          Item("Ziemniaki", false, Importance.normal),
+          Item("Siemię lniane", false, Importance.important),
+          Item("Płatki", false, Importance.important),
+          Item("Herbata", false, Importance.important),
+          Item("Chleb", false, Importance.important),
+          Item("Ziemniaki", false, Importance.important),
+          Item("Siemię lniane", false, Importance.important),
+          Item("Płatki", false, Importance.important),
+          Item("Herbata", false, Importance.important),
+          Item("Chleb", false, Importance.important),
+          Item("Ziemniaki", false, Importance.urgent),
+          Item("Siemię lniane", false, Importance.important),
+          Item("Płatki", false, Importance.important),
+          Item("Herbata", false, Importance.important),
+          Item("Chleb", false, Importance.important),
+          Item("Ziemniaki", false, Importance.important),
+          Item("Siemię lniane", false, Importance.important),
+          Item("Płatki", false, Importance.important),
+          Item("Herbata", false, Importance.important),
+          Item("Chleb", false, Importance.important),
         ],
         Importance.normal),
     ShoppingList(
         "Rossman",
         [
-          Item("Waciki", false),
-          Item("Pasta do zębów", false),
+          Item("Waciki", false, Importance.important),
+          Item("Pasta do zębów", false, Importance.normal),
         ],
         Importance.important),
     ShoppingList(
         "Komputerowy",
         [
-          Item("Karta Graficzna", false),
+          Item("Karta Graficzna", false, Importance.urgent),
         ],
         Importance.urgent),
     ShoppingList(
         "Krawiec",
         [
-          Item("Naszywka", false),
-          Item("Czarna nić", false),
+          Item("Naszywka", false, Importance.small),
+          Item("Czarna nić", false, Importance.normal),
         ],
         Importance.small)
   ];
   List<ShoppingList> get shoppingList => _shoppingList;
 
-  void editListElement(
-      String itemName, bool gotItem, int listIndex, int itemIndex) {
-    if (itemName != null)
-      _shoppingList[listIndex].list[itemIndex].itemName = itemName;
-    if (gotItem != null)
-      _shoppingList[listIndex].list[itemIndex].gotItem = gotItem;
+  void toggleItemActivation(int listIndex, int itemIndex) {
+    bool gotItem = _shoppingList[listIndex].list[itemIndex].gotItem;
+    _shoppingList[listIndex].list[itemIndex].gotItem = !gotItem;
     notifyListeners();
   }
 

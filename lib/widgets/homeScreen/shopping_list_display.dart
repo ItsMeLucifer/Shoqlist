@@ -45,7 +45,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                 Expanded(
                   child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: shoppingList(shoppingListsVM)),
+                      child: shoppingList(watch)),
                 ),
               ],
             ),
@@ -55,7 +55,9 @@ class ShoppingListDisplay extends ConsumerWidget {
     );
   }
 
-  Widget shoppingList(ShoppingListsViewModel shoppingListsVM) {
+  Widget shoppingList(ScopedReader watch) {
+    final shoppingListsVM = watch(shoppingListsProvider);
+    final toolsVM = watch(toolsProvider);
     ShoppingList shoppingList =
         shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex];
     return ListView.builder(
@@ -64,23 +66,25 @@ class ShoppingListDisplay extends ConsumerWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              shoppingListsVM.editListElement(
-                  null,
-                  !shoppingList.list[index].gotItem,
-                  shoppingListsVM.currentListIndex,
-                  index);
+              shoppingListsVM.toggleItemActivation(
+                  shoppingListsVM.currentListIndex, index);
             },
             child: Card(
-              color: Color.fromRGBO(0, 0, 0, 0.001),
+              color: toolsVM
+                  .getImportanceColor(shoppingList.list[index].importance),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
-                    shoppingList.list[index].gotItem
-                        ? Icon(Icons.radio_button_checked)
-                        : Icon(Icons.radio_button_off),
+                    Icon(shoppingList.list[index].gotItem
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off),
                     SizedBox(width: 5),
-                    Text(shoppingList.list[index].itemName),
+                    Text(shoppingList.list[index].itemName,
+                        style: TextStyle(
+                            decoration: shoppingList.list[index].gotItem
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none)),
                   ],
                 ),
               ),
