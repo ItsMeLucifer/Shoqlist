@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,6 +15,24 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   Widget build(BuildContext context) {
-    return Scaffold(body: HomeScreenMainView());
+    return Scaffold(
+        floatingActionButton: SpeedDial(
+            overlayOpacity: 0,
+            animatedIcon: AnimatedIcons.menu_close,
+            children: [
+              SpeedDialChild(
+                  onTap: () {
+                    //SETTINGS
+                  },
+                  child: Icon(Icons.settings),
+                  label: 'Settings'),
+              SpeedDialChild(
+                  onTap: () {
+                    //SCAN
+                  },
+                  child: Icon(Icons.qr_code_scanner_rounded),
+                  label: 'Scan your list')
+            ]),
+        body: HomeScreenMainView());
   }
 }

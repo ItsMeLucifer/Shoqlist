@@ -14,4 +14,12 @@ class Tools extends ChangeNotifier {
         return Colors.green[200];
     }
   }
+
+  //Add new Item
+  Importance _newItemImportance = Importance.normal;
+  Importance get newItemImportance => _newItemImportance;
+  set newItemImportance(Importance value) {
+    _newItemImportance = value;
+    notifyListeners();
+  }
 }

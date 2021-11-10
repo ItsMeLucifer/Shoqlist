@@ -5,11 +5,49 @@ class ShoppingListsViewModel extends ChangeNotifier {
   List<ShoppingList> shoppingList = [
     ShoppingList(
         "Biedronka",
-        ["Ziemniaki", "Siemię lniane", "Płatki", "Herbata", "Chleb"],
+        [
+          Item("Ziemniaki", false),
+          Item("Siemię lniane", false),
+          Item("Płatki", false),
+          Item("Herbata", false),
+          Item("Chleb", false),
+          Item("Ziemniaki", false),
+          Item("Siemię lniane", false),
+          Item("Płatki", false),
+          Item("Herbata", false),
+          Item("Chleb", false),
+          Item("Ziemniaki", false),
+          Item("Siemię lniane", false),
+          Item("Płatki", false),
+          Item("Herbata", false),
+          Item("Chleb", false),
+          Item("Ziemniaki", false),
+          Item("Siemię lniane", false),
+          Item("Płatki", false),
+          Item("Herbata", false),
+          Item("Chleb", false),
+        ],
         Importance.normal),
-    ShoppingList("Rossman", ["Waciki", "Pasta do zębów"], Importance.important),
-    ShoppingList("Komputerowy", ["Karta graficzna"], Importance.urgent),
-    ShoppingList("Krawiec", ["Naszywka", "Czarna nić"], Importance.small)
+    ShoppingList(
+        "Rossman",
+        [
+          Item("Waciki", false),
+          Item("Pasta do zębów", false),
+        ],
+        Importance.important),
+    ShoppingList(
+        "Komputerowy",
+        [
+          Item("Karta Graficzna", false),
+        ],
+        Importance.urgent),
+    ShoppingList(
+        "Krawiec",
+        [
+          Item("Naszywka", false),
+          Item("Czarna nić", false),
+        ],
+        Importance.small)
   ];
   int _currentListIndex = 0;
   int get currentListIndex => _currentListIndex;
