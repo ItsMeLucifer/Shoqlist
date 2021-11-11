@@ -8,7 +8,6 @@ class AddNewItem extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
-    TextEditingController nameController;
     return AlertDialog(
       content: Container(
           height: 300,
@@ -37,10 +36,7 @@ class AddNewItem extends ConsumerWidget {
                             autofocus: false,
                             autocorrect: false,
                             obscureText: false,
-                            controller: nameController,
-                            onChanged: (String value) {
-                              toolsVM.newItemName = value;
-                            },
+                            controller: toolsVM.nameController,
                             style: TextStyle(fontWeight: FontWeight.bold),
                             decoration: InputDecoration(
                               hintText: "Item name",
@@ -118,9 +114,9 @@ class AddNewItem extends ConsumerWidget {
               FlatButton(
                   color: Color.fromRGBO(0, 0, 0, 0.2),
                   onPressed: () {
-                    if (toolsVM.newItemName != "")
+                    if (toolsVM.nameController.text != "")
                       shoppingListsVM.addNewItemToShoppingList(
-                          toolsVM.newItemName,
+                          toolsVM.nameController.text,
                           false,
                           toolsVM.newItemImportance);
                     Navigator.of(context).pop();

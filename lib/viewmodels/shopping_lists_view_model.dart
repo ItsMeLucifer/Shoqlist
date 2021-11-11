@@ -53,10 +53,22 @@ class ShoppingListsViewModel extends ChangeNotifier {
   ];
   List<ShoppingList> get shoppingList => _shoppingList;
   List<LoyaltyCard> _loyaltyCardsList = [
-    LoyaltyCard("Biedronka", "1243221312"),
-    LoyaltyCard("Aushan", "1243221312")
+    LoyaltyCard("Payback", "0480404624192"),
+    LoyaltyCard("Orsay", "000000005040008629"),
+    LoyaltyCard("Biedronka", "000000005040008629")
   ];
   List<LoyaltyCard> get loyaltyCardsList => _loyaltyCardsList;
+  int _currentLoyaltyCardsListIndex = 0;
+  int get currentLoyaltyCardsListIndex => _currentLoyaltyCardsListIndex;
+  set currentLoyaltyCardsListIndex(int index) {
+    _currentLoyaltyCardsListIndex = index;
+    notifyListeners();
+  }
+
+  void addNewLoyaltyCard(String cardName, String barCode) {
+    _loyaltyCardsList.add(LoyaltyCard(cardName, barCode));
+    notifyListeners();
+  }
 
   void toggleItemActivation(int listIndex, int itemIndex) {
     bool gotItem = _shoppingList[listIndex].list[itemIndex].gotItem;

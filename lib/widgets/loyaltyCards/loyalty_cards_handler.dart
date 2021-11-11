@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:shoqlist/widgets/loyaltyCards/add_new_loyalty_card.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_card_info.dart';
 
 import '../../main.dart';
 
 class LoyaltyCardsHandler extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
-    String barCode;
+    final toolsVM = watch(toolsProvider);
     return Scaffold(
       floatingActionButton: SpeedDial(
         overlayOpacity: 0,
@@ -17,8 +17,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
         children: [
           SpeedDialChild(
               onTap: () async {
-                barCode = await FlutterBarcodeScanner.scanBarcode(
-                    "#ff6666", "Cancel", false, ScanMode.DEFAULT);
+                showDialog(context: context, child: AddNewLoyaltyCard());
               },
               child: Icon(Icons.add),
               label: "Add new card"),
@@ -62,6 +61,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
             },
             child: GestureDetector(
               onTap: () {
+                shoppingListsVM.currentLoyaltyCardsListIndex = index;
                 showDialog(
                     context: context,
                     builder: (context) {

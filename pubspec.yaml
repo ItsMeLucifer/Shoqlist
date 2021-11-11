@@ -36,6 +36,7 @@ dependencies:
   flutter_speed_dial: ^2.1.1
   flutter_barcode_scanner: ^1.0.2
   syncfusion_flutter_barcodes: ^18.4.49
+  sizer: ^1.1.8
 
 dev_dependencies:
   flutter_test:

@@ -30,12 +30,10 @@ class Tools extends ChangeNotifier {
     notifyListeners();
   }
 
-  String _newItemName = "";
-  String get newItemName => _newItemName;
-  set newItemName(String value) {
-    _newItemName = value;
-    notifyListeners();
-  }
-
+  TextEditingController nameController = TextEditingController();
   Key addNewItemNameFormFieldKey;
+
+  //Add new Card
+  Key addNewCardNameFormFieldKey;
+  Key addNewCardBarCodeFormFieldKey;
 }
