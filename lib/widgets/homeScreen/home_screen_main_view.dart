@@ -37,6 +37,8 @@ class HomeScreenMainView extends ConsumerWidget {
                           onTap: () {
                             shoppingListsVM.currentListIndex = index;
                             _navigateToShoppingList(context);
+                            print(shoppingListsVM.shoppingList[index].importance
+                                .toString());
                           },
                           child: Card(
                               color: toolsVM.getImportanceColor(shoppingListsVM

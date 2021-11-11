@@ -32,6 +32,7 @@ class AddNewItem extends ConsumerWidget {
                           width: 200,
                           height: 40,
                           child: TextFormField(
+                            key: toolsVM.addNewItemNameFormFieldKey,
                             keyboardType: TextInputType.name,
                             autofocus: false,
                             autocorrect: false,
@@ -94,7 +95,7 @@ class AddNewItem extends ConsumerWidget {
                             toolsVM.newItemImportance = imp;
                           },
                           items: <Importance>[
-                            Importance.small,
+                            Importance.low,
                             Importance.normal,
                             Importance.important,
                             Importance.urgent
@@ -118,10 +119,10 @@ class AddNewItem extends ConsumerWidget {
                   color: Color.fromRGBO(0, 0, 0, 0.2),
                   onPressed: () {
                     if (toolsVM.newItemName != "")
-                      shoppingListsVM
-                          .shoppingList[shoppingListsVM.currentListIndex].list
-                          .add(Item(toolsVM.newItemName, false,
-                              toolsVM.newItemImportance));
+                      shoppingListsVM.addNewItemToShoppingList(
+                          toolsVM.newItemName,
+                          false,
+                          toolsVM.newItemImportance);
                     Navigator.of(context).pop();
                   },
                   child: Text(

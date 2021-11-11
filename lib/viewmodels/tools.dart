@@ -8,10 +8,12 @@ class Tools extends ChangeNotifier {
         return Colors.orange[200];
       case Importance.urgent:
         return Colors.red[300];
-      case Importance.small:
+      case Importance.low:
         return Colors.blue[200];
-      default:
+      case Importance.normal:
         return Colors.green[200];
+      // default:
+      //   return Colors.green[200];
     }
   }
 
@@ -34,4 +36,6 @@ class Tools extends ChangeNotifier {
     _newItemName = value;
     notifyListeners();
   }
+
+  Key addNewItemNameFormFieldKey;
 }

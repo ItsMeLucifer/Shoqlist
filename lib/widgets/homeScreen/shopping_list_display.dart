@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
-import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/widgets/homeScreen/add_new_item.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
@@ -12,8 +11,11 @@ class ShoppingListDisplay extends ConsumerWidget {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
     return Scaffold(
-      backgroundColor: toolsVM.getImportanceColor(shoppingListsVM
-          .shoppingList[shoppingListsVM.currentListIndex].importance),
+      backgroundColor: Color.lerp(
+          toolsVM.getImportanceColor(shoppingListsVM
+              .shoppingList[shoppingListsVM.currentListIndex].importance),
+          Colors.black,
+          0.15),
       floatingActionButton: SpeedDial(
         overlayOpacity: 0,
         animatedIcon: AnimatedIcons.menu_close,

@@ -1,59 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
+import 'package:shoqlist/models/shopping_list_item.dart';
 
 class ShoppingListsViewModel extends ChangeNotifier {
   List<ShoppingList> _shoppingList = [
     ShoppingList(
         "Biedronka",
         [
-          Item("Ziemniaki", false, Importance.normal),
-          Item("Siemię lniane", false, Importance.important),
-          Item("Płatki", false, Importance.important),
-          Item("Herbata", false, Importance.important),
-          Item("Chleb", false, Importance.important),
-          Item("Ziemniaki", false, Importance.important),
-          Item("Siemię lniane", false, Importance.important),
-          Item("Płatki", false, Importance.important),
-          Item("Herbata", false, Importance.important),
-          Item("Chleb", false, Importance.important),
-          Item("Ziemniaki", false, Importance.urgent),
-          Item("Siemię lniane", false, Importance.important),
-          Item("Płatki", false, Importance.important),
-          Item("Herbata", false, Importance.important),
-          Item("Chleb", false, Importance.important),
-          Item("Ziemniaki", false, Importance.important),
-          Item("Siemię lniane", false, Importance.important),
-          Item("Płatki", false, Importance.important),
-          Item("Herbata", false, Importance.important),
-          Item("Chleb", false, Importance.important),
+          ShoppingListItem("Ziemniaki", false, Importance.normal),
+          ShoppingListItem("Siemię lniane", false, Importance.important),
+          ShoppingListItem("Płatki", false, Importance.important),
+          ShoppingListItem("Herbata", false, Importance.important),
+          ShoppingListItem("Chleb", false, Importance.important),
+          ShoppingListItem("Ziemniaki", false, Importance.important),
+          ShoppingListItem("Siemię lniane", false, Importance.important),
+          ShoppingListItem("Płatki", false, Importance.important),
+          ShoppingListItem("Herbata", false, Importance.important),
+          ShoppingListItem("Chleb", false, Importance.important),
+          ShoppingListItem("Ziemniaki", false, Importance.urgent),
+          ShoppingListItem("Siemię lniane", false, Importance.important),
+          ShoppingListItem("Płatki", false, Importance.important),
+          ShoppingListItem("Herbata", false, Importance.important),
+          ShoppingListItem("Chleb", false, Importance.important),
+          ShoppingListItem("Ziemniaki", false, Importance.important),
+          ShoppingListItem("Siemię lniane", false, Importance.important),
+          ShoppingListItem("Płatki", false, Importance.important),
+          ShoppingListItem("Herbata", false, Importance.important),
+          ShoppingListItem("Chleb", false, Importance.important),
         ],
         Importance.normal),
     ShoppingList(
         "Rossman",
         [
-          Item("Waciki", false, Importance.important),
-          Item("Pasta do zębów", false, Importance.normal),
+          ShoppingListItem("Waciki", false, Importance.important),
+          ShoppingListItem("Pasta do zębów", false, Importance.normal),
         ],
         Importance.important),
     ShoppingList(
         "Komputerowy",
         [
-          Item("Karta Graficzna", false, Importance.urgent),
+          ShoppingListItem("Karta Graficzna", false, Importance.urgent),
         ],
         Importance.urgent),
     ShoppingList(
         "Krawiec",
         [
-          Item("Naszywka", false, Importance.small),
-          Item("Czarna nić", false, Importance.normal),
+          ShoppingListItem("Naszywka", false, Importance.low),
+          ShoppingListItem("Czarna nić", false, Importance.normal),
         ],
-        Importance.small)
+        Importance.low)
   ];
   List<ShoppingList> get shoppingList => _shoppingList;
+  List<LoyaltyCard> _loyaltyCardsList = [
+    LoyaltyCard("Biedronka", "1243221312"),
+    LoyaltyCard("Aushan", "1243221312")
+  ];
+  List<LoyaltyCard> get loyaltyCardsList => _loyaltyCardsList;
 
   void toggleItemActivation(int listIndex, int itemIndex) {
     bool gotItem = _shoppingList[listIndex].list[itemIndex].gotItem;
     _shoppingList[listIndex].list[itemIndex].gotItem = !gotItem;
+    notifyListeners();
+  }
+
+  void addNewItemToShoppingList(
+      String itemName, bool itemGot, Importance importance) {
+    _shoppingList[_currentListIndex]
+        .list
+        .add(ShoppingListItem(itemName, itemGot, importance));
     notifyListeners();
   }
 
