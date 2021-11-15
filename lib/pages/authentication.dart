@@ -5,7 +5,7 @@ import 'package:shoqlist/main.dart';
 
 class Authentication extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
-    final firebaseVM = watch(firebaseProvider);
+    final firebaseAuthVM = watch(firebaseAuthProvider);
     final toolsVM = watch(toolsProvider);
     return Scaffold(
         backgroundColor: Colors.blueGrey,
@@ -22,7 +22,7 @@ class Authentication extends ConsumerWidget {
                     autofocus: false,
                     controller: toolsVM.emailController,
                     onChanged: (value) {
-                      firebaseVM.resetExceptionMessage();
+                      firebaseAuthVM.resetExceptionMessage();
                     },
                     style: TextStyle(
                         color: Colors.white,
@@ -57,7 +57,7 @@ class Authentication extends ConsumerWidget {
                       autocorrect: false,
                       obscureText: !toolsVM.showPassword,
                       onChanged: (value) {
-                        firebaseVM.resetExceptionMessage();
+                        firebaseAuthVM.resetExceptionMessage();
                       },
                       controller: toolsVM.passwordController,
                       style: TextStyle(
@@ -95,7 +95,7 @@ class Authentication extends ConsumerWidget {
               SizedBox(height: 5),
               GestureDetector(
                 onTap: () {
-                  firebaseVM.signIn(toolsVM.emailController.text,
+                  firebaseAuthVM.signIn(toolsVM.emailController.text,
                       toolsVM.passwordController.text);
                 },
                 child: Container(
@@ -119,7 +119,7 @@ class Authentication extends ConsumerWidget {
               SizedBox(height: 5),
               GestureDetector(
                 onTap: () {
-                  firebaseVM.register(toolsVM.emailController.text,
+                  firebaseAuthVM.register(toolsVM.emailController.text,
                       toolsVM.passwordController.text);
                 },
                 child: Container(

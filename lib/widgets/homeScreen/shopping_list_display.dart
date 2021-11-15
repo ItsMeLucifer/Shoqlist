@@ -82,11 +82,13 @@ class ShoppingListDisplay extends ConsumerWidget {
                         ? Icons.radio_button_checked
                         : Icons.radio_button_off),
                     SizedBox(width: 5),
-                    Text(shoppingList.list[index].itemName,
-                        style: TextStyle(
-                            decoration: shoppingList.list[index].gotItem
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none)),
+                    Expanded(
+                      child: Text(shoppingList.list[index].itemName,
+                          style: TextStyle(
+                              decoration: shoppingList.list[index].gotItem
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none)),
+                    ),
                   ],
                 ),
               ),

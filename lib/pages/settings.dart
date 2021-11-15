@@ -5,7 +5,7 @@ import 'package:shoqlist/main.dart';
 
 class Settings extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
-    final firebaseVM = watch(firebaseProvider);
+    final firebaseAuthVM = watch(firebaseAuthProvider);
     return Scaffold(
         body: Center(
       child: Column(
@@ -14,7 +14,7 @@ class Settings extends ConsumerWidget {
         children: [
           GestureDetector(
             onTap: () {
-              firebaseVM.signOut();
+              firebaseAuthVM.signOut();
               Navigator.pop(context);
             },
             child: Container(height: 50, width: 200, child: Text("Sign out")),
