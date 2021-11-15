@@ -55,14 +55,21 @@ class HomeScreenMainView extends ConsumerWidget {
                                     ),
                                     Row(
                                       children: [
-                                        Text(
-                                          shoppingListsVM.shoppingList[index]
-                                                  .list[0].itemName +
-                                              "${shoppingListsVM.shoppingList[index].list.length > 1 ? ', ...' : ''}",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 15),
-                                        ),
+                                        shoppingListsVM.shoppingList[index].list
+                                                    .length !=
+                                                0
+                                            ? Text(
+                                                shoppingListsVM
+                                                        .shoppingList[index]
+                                                        .list[0]
+                                                        .itemName +
+                                                    "${shoppingListsVM.shoppingList[index].list.length > 1 ? ', ...' : ''}",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 15),
+                                              )
+                                            : Container(),
                                         Text(
                                           " [" +
                                               shoppingListsVM

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
+import 'package:shoqlist/widgets/homeScreen/add_new_list.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,6 +54,13 @@ class _HomeScreen extends State<HomeScreen> {
                   },
                   child: Icon(Icons.card_membership),
                   label: 'Loyalty cards'),
+              SpeedDialChild(
+                  onTap: () {
+                    showDialog(
+                        context: context, builder: (context) => AddNewList());
+                  },
+                  child: Icon(Icons.add),
+                  label: 'Create new list'),
             ]),
         body: HomeScreenMainView());
   }

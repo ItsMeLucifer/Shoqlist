@@ -34,8 +34,6 @@ class FirebaseViewModel extends ChangeNotifier {
                   })
                 }
             });
-    print("Fetched shopping lists: " +
-        _shoppingListsFromFetchedFirebase.length.toString());
     addFetchedDataToLocalList();
   }
 
@@ -61,16 +59,16 @@ class FirebaseViewModel extends ChangeNotifier {
           _toolsVM.getImportanceValueFromLabel(
               _shoppingListsFromFetchedFirebase[i].get('importance'))));
     }
-    _shoppingListsVM.addNewShoppingList(temp[0]);
+    _shoppingListsVM.overrideShoppingList(temp);
   }
 
-  void saveNewShoppingList(String name, Importance importance) async {
+  void saveNewShoppingListToFirebase(String name, Importance importance) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     users.doc(_firebaseAuth.auth.currentUser.uid).collection('lists').add({
       'name': name,
       'importance': _toolsVM.getImportanceLabel(importance),
-      'listContent': ['Pierwszy Item'],
-      'listState': [false],
+      'listContent': [],
+      'listState': [],
     });
   }
 }

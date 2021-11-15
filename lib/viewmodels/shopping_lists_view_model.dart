@@ -19,14 +19,19 @@ class ShoppingListsViewModel extends ChangeNotifier {
   ];
   List<ShoppingList> get shoppingList => _shoppingList;
 
+  void overrideShoppingList(List<ShoppingList> list) {
+    _shoppingList = list;
+  }
+
   void toggleItemActivation(int listIndex, int itemIndex) {
     bool gotItem = _shoppingList[listIndex].list[itemIndex].gotItem;
     _shoppingList[listIndex].list[itemIndex].gotItem = !gotItem;
     notifyListeners();
   }
 
-  void addNewShoppingList(ShoppingList list) {
-    _shoppingList.add(list);
+  void saveNewShoppingListLocally(String name, Importance importance) {
+    _shoppingList.add(ShoppingList(name, [], importance));
+    //SAVE IT TO THE LOCAL DATABASE
   }
 
   void addNewItemToShoppingList(

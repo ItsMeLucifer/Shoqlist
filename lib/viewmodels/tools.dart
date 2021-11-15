@@ -29,6 +29,16 @@ class Tools extends ChangeNotifier {
     }
   }
 
+  //Add new List
+  Importance _newListImportance = Importance.normal;
+  Importance get newListImportance => _newListImportance;
+  set newListImportance(Importance value) {
+    _newListImportance = value;
+    notifyListeners();
+  }
+
+  TextEditingController newListNameController = TextEditingController();
+  Key newListNameFormFieldKey;
   //Add new Item
   Importance _newItemImportance = Importance.normal;
   Importance get newItemImportance => _newItemImportance;
