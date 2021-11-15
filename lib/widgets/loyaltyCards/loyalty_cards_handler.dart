@@ -46,36 +46,30 @@ class LoyaltyCardsHandler extends ConsumerWidget {
   }
 
   Widget loyaltyCardsList(ScopedReader watch) {
-    final shoppingListsVM = watch(shoppingListsProvider);
+    final loyaltyCardsVM = watch(loyaltyCardsProvider);
     final toolsVM = watch(toolsProvider);
     return GridView.builder(
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
         shrinkWrap: true,
-        itemCount: shoppingListsVM.loyaltyCardsList.length,
+        itemCount: loyaltyCardsVM.loyaltyCardsList.length,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              shoppingListsVM.toggleItemActivation(
-                  shoppingListsVM.currentListIndex, index);
+              loyaltyCardsVM.currentLoyaltyCardsListIndex = index;
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return LoyaltyCardInfo();
+                  });
             },
-            child: GestureDetector(
-              onTap: () {
-                shoppingListsVM.currentLoyaltyCardsListIndex = index;
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return LoyaltyCardInfo();
-                    });
-              },
-              child: Card(
-                color: Colors.grey,
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                        child: Text(
-                            shoppingListsVM.loyaltyCardsList[index].cardName))),
-              ),
+            child: Card(
+              color: Colors.grey,
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                      child: Text(
+                          loyaltyCardsVM.loyaltyCardsList[index].cardName))),
             ),
           );
         });

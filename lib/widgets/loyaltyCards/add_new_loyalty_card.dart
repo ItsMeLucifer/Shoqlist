@@ -6,7 +6,7 @@ import 'package:shoqlist/main.dart';
 
 class AddNewLoyaltyCard extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
-    final shoppingListsVM = watch(shoppingListsProvider);
+    final loyaltyCardsVM = watch(loyaltyCardsProvider);
     final toolsVM = watch(toolsProvider);
     TextEditingController nameController = TextEditingController();
     TextEditingController barCodeController = TextEditingController();
@@ -123,7 +123,7 @@ class AddNewLoyaltyCard extends ConsumerWidget {
                   onPressed: () {
                     if (nameController.text != "" &&
                         barCodeController.text != "")
-                      shoppingListsVM.addNewLoyaltyCard(
+                      loyaltyCardsVM.addNewLoyaltyCard(
                           nameController.text, barCodeController.text);
                     Navigator.of(context).pop();
                   },

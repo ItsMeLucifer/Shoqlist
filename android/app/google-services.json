@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "817248221268",
+    "project_id": "shoqlist",
+    "storage_bucket": "shoqlist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:817248221268:android:0945d35d3ab94c776615c1",
+        "android_client_info": {
+          "package_name": "com.example.shoqlist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "817248221268-7n0fk8ehlg56htoaku74uoioovc925ai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc2yunAdMay3BviNVdRuFDQTZb4uQLlBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "817248221268-7n0fk8ehlg56htoaku74uoioovc925ai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

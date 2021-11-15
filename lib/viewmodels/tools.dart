@@ -22,6 +22,13 @@ class Tools extends ChangeNotifier {
     return temp[0].toUpperCase() + temp.substring(1);
   }
 
+  Importance getImportanceValueFromLabel(String label) {
+    for (int i = 0; i < Importance.values.length; i++) {
+      if (getImportanceLabel(Importance.values[i]) == label)
+        return Importance.values[i];
+    }
+  }
+
   //Add new Item
   Importance _newItemImportance = Importance.normal;
   Importance get newItemImportance => _newItemImportance;
@@ -36,4 +43,21 @@ class Tools extends ChangeNotifier {
   //Add new Card
   Key addNewCardNameFormFieldKey;
   Key addNewCardBarCodeFormFieldKey;
+
+  //Authentication
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  bool _indicator = false;
+  bool get indicator => _indicator;
+  set indicator(bool value) {
+    _indicator = value;
+    notifyListeners();
+  }
+
+  bool _showPassword = false;
+  bool get showPassword => _showPassword;
+  set showPassword(bool value) {
+    _showPassword = value;
+    notifyListeners();
+  }
 }
