@@ -7,5 +7,6 @@ class ShoppingList {
   final String name;
   final List<ShoppingListItem> list;
   final Importance importance;
-  ShoppingList(this.name, this.list, this.importance);
+  final String documentId;
+  ShoppingList(this.name, this.list, this.importance, this.documentId);
 }

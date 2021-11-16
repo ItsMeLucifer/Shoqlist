@@ -14,11 +14,15 @@ class LoyaltyCardsHandler extends ConsumerWidget {
       floatingActionButton: SpeedDial(
         overlayOpacity: 0,
         animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor:
+            Theme.of(context).floatingActionButtonTheme.backgroundColor,
         children: [
           SpeedDialChild(
               onTap: () async {
                 showDialog(context: context, child: AddNewLoyaltyCard());
               },
+              backgroundColor:
+                  Theme.of(context).floatingActionButtonTheme.backgroundColor,
               child: Icon(Icons.add),
               label: "Add new card"),
         ],

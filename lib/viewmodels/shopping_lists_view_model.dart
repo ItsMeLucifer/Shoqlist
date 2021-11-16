@@ -3,20 +3,7 @@ import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
 
 class ShoppingListsViewModel extends ChangeNotifier {
-  List<ShoppingList> _shoppingList = [
-    ShoppingList(
-        "Komputerowy",
-        [
-          ShoppingListItem("Karta Graficzna", false, Importance.urgent),
-        ],
-        Importance.urgent),
-    ShoppingList(
-        "Krawiec",
-        [
-          ShoppingListItem("Naszywka", false, Importance.low),
-        ],
-        Importance.low)
-  ];
+  List<ShoppingList> _shoppingList = [];
   List<ShoppingList> get shoppingList => _shoppingList;
 
   void overrideShoppingList(List<ShoppingList> list) {
@@ -29,17 +16,22 @@ class ShoppingListsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void saveNewShoppingListLocally(String name, Importance importance) {
-    _shoppingList.add(ShoppingList(name, [], importance));
+  void saveNewShoppingListLocally(
+      String name, Importance importance, String documentId) {
+    _shoppingList.add(ShoppingList(name, [], importance, documentId));
     //SAVE IT TO THE LOCAL DATABASE
   }
 
-  void addNewItemToShoppingList(
-      String itemName, bool itemGot, Importance importance) {
+  void addNewItemToShoppingListLocally(
+      String itemName, bool itemGot, bool isFavorited) {
     _shoppingList[_currentListIndex]
         .list
-        .add(ShoppingListItem(itemName, itemGot, importance));
+        .add(ShoppingListItem(itemName, itemGot, isFavorited));
     notifyListeners();
+  }
+
+  void deleteListLocally(int index) {
+    _shoppingList.removeAt(index);
   }
 
   int _currentListIndex = 0;

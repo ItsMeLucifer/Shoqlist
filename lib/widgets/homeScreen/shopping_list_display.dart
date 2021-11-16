@@ -19,6 +19,8 @@ class ShoppingListDisplay extends ConsumerWidget {
       floatingActionButton: SpeedDial(
         overlayOpacity: 0,
         animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor:
+            Theme.of(context).floatingActionButtonTheme.backgroundColor,
         children: [
           SpeedDialChild(
               onTap: () {
@@ -28,9 +30,15 @@ class ShoppingListDisplay extends ConsumerWidget {
                       return AddNewItem();
                     });
               },
+              backgroundColor:
+                  Theme.of(context).floatingActionButtonTheme.backgroundColor,
               child: Icon(Icons.add),
               label: "Add item"),
-          SpeedDialChild(child: Icon(Icons.add), label: "Edit details")
+          SpeedDialChild(
+              child: Icon(Icons.add),
+              backgroundColor:
+                  Theme.of(context).floatingActionButtonTheme.backgroundColor,
+              label: "Edit details")
         ],
       ),
       body: SafeArea(
@@ -72,8 +80,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                   shoppingListsVM.currentListIndex, index);
             },
             child: Card(
-              color: toolsVM
-                  .getImportanceColor(shoppingList.list[index].importance),
+              color: Theme.of(context).primaryColor,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(

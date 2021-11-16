@@ -48,27 +48,68 @@ class FirebaseViewModel extends ChangeNotifier {
           ShoppingListItem(
               _shoppingListsFromFetchedFirebase[i].get('listContent')[j],
               _shoppingListsFromFetchedFirebase[i].get('listState')[j],
-              _toolsVM.getImportanceValueFromLabel(
-                  _shoppingListsFromFetchedFirebase[i]
-                      .get('listImportance')[j])),
+              _shoppingListsFromFetchedFirebase[i].get('listFavorite')[j]),
         );
       }
       temp.add(ShoppingList(
           _shoppingListsFromFetchedFirebase[i].get('name'),
           items,
           _toolsVM.getImportanceValueFromLabel(
-              _shoppingListsFromFetchedFirebase[i].get('importance'))));
+              _shoppingListsFromFetchedFirebase[i].get('importance')),
+          _shoppingListsFromFetchedFirebase[i].get('id')));
     }
     _shoppingListsVM.overrideShoppingList(temp);
   }
 
-  void saveNewShoppingListToFirebase(String name, Importance importance) async {
+  void saveNewShoppingListToFirebase(
+      String name, Importance importance, String documentId) async {
     if (_firebaseAuth.auth.currentUser == null) return;
-    users.doc(_firebaseAuth.auth.currentUser.uid).collection('lists').add({
+    users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .set({
       'name': name,
       'importance': _toolsVM.getImportanceLabel(importance),
       'listContent': [],
       'listState': [],
+      'listImportance': [],
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'id': documentId
+    });
+  }
+
+  void deleteShoppingListOnFirebase(String documentId) async {
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .delete()
+        .then((value) => print("List Deleted"))
+        .catchError((error) => print("Failed to delete list: $error"));
+  }
+
+  void addNewItemToShoppingListOnFirebase(
+      String itemName, String documentId) async {
+    DocumentSnapshot document = await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .get();
+    List<dynamic> listContent = document.get('listContent');
+    listContent.add(itemName);
+    List<dynamic> listState = document.get('listState');
+    listState.add(false);
+    List<dynamic> listImportance = document.get('listFavorite');
+    listImportance.add(false);
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .update({
+      'listContent': listContent,
+      'listState': listState,
+      'listFavorite': listImportance
     });
   }
 }

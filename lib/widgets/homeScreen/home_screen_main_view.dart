@@ -13,6 +13,7 @@ class HomeScreenMainView extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
+    final firebaseVM = watch(firebaseProvider);
     return SafeArea(
       child: Stack(
         children: [
@@ -38,6 +39,51 @@ class HomeScreenMainView extends ConsumerWidget {
                             shoppingListsVM.currentListIndex = index;
                             _navigateToShoppingList(context);
                           },
+                          onLongPress: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    content: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                          child: Text(
+                                              "Delete the '" +
+                                                  shoppingListsVM
+                                                      .shoppingList[index]
+                                                      .name +
+                                                  "' list?",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.center)),
+                                    ),
+                                    actions: [
+                                      FlatButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          //DELETE LIST ON FIREBASE
+                                          firebaseVM
+                                              .deleteShoppingListOnFirebase(
+                                                  shoppingListsVM
+                                                      .shoppingList[index]
+                                                      .documentId);
+                                          //DELETE LIST LOCALLY
+                                          shoppingListsVM
+                                              .deleteListLocally(index);
+                                        },
+                                        child: Text('Yes'),
+                                      ),
+                                      FlatButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('No'),
+                                      )
+                                    ],
+                                  );
+                                });
+                          },
                           child: Card(
                               color: toolsVM.getImportanceColor(shoppingListsVM
                                   .shoppingList[index].importance),
@@ -58,20 +104,27 @@ class HomeScreenMainView extends ConsumerWidget {
                                         shoppingListsVM.shoppingList[index].list
                                                     .length !=
                                                 0
-                                            ? Text(
-                                                shoppingListsVM
-                                                        .shoppingList[index]
-                                                        .list[0]
-                                                        .itemName +
-                                                    "${shoppingListsVM.shoppingList[index].list.length > 1 ? ', ...' : ''}",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontSize: 15),
+                                            ? Container(
+                                                width: 100,
+                                                child: Text(
+                                                  shoppingListsVM
+                                                          .shoppingList[index]
+                                                          .list[0]
+                                                          .itemName +
+                                                      "${shoppingListsVM.shoppingList[index].list.length > 1 ? ', ...' : ''}",
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontSize: 15),
+                                                  textAlign: TextAlign.end,
+                                                ),
                                               )
                                             : Container(),
                                         Text(
-                                          " [" +
+                                          "   [" +
                                               shoppingListsVM
                                                   .shoppingList[index]
                                                   .list

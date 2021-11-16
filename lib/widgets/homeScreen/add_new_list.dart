@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/models/shopping_list.dart';
-
+import 'package:nanoid/nanoid.dart';
 import '../../main.dart';
 
 class AddNewList extends ConsumerWidget {
@@ -117,14 +117,17 @@ class AddNewList extends ConsumerWidget {
                   color: Color.fromRGBO(0, 0, 0, 0.2),
                   onPressed: () {
                     if (toolsVM.newListNameController.text != "") {
+                      String id = nanoid();
                       //CREATE LIST ON SERVER
                       firebaseVM.saveNewShoppingListToFirebase(
                           toolsVM.newListNameController.text,
-                          toolsVM.newListImportance);
+                          toolsVM.newListImportance,
+                          id);
                       //CREATE LIST LOCALLY
                       shoppingListsVM.saveNewShoppingListLocally(
                           toolsVM.newListNameController.text,
-                          toolsVM.newListImportance);
+                          toolsVM.newListImportance,
+                          id);
                     }
                     Navigator.of(context).pop();
                   },

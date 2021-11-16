@@ -35,23 +35,34 @@ class _HomeScreen extends State<HomeScreen> {
         floatingActionButton: SpeedDial(
             overlayOpacity: 0,
             animatedIcon: AnimatedIcons.menu_close,
+            backgroundColor:
+                Theme.of(context).floatingActionButtonTheme.backgroundColor,
             children: [
               SpeedDialChild(
                   onTap: () {
                     _navigateToSettings(context);
                   },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   child: Icon(Icons.settings),
                   label: 'Settings'),
               SpeedDialChild(
                   onTap: () {
                     //SCAN
                   },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   child: Icon(Icons.qr_code_scanner_rounded),
                   label: 'Scan your list'),
               SpeedDialChild(
                   onTap: () {
                     _navigateToLoyaltyCardsHandler(context);
                   },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   child: Icon(Icons.card_membership),
                   label: 'Loyalty cards'),
               SpeedDialChild(
@@ -59,6 +70,9 @@ class _HomeScreen extends State<HomeScreen> {
                     showDialog(
                         context: context, builder: (context) => AddNewList());
                   },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   child: Icon(Icons.add),
                   label: 'Create new list'),
             ]),

@@ -8,6 +8,7 @@ class AddNewItem extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
+    final firebaseVM = watch(firebaseProvider);
     return AlertDialog(
       content: Container(
           height: 300,
@@ -73,52 +74,24 @@ class AddNewItem extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text("Importance:"),
-                        DropdownButton<Importance>(
-                          value: toolsVM.newItemImportance,
-                          icon: Icon(Icons.keyboard_arrow_down,
-                              color: Colors.black),
-                          iconSize: 24,
-                          elevation: 16,
-                          underline: Container(
-                            height: 2,
-                            color: Colors.white,
-                          ),
-                          onChanged: (Importance imp) {
-                            toolsVM.newItemImportance = imp;
-                          },
-                          items: <Importance>[
-                            Importance.low,
-                            Importance.normal,
-                            Importance.important,
-                            Importance.urgent
-                          ].map<DropdownMenuItem<Importance>>(
-                              (Importance value) {
-                            return DropdownMenuItem<Importance>(
-                              value: value,
-                              child: Text(
-                                toolsVM.getImportanceLabel(value),
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
               FlatButton(
                   color: Color.fromRGBO(0, 0, 0, 0.2),
                   onPressed: () {
-                    if (toolsVM.nameController.text != "")
-                      shoppingListsVM.addNewItemToShoppingList(
+                    if (toolsVM.nameController.text != "") {
+                      //ADD ITEM TO FIREBASE
+                      firebaseVM.addNewItemToShoppingListOnFirebase(
                           toolsVM.nameController.text,
-                          false,
-                          toolsVM.newItemImportance);
+                          shoppingListsVM
+                              .shoppingList[shoppingListsVM.currentListIndex]
+                              .documentId);
+                      //ADD ITEM LOCALLY
+                      shoppingListsVM.addNewItemToShoppingListLocally(
+                          toolsVM.nameController.text, false, false);
+                    }
+
                     Navigator.of(context).pop();
                   },
                   child: Text(
