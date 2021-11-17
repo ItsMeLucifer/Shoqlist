@@ -70,7 +70,7 @@ class HomeScreenMainView extends ConsumerWidget {
                                                       .documentId);
                                           //DELETE LIST LOCALLY
                                           shoppingListsVM
-                                              .deleteListLocally(index);
+                                              .deleteShoppingListLocally(index);
                                         },
                                         child: Text('Yes'),
                                       ),

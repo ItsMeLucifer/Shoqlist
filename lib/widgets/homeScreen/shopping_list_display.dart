@@ -108,6 +108,8 @@ class ShoppingListDisplay extends ConsumerWidget {
                                           shoppingListsVM.currentListIndex]
                                       .documentId);
                               //DELETE ITEM LOCALLY
+                              shoppingListsVM
+                                  .deleteItemFromShoppingListLocally(index);
                             },
                             child: Text('Yes'),
                           ),

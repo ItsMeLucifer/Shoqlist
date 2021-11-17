@@ -20,6 +20,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
       String name, Importance importance, String documentId) {
     _shoppingList.add(ShoppingList(name, [], importance, documentId));
     //SAVE IT TO THE LOCAL DATABASE
+    notifyListeners();
   }
 
   void addNewItemToShoppingListLocally(
@@ -30,8 +31,14 @@ class ShoppingListsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteListLocally(int index) {
+  void deleteItemFromShoppingListLocally(int itemIndex) {
+    _shoppingList[_currentListIndex].list.removeAt(itemIndex);
+    notifyListeners();
+  }
+
+  void deleteShoppingListLocally(int index) {
     _shoppingList.removeAt(index);
+    notifyListeners();
   }
 
   int _currentListIndex = 0;
