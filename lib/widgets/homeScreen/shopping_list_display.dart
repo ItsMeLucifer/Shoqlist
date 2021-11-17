@@ -10,6 +10,7 @@ class ShoppingListDisplay extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
+
     return Scaffold(
       backgroundColor: Color.lerp(
           toolsVM.getImportanceColor(shoppingListsVM
@@ -68,6 +69,7 @@ class ShoppingListDisplay extends ConsumerWidget {
   Widget shoppingList(ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
+    final firebaseVM = watch(firebaseProvider);
     ShoppingList shoppingList =
         shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex];
     return ListView.builder(
@@ -79,24 +81,66 @@ class ShoppingListDisplay extends ConsumerWidget {
               shoppingListsVM.toggleItemActivation(
                   shoppingListsVM.currentListIndex, index);
             },
-            child: Card(
-              color: Theme.of(context).primaryColor,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(shoppingList.list[index].gotItem
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off),
-                    SizedBox(width: 5),
-                    Expanded(
-                      child: Text(shoppingList.list[index].itemName,
-                          style: TextStyle(
-                              decoration: shoppingList.list[index].gotItem
-                                  ? TextDecoration.lineThrough
-                                  : TextDecoration.none)),
-                    ),
-                  ],
+            child: GestureDetector(
+              onLongPress: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                              child: Text("Delete the this item?",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center)),
+                        ),
+                        actions: [
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              //DELETE ITEM ON FIREBASE
+                              firebaseVM.deleteShoppingListItemOnFirebase(
+                                  shoppingListsVM.currentListIndex,
+                                  shoppingListsVM
+                                      .shoppingList[
+                                          shoppingListsVM.currentListIndex]
+                                      .documentId);
+                              //DELETE ITEM LOCALLY
+                            },
+                            child: Text('Yes'),
+                          ),
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('No'),
+                          )
+                        ],
+                      );
+                    });
+              },
+              child: Card(
+                color: Theme.of(context).primaryColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Icon(shoppingList.list[index].gotItem
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Text(shoppingList.list[index].itemName,
+                            style: TextStyle(
+                                decoration: shoppingList.list[index].gotItem
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none)),
+                      ),
+                      Icon(Icons.star_border_outlined)
+                    ],
+                  ),
                 ),
               ),
             ),
