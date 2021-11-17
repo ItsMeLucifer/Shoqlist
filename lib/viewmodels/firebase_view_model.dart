@@ -96,15 +96,20 @@ class FirebaseViewModel extends ChangeNotifier {
         .catchError((error) => print("Failed to delete list: $error"));
   }
 
+  Future<DocumentSnapshot> getDocumentSnapshotFromFirebaseWithId(
+      String documentId) async {
+    return await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .get();
+  }
+
   void addNewItemToShoppingListOnFirebase(
       String itemName, String documentId) async {
     DocumentSnapshot document;
     try {
-      document = await users
-          .doc(_firebaseAuth.auth.currentUser.uid)
-          .collection('lists')
-          .doc(documentId)
-          .get();
+      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -135,11 +140,7 @@ class FirebaseViewModel extends ChangeNotifier {
       int itemIndex, String documentId) async {
     DocumentSnapshot document;
     try {
-      document = await users
-          .doc(_firebaseAuth.auth.currentUser.uid)
-          .collection('lists')
-          .doc(documentId)
-          .get();
+      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -164,5 +165,49 @@ class FirebaseViewModel extends ChangeNotifier {
         })
         .then((value) => print("List item deleted"))
         .catchError((error) => print("Failed to delete item: $error"));
+  }
+
+  void toggleStateOfShoppingListItemOnFirebase(
+      String documentId, int itemIndex) async {
+    DocumentSnapshot document;
+    try {
+      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+    } catch (e) {
+      return print(
+          "Could not get document from Firebase, error: " + e.code.toString());
+    }
+    List<dynamic> listState = document.get('listState');
+    listState[itemIndex] = !listState[itemIndex];
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .update({
+          'listState': listState,
+        })
+        .then((value) => print("Changed state of item"))
+        .catchError((error) => print("Failed to toggle item's state: $error"));
+  }
+
+  void toggleFavoriteOfShoppingListItemOnFirebase(
+      String documentId, int itemIndex) async {
+    DocumentSnapshot document;
+    try {
+      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+    } catch (e) {
+      return print(
+          "Could not get document from Firebase, error: " + e.code.toString());
+    }
+    List<dynamic> listFavorite = document.get('listFavorite');
+    listFavorite[itemIndex] = !listFavorite[itemIndex];
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .update({
+          'listFavorite': listFavorite,
+        })
+        .then((value) => print("Changed state of item"))
+        .catchError((error) => print("Failed to toggle item's state: $error"));
   }
 }

@@ -78,71 +78,97 @@ class ShoppingListDisplay extends ConsumerWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              shoppingListsVM.toggleItemActivation(
+              //TOGGLE ITEM STATE ON FIREBASE
+              firebaseVM.toggleStateOfShoppingListItemOnFirebase(
+                  shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex]
+                      .documentId,
+                  index);
+              //TOGGLE ITEM STATE LOCALLY
+              shoppingListsVM.toggleItemStateLocally(
                   shoppingListsVM.currentListIndex, index);
             },
-            child: GestureDetector(
-              onLongPress: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                              child: Text("Delete the this item?",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center)),
-                        ),
-                        actions: [
-                          FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              //DELETE ITEM ON FIREBASE
-                              firebaseVM.deleteShoppingListItemOnFirebase(
-                                  shoppingListsVM.currentListIndex,
-                                  shoppingListsVM
-                                      .shoppingList[
-                                          shoppingListsVM.currentListIndex]
-                                      .documentId);
-                              //DELETE ITEM LOCALLY
-                              shoppingListsVM
-                                  .deleteItemFromShoppingListLocally(index);
-                            },
-                            child: Text('Yes'),
-                          ),
-                          FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('No'),
-                          )
-                        ],
-                      );
-                    });
-              },
-              child: Card(
-                color: Theme.of(context).primaryColor,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Icon(shoppingList.list[index].gotItem
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(shoppingList.list[index].itemName,
-                            style: TextStyle(
-                                decoration: shoppingList.list[index].gotItem
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none)),
+            onLongPress: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                            child: Text("Delete the this item?",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center)),
                       ),
-                      Icon(Icons.star_border_outlined)
-                    ],
-                  ),
+                      actions: [
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            //DELETE ITEM ON FIREBASE
+                            firebaseVM.deleteShoppingListItemOnFirebase(
+                                shoppingListsVM.currentListIndex,
+                                shoppingListsVM
+                                    .shoppingList[
+                                        shoppingListsVM.currentListIndex]
+                                    .documentId);
+                            //DELETE ITEM LOCALLY
+                            shoppingListsVM
+                                .deleteItemFromShoppingListLocally(index);
+                          },
+                          child: Text('Yes'),
+                        ),
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('No'),
+                        )
+                      ],
+                    );
+                  });
+            },
+            child: Card(
+              color: Theme.of(context).primaryColor,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(shoppingList.list[index].gotItem
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off),
+                    SizedBox(width: 5),
+                    Expanded(
+                      child: Text(shoppingList.list[index].itemName,
+                          style: TextStyle(
+                              decoration: shoppingList.list[index].gotItem
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none)),
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                          //TOGGLE ITEM FAVORITE ON FIREBASE
+                          firebaseVM.toggleFavoriteOfShoppingListItemOnFirebase(
+                              shoppingListsVM
+                                  .shoppingList[
+                                      shoppingListsVM.currentListIndex]
+                                  .documentId,
+                              index);
+                          //TOGGLE ITEM FAVORITE LOCALLY
+                          shoppingListsVM.toggleItemFavoriteLocally(
+                              shoppingListsVM.currentListIndex, index);
+                        },
+                        child: Stack(
+                          children: [
+                            Icon(
+                                shoppingList.list[index].isFavorite
+                                    ? null
+                                    : Icons.star,
+                                color: Colors.yellow),
+                            Icon(Icons.star_border_outlined,
+                                color: Colors.black),
+                          ],
+                        )),
+                  ],
                 ),
               ),
             ),

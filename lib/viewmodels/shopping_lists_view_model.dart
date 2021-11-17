@@ -10,9 +10,15 @@ class ShoppingListsViewModel extends ChangeNotifier {
     _shoppingList = list;
   }
 
-  void toggleItemActivation(int listIndex, int itemIndex) {
+  void toggleItemStateLocally(int listIndex, int itemIndex) {
     bool gotItem = _shoppingList[listIndex].list[itemIndex].gotItem;
     _shoppingList[listIndex].list[itemIndex].gotItem = !gotItem;
+    notifyListeners();
+  }
+
+  void toggleItemFavoriteLocally(int listIndex, int itemIndex) {
+    bool isFavorite = _shoppingList[listIndex].list[itemIndex].isFavorite;
+    _shoppingList[listIndex].list[itemIndex].isFavorite = !isFavorite;
     notifyListeners();
   }
 
