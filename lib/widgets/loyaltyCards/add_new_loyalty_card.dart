@@ -123,9 +123,9 @@ class AddNewLoyaltyCard extends ConsumerWidget {
                   onPressed: () {
                     if (nameController.text != "" &&
                         barCodeController.text != "")
-                      loyaltyCardsVM.addNewLoyaltyCard(
-                          nameController.text, barCodeController.text);
-                    Navigator.of(context).pop();
+                      // loyaltyCardsVM.addNewLoyaltyCardLocally(
+                      //     nameController.text, barCodeController.text);
+                      Navigator.of(context).pop();
                   },
                   child: Text(
                     'Add',

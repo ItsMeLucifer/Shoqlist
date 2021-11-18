@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
 import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
@@ -18,11 +19,12 @@ class FirebaseViewModel extends ChangeNotifier {
   //SYNCHRONIZATION
   CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-  List<QueryDocumentSnapshot> _shoppingListsFromFetchedFirebase =
+  // -- SHOPPING LISTS
+  List<QueryDocumentSnapshot> _shoppingListsFetchedFromFirebase =
       List<QueryDocumentSnapshot>();
   void getShoppingListsFromFirebase(bool shouldUpdateLocalData) async {
     if (_firebaseAuth.auth.currentUser == null) return;
-    _shoppingListsFromFetchedFirebase.clear();
+    _shoppingListsFetchedFromFirebase.clear();
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('lists')
@@ -31,38 +33,37 @@ class FirebaseViewModel extends ChangeNotifier {
               if (querySnapshot.size > 0)
                 {
                   querySnapshot.docs.forEach((doc) {
-                    _shoppingListsFromFetchedFirebase.add(doc);
+                    _shoppingListsFetchedFromFirebase.add(doc);
                   })
                 }
             })
-        .catchError(
-            (error) => print("Failed to fetch data from Firebase: $error"));
-    notifyListeners();
-    if (shouldUpdateLocalData) addFetchedDataToLocalList();
+        .catchError((error) =>
+            print("Failed to fetch shopping lists data from Firebase: $error"));
+    if (shouldUpdateLocalData) addFetchedShoppingListsDataToLocalList();
   }
 
-  void addFetchedDataToLocalList() {
+  void addFetchedShoppingListsDataToLocalList() {
     List<ShoppingList> temp = [];
-    for (int i = 0; i < _shoppingListsFromFetchedFirebase.length; i++) {
+    for (int i = 0; i < _shoppingListsFetchedFromFirebase.length; i++) {
       List<ShoppingListItem> items = [];
       for (int j = 0;
-          j < _shoppingListsFromFetchedFirebase[i].get('listContent').length;
+          j < _shoppingListsFetchedFromFirebase[i].get('listContent').length;
           j++) {
         items.add(
           ShoppingListItem(
-              _shoppingListsFromFetchedFirebase[i].get('listContent')[j],
-              _shoppingListsFromFetchedFirebase[i].get('listState')[j],
-              _shoppingListsFromFetchedFirebase[i].get('listFavorite')[j]),
+              _shoppingListsFetchedFromFirebase[i].get('listContent')[j],
+              _shoppingListsFetchedFromFirebase[i].get('listState')[j],
+              _shoppingListsFetchedFromFirebase[i].get('listFavorite')[j]),
         );
       }
       temp.add(ShoppingList(
-          _shoppingListsFromFetchedFirebase[i].get('name'),
+          _shoppingListsFetchedFromFirebase[i].get('name'),
           items,
           _toolsVM.getImportanceValueFromLabel(
-              _shoppingListsFromFetchedFirebase[i].get('importance')),
-          _shoppingListsFromFetchedFirebase[i].get('id')));
+              _shoppingListsFetchedFromFirebase[i].get('importance')),
+          _shoppingListsFetchedFromFirebase[i].get('id')));
     }
-    _shoppingListsVM.overrideShoppingList(temp);
+    _shoppingListsVM.overrideShoppingListLocally(temp);
   }
 
   void saveNewShoppingListToFirebase(
@@ -209,5 +210,41 @@ class FirebaseViewModel extends ChangeNotifier {
         })
         .then((value) => print("Changed state of item"))
         .catchError((error) => print("Failed to toggle item's state: $error"));
+  }
+
+  // -- LOYALTY CARDS
+  List<QueryDocumentSnapshot> _loyaltyCardsFetchedFromFirebase =
+      List<QueryDocumentSnapshot>();
+  void getLoyaltyCardsFromFirebase(bool shouldUpdateLocalData) async {
+    if (_firebaseAuth.auth.currentUser == null) return;
+    _loyaltyCardsFetchedFromFirebase.clear();
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('loyaltyCards')
+        .get()
+        .then((QuerySnapshot querySnapshot) => {
+              if (querySnapshot.size > 0)
+                {
+                  querySnapshot.docs.forEach((doc) {
+                    _loyaltyCardsFetchedFromFirebase.add(doc);
+                  })
+                }
+            })
+        .catchError((error) =>
+            print("Failed to fetch cards data from Firebase: $error"));
+    if (shouldUpdateLocalData) addFetchedLoyaltyCardsDataToLocalList();
+  }
+
+  void addFetchedLoyaltyCardsDataToLocalList() {
+    List<LoyaltyCard> temp = [];
+    for (int i = 0; i < _loyaltyCardsFetchedFromFirebase.length; i++) {
+      temp.add(LoyaltyCard(
+        _loyaltyCardsFetchedFromFirebase[i].get('name'),
+        _loyaltyCardsFetchedFromFirebase[i].get('barCode'),
+        _loyaltyCardsFetchedFromFirebase[i].get('isFavorite'),
+        _loyaltyCardsFetchedFromFirebase[i].get('documentId'),
+      ));
+    }
+    _loyaltyCardsVM.overrideLoyaltyCardsListLocally(temp);
   }
 }

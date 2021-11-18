@@ -18,6 +18,7 @@ class _HomeScreen extends State<HomeScreen> {
   initState() {
     super.initState();
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
+    context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
   }
 
   void _navigateToLoyaltyCardsHandler(BuildContext context) {

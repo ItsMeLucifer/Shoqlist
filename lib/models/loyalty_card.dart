@@ -1,6 +1,7 @@
 class LoyaltyCard {
   String cardName;
   String barCode;
-
-  LoyaltyCard(this.cardName, this.barCode);
+  bool isFavorite;
+  String documentId;
+  LoyaltyCard(this.cardName, this.barCode, this.isFavorite, this.documentId);
 }

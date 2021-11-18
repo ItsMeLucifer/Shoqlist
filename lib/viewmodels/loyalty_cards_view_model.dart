@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 
 class LoyaltyCardsViewModel extends ChangeNotifier {
-  List<LoyaltyCard> _loyaltyCardsList = [
-    LoyaltyCard("Payback", "0480404624192"),
-    LoyaltyCard("Orsay", "000000005040008629"),
-    LoyaltyCard("Biedronka", "000000005040008629")
-  ];
+  List<LoyaltyCard> _loyaltyCardsList = [];
   List<LoyaltyCard> get loyaltyCardsList => _loyaltyCardsList;
   int _currentLoyaltyCardsListIndex = 0;
   int get currentLoyaltyCardsListIndex => _currentLoyaltyCardsListIndex;
@@ -15,8 +11,14 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addNewLoyaltyCard(String cardName, String barCode) {
-    _loyaltyCardsList.add(LoyaltyCard(cardName, barCode));
+  void addNewLoyaltyCardLocally(
+      String cardName, String barCode, String documentId) {
+    _loyaltyCardsList.add(LoyaltyCard(cardName, barCode, false, documentId));
+    notifyListeners();
+  }
+
+  void overrideLoyaltyCardsListLocally(List<LoyaltyCard> newLoyaltyCardsList) {
+    _loyaltyCardsList = newLoyaltyCardsList;
     notifyListeners();
   }
 }

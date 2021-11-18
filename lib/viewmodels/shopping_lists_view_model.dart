@@ -6,7 +6,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
   List<ShoppingList> _shoppingList = [];
   List<ShoppingList> get shoppingList => _shoppingList;
 
-  void overrideShoppingList(List<ShoppingList> list) {
+  void overrideShoppingListLocally(List<ShoppingList> list) {
     _shoppingList = list;
   }
 
