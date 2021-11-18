@@ -15,7 +15,7 @@ class LoyaltyCardInfo extends ConsumerWidget {
           Text(
             loyaltyCardsVM
                 .loyaltyCardsList[loyaltyCardsVM.currentLoyaltyCardsListIndex]
-                .cardName,
+                .name,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),

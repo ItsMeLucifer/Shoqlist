@@ -47,12 +47,24 @@ class Tools extends ChangeNotifier {
     notifyListeners();
   }
 
-  TextEditingController nameController = TextEditingController();
+  TextEditingController newItemNameController = TextEditingController();
   Key addNewItemNameFormFieldKey;
+  void clearNewItemTextEditingController() {
+    newItemNameController.clear();
+    notifyListeners();
+  }
 
   //Add new Card
   Key addNewCardNameFormFieldKey;
   Key addNewCardBarCodeFormFieldKey;
+
+  TextEditingController loyaltyCardNameController = TextEditingController();
+  TextEditingController loyaltyCardBarCodeController = TextEditingController();
+  void clearLoyaltyCardTextEditingControllers() {
+    loyaltyCardNameController.clear();
+    loyaltyCardBarCodeController.clear();
+    notifyListeners();
+  }
 
   //Authentication
   TextEditingController emailController = TextEditingController();

@@ -19,6 +19,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
         children: [
           SpeedDialChild(
               onTap: () async {
+                toolsVM.clearLoyaltyCardTextEditingControllers();
                 showDialog(context: context, child: AddNewLoyaltyCard());
               },
               backgroundColor:
@@ -52,6 +53,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
   Widget loyaltyCardsList(ScopedReader watch) {
     final loyaltyCardsVM = watch(loyaltyCardsProvider);
     final toolsVM = watch(toolsProvider);
+    final firebaseVM = watch(firebaseProvider);
     return GridView.builder(
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
@@ -67,13 +69,53 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                     return LoyaltyCardInfo();
                   });
             },
+            onLongPress: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                            child: Text(
+                                "Delete the '" +
+                                    loyaltyCardsVM
+                                        .loyaltyCardsList[index].name +
+                                    "' card?",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center)),
+                      ),
+                      actions: [
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            //DELETE LIST ON FIREBASE
+                            firebaseVM.deleteLoyaltyCardOnFirebase(
+                                loyaltyCardsVM
+                                    .loyaltyCardsList[index].documentId);
+                            //DELETE LIST LOCALLY
+                            loyaltyCardsVM.deleteLoyaltyCardLocally(index);
+                          },
+                          child: Text('Yes'),
+                        ),
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('No'),
+                        )
+                      ],
+                    );
+                  });
+            },
             child: Card(
               color: Colors.grey,
               child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
-                      child: Text(
-                          loyaltyCardsVM.loyaltyCardsList[index].cardName))),
+                      child:
+                          Text(loyaltyCardsVM.loyaltyCardsList[index].name))),
             ),
           );
         });

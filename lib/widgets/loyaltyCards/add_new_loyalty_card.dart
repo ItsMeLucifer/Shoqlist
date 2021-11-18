@@ -2,14 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 
 class AddNewLoyaltyCard extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final loyaltyCardsVM = watch(loyaltyCardsProvider);
     final toolsVM = watch(toolsProvider);
-    TextEditingController nameController = TextEditingController();
-    TextEditingController barCodeController = TextEditingController();
+    final firebaseVM = watch(firebaseProvider);
+
     return AlertDialog(
       content: Container(
           height: 300,
@@ -32,7 +33,7 @@ class AddNewLoyaltyCard extends ConsumerWidget {
                       autofocus: false,
                       autocorrect: false,
                       obscureText: false,
-                      controller: nameController,
+                      controller: toolsVM.loyaltyCardNameController,
                       style: TextStyle(fontWeight: FontWeight.bold),
                       decoration: InputDecoration(
                         hintText: "Card name",
@@ -71,13 +72,13 @@ class AddNewLoyaltyCard extends ConsumerWidget {
                       autofocus: false,
                       autocorrect: false,
                       obscureText: false,
-                      controller: barCodeController,
+                      controller: toolsVM.loyaltyCardBarCodeController,
                       style: TextStyle(fontWeight: FontWeight.bold),
                       decoration: InputDecoration(
                         hintText: "Card code",
                         suffixIcon: GestureDetector(
                           onTap: () async {
-                            barCodeController.text =
+                            toolsVM.loyaltyCardBarCodeController.text =
                                 await FlutterBarcodeScanner.scanBarcode(
                                     "#ff6666",
                                     "Cancel",
@@ -121,11 +122,21 @@ class AddNewLoyaltyCard extends ConsumerWidget {
               FlatButton(
                   color: Color.fromRGBO(0, 0, 0, 0.2),
                   onPressed: () {
-                    if (nameController.text != "" &&
-                        barCodeController.text != "")
-                      // loyaltyCardsVM.addNewLoyaltyCardLocally(
-                      //     nameController.text, barCodeController.text);
-                      Navigator.of(context).pop();
+                    if (toolsVM.loyaltyCardNameController.text != "" &&
+                        toolsVM.loyaltyCardBarCodeController.text != "") {
+                      String id = nanoid();
+                      //ADD LOYALTY CARD TO FIREBASE
+                      firebaseVM.addNewLoyaltyCardToFirebase(
+                          toolsVM.loyaltyCardNameController.text,
+                          toolsVM.loyaltyCardBarCodeController.text,
+                          id);
+                      //ADD LOYALTY CARD LOCALLY
+                      loyaltyCardsVM.addNewLoyaltyCardLocally(
+                          toolsVM.loyaltyCardNameController.text,
+                          toolsVM.loyaltyCardBarCodeController.text,
+                          id);
+                    }
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Add',

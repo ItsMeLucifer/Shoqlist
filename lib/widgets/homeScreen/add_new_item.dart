@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
-import 'package:shoqlist/models/shopping_list.dart';
 
 class AddNewItem extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
@@ -37,7 +36,7 @@ class AddNewItem extends ConsumerWidget {
                             autofocus: false,
                             autocorrect: false,
                             obscureText: false,
-                            controller: toolsVM.nameController,
+                            controller: toolsVM.newItemNameController,
                             style: TextStyle(fontWeight: FontWeight.bold),
                             decoration: InputDecoration(
                               hintText: "Item name",
@@ -80,16 +79,16 @@ class AddNewItem extends ConsumerWidget {
               FlatButton(
                   color: Color.fromRGBO(0, 0, 0, 0.2),
                   onPressed: () {
-                    if (toolsVM.nameController.text != "") {
+                    if (toolsVM.newItemNameController.text != "") {
                       //ADD ITEM TO FIREBASE
                       firebaseVM.addNewItemToShoppingListOnFirebase(
-                          toolsVM.nameController.text,
+                          toolsVM.newItemNameController.text,
                           shoppingListsVM
                               .shoppingList[shoppingListsVM.currentListIndex]
                               .documentId);
                       //ADD ITEM LOCALLY
                       shoppingListsVM.addNewItemToShoppingListLocally(
-                          toolsVM.nameController.text, false, false);
+                          toolsVM.newItemNameController.text, false, false);
                     }
 
                     Navigator.of(context).pop();

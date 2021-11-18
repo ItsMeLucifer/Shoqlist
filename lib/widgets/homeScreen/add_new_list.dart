@@ -119,7 +119,7 @@ class AddNewList extends ConsumerWidget {
                     if (toolsVM.newListNameController.text != "") {
                       String id = nanoid();
                       //CREATE LIST ON SERVER
-                      firebaseVM.saveNewShoppingListToFirebase(
+                      firebaseVM.addNewShoppingListToFirebase(
                           toolsVM.newListNameController.text,
                           toolsVM.newListImportance,
                           id);

@@ -66,7 +66,7 @@ class FirebaseViewModel extends ChangeNotifier {
     _shoppingListsVM.overrideShoppingListLocally(temp);
   }
 
-  void saveNewShoppingListToFirebase(
+  void addNewShoppingListToFirebase(
       String name, Importance importance, String documentId) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     users
@@ -242,9 +242,36 @@ class FirebaseViewModel extends ChangeNotifier {
         _loyaltyCardsFetchedFromFirebase[i].get('name'),
         _loyaltyCardsFetchedFromFirebase[i].get('barCode'),
         _loyaltyCardsFetchedFromFirebase[i].get('isFavorite'),
-        _loyaltyCardsFetchedFromFirebase[i].get('documentId'),
+        _loyaltyCardsFetchedFromFirebase[i].get('id'),
       ));
     }
     _loyaltyCardsVM.overrideLoyaltyCardsListLocally(temp);
+  }
+
+  void addNewLoyaltyCardToFirebase(
+      String name, String barCode, String documentId) async {
+    if (_firebaseAuth.auth.currentUser == null) return;
+    users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('loyaltyCards')
+        .doc(documentId)
+        .set({
+          'name': name,
+          'barCode': barCode,
+          'isFavorite': false,
+          'id': documentId
+        })
+        .then((value) => print("Created new Loyalty card"))
+        .catchError((error) => print("Failed to create Loyalty card: $error"));
+  }
+
+  void deleteLoyaltyCardOnFirebase(String documentId) async {
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('loyaltyCards')
+        .doc(documentId)
+        .delete()
+        .then((value) => print("Loyalty card Deleted"))
+        .catchError((error) => print("Failed to delete loyalty card: $error"));
   }
 }

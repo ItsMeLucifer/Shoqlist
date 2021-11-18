@@ -25,6 +25,7 @@ class ShoppingListDisplay extends ConsumerWidget {
         children: [
           SpeedDialChild(
               onTap: () {
+                toolsVM.clearNewItemTextEditingController();
                 showDialog(
                     context: context,
                     builder: (context) {

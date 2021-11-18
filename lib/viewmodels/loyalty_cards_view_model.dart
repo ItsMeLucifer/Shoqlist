@@ -21,4 +21,9 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
     _loyaltyCardsList = newLoyaltyCardsList;
     notifyListeners();
   }
+
+  void deleteLoyaltyCardLocally(int index) {
+    _loyaltyCardsList.removeAt(index);
+    notifyListeners();
+  }
 }
