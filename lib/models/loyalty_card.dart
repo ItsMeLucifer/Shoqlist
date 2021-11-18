@@ -4,4 +4,7 @@ class LoyaltyCard {
   bool isFavorite;
   String documentId;
   LoyaltyCard(this.name, this.barCode, this.isFavorite, this.documentId);
+  void toggleIsFavorite() {
+    isFavorite = !isFavorite;
+  }
 }

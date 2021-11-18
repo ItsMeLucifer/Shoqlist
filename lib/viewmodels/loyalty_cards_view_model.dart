@@ -26,4 +26,9 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
     _loyaltyCardsList.removeAt(index);
     notifyListeners();
   }
+
+  void toggleLoyaltyCardFavoriteLocally() {
+    _loyaltyCardsList[_currentLoyaltyCardsListIndex].toggleIsFavorite();
+    notifyListeners();
+  }
 }

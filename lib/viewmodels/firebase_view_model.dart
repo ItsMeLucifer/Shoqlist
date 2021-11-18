@@ -274,4 +274,26 @@ class FirebaseViewModel extends ChangeNotifier {
         .then((value) => print("Loyalty card Deleted"))
         .catchError((error) => print("Failed to delete loyalty card: $error"));
   }
+
+  void toggleFavoriteOfLoyaltyCardOnFirebase(String documentId) async {
+    DocumentSnapshot document;
+    try {
+      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+    } catch (e) {
+      return print(
+          "Could not get document from Firebase, error: " + e.code.toString());
+    }
+    bool isFavorite = document.get('listFavorite');
+    isFavorite = !isFavorite;
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('loyaltyCards')
+        .doc(documentId)
+        .update({
+          'isFavorite': isFavorite,
+        })
+        .then((value) => print("Changed favorite of loyalty card"))
+        .catchError((error) =>
+            print("Failed to toggle loyalty card's favorite: $error"));
+  }
 }

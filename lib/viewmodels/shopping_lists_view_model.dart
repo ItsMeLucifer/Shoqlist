@@ -11,14 +11,12 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void toggleItemStateLocally(int listIndex, int itemIndex) {
-    bool gotItem = _shoppingList[listIndex].list[itemIndex].gotItem;
-    _shoppingList[listIndex].list[itemIndex].gotItem = !gotItem;
+    _shoppingList[listIndex].list[itemIndex].toggleGotItem();
     notifyListeners();
   }
 
   void toggleItemFavoriteLocally(int listIndex, int itemIndex) {
-    bool isFavorite = _shoppingList[listIndex].list[itemIndex].isFavorite;
-    _shoppingList[listIndex].list[itemIndex].isFavorite = !isFavorite;
+    _shoppingList[listIndex].list[itemIndex].toggleIsFavorite();
     notifyListeners();
   }
 
