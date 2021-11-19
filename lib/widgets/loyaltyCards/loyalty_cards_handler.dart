@@ -2,12 +2,27 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:shoqlist/widgets/components/buttons.dart';
+import 'package:shoqlist/widgets/components/notifications.dart';
 import 'package:shoqlist/widgets/loyaltyCards/add_new_loyalty_card.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_card_info.dart';
 
 import '../../main.dart';
 
 class LoyaltyCardsHandler extends ConsumerWidget {
+  void _onLongPressedLoyaltyCard(BuildContext context) {
+    Navigator.of(context).pop();
+    //DELETE LIST ON FIREBASE
+    context.read(firebaseProvider).deleteLoyaltyCardOnFirebase(context
+        .read(loyaltyCardsProvider)
+        .loyaltyCardsList[
+            context.read(loyaltyCardsProvider).currentLoyaltyCardsListIndex]
+        .documentId);
+    //DELETE LIST LOCALLY
+    context.read(loyaltyCardsProvider).deleteLoyaltyCardLocally(
+        context.read(loyaltyCardsProvider).currentLoyaltyCardsListIndex);
+  }
+
   Widget build(BuildContext context, ScopedReader watch) {
     final toolsVM = watch(toolsProvider);
     return Scaffold(
@@ -61,63 +76,30 @@ class LoyaltyCardsHandler extends ConsumerWidget {
         itemCount: loyaltyCardsVM.loyaltyCardsList.length,
         itemBuilder: (context, index) {
           return GestureDetector(
-            onTap: () {
-              loyaltyCardsVM.currentLoyaltyCardsListIndex = index;
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return LoyaltyCardInfo();
-                  });
-            },
-            onLongPress: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                            child: Text(
-                                "Delete the '" +
-                                    loyaltyCardsVM
-                                        .loyaltyCardsList[index].name +
-                                    "' card?",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center)),
-                      ),
-                      actions: [
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            //DELETE LIST ON FIREBASE
-                            firebaseVM.deleteLoyaltyCardOnFirebase(
-                                loyaltyCardsVM
-                                    .loyaltyCardsList[index].documentId);
-                            //DELETE LIST LOCALLY
-                            loyaltyCardsVM.deleteLoyaltyCardLocally(index);
-                          },
-                          child: Text('Yes'),
-                        ),
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('No'),
-                        )
-                      ],
-                    );
-                  });
-            },
-            child: Card(
-              color: Colors.grey,
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                      child:
-                          Text(loyaltyCardsVM.loyaltyCardsList[index].name))),
-            ),
-          );
+              onTap: () {
+                loyaltyCardsVM.currentLoyaltyCardsListIndex = index;
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return LoyaltyCardInfo();
+                    });
+              },
+              onLongPress: () {
+                loyaltyCardsVM.currentLoyaltyCardsListIndex = index;
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      String title = "the '" +
+                          loyaltyCardsVM.loyaltyCardsList[index].name +
+                          "' card?";
+                      return DeleteNotification(
+                          _onLongPressedLoyaltyCard, title, context);
+                    });
+              },
+              child: LoyaltyCardButton(
+                  loyaltyCardsVM.loyaltyCardsList[index].name,
+                  loyaltyCardsVM.loyaltyCardsList[index].isFavorite,
+                  Colors.red[300]));
         });
   }
 }

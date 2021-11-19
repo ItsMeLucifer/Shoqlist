@@ -98,10 +98,10 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   Future<DocumentSnapshot> getDocumentSnapshotFromFirebaseWithId(
-      String documentId) async {
+      String documentId, String collectionName) async {
     return await users
         .doc(_firebaseAuth.auth.currentUser.uid)
-        .collection('lists')
+        .collection(collectionName)
         .doc(documentId)
         .get();
   }
@@ -110,7 +110,8 @@ class FirebaseViewModel extends ChangeNotifier {
       String itemName, String documentId) async {
     DocumentSnapshot document;
     try {
-      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+      document =
+          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -141,7 +142,8 @@ class FirebaseViewModel extends ChangeNotifier {
       int itemIndex, String documentId) async {
     DocumentSnapshot document;
     try {
-      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+      document =
+          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -172,7 +174,8 @@ class FirebaseViewModel extends ChangeNotifier {
       String documentId, int itemIndex) async {
     DocumentSnapshot document;
     try {
-      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+      document =
+          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -194,7 +197,8 @@ class FirebaseViewModel extends ChangeNotifier {
       String documentId, int itemIndex) async {
     DocumentSnapshot document;
     try {
-      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+      document =
+          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -278,7 +282,8 @@ class FirebaseViewModel extends ChangeNotifier {
   void toggleFavoriteOfLoyaltyCardOnFirebase(String documentId) async {
     DocumentSnapshot document;
     try {
-      document = await getDocumentSnapshotFromFirebaseWithId(documentId);
+      document = await getDocumentSnapshotFromFirebaseWithId(
+          documentId, 'loyaltyCards');
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());

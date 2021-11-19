@@ -12,39 +12,48 @@ class LoyaltyCardInfo extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    loyaltyCardsVM
+                            .loyaltyCardsList[
+                                loyaltyCardsVM.currentLoyaltyCardsListIndex]
+                            .isFavorite
+                        ? Icons.star
+                        : Icons.star_border_outlined,
+                    size: 15,
+                  ),
+                  SizedBox(width: 5),
+                  Text("Favorite", style: TextStyle(fontSize: 15)),
+                ],
+              ),
+              onPressed: () {
+                String documentId = loyaltyCardsVM
+                    .loyaltyCardsList[
+                        loyaltyCardsVM.currentLoyaltyCardsListIndex]
+                    .documentId;
+                Navigator.of(context).pop();
+                //FIREBASE
+                context
+                    .read(firebaseProvider)
+                    .toggleFavoriteOfLoyaltyCardOnFirebase(documentId);
+                //LOCALLY
+                loyaltyCardsVM.toggleLoyaltyCardFavoriteLocally();
+                loyaltyCardsVM.sortLoyaltyCardsListLocally();
+              },
+            ),
+          ),
           Text(
             loyaltyCardsVM
                 .loyaltyCardsList[loyaltyCardsVM.currentLoyaltyCardsListIndex]
                 .name,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
-          ),
-          FlatButton(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(loyaltyCardsVM
-                        .loyaltyCardsList[
-                            loyaltyCardsVM.currentLoyaltyCardsListIndex]
-                        .isFavorite
-                    ? Icons.star
-                    : Icons.star_outlined),
-                SizedBox(width: 5),
-                Text("Favorite"),
-              ],
-            ),
-            onPressed: () {
-              String documentId = loyaltyCardsVM
-                  .loyaltyCardsList[loyaltyCardsVM.currentLoyaltyCardsListIndex]
-                  .documentId;
-              //FIREBASE
-              context
-                  .read(firebaseProvider)
-                  .toggleFavoriteOfLoyaltyCardOnFirebase(documentId);
-              //LOCALLY
-              loyaltyCardsVM.toggleLoyaltyCardFavoriteLocally();
-            },
           ),
           SizedBox(height: 10),
           Container(
