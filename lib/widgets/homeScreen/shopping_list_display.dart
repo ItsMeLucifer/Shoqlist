@@ -4,9 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
+import 'package:shoqlist/widgets/components/notifications.dart';
 import 'package:shoqlist/widgets/homeScreen/add_new_item.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
+  void _onLongPressShoppingListItem(BuildContext context) {
+    Navigator.of(context).pop();
+    //DELETE ITEM ON FIREBASE
+    context.read(firebaseProvider).deleteShoppingListItemOnFirebase(
+        context.read(shoppingListsProvider).currentListIndex,
+        context
+            .read(shoppingListsProvider)
+            .shoppingList[context.read(shoppingListsProvider).currentListIndex]
+            .documentId);
+    //DELETE ITEM LOCALLY
+    context.read(shoppingListsProvider).deleteItemFromShoppingListLocally(
+        context.read(shoppingListsProvider).pickedListItemIndex);
+  }
+
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
@@ -78,54 +93,14 @@ class ShoppingListDisplay extends ConsumerWidget {
         itemCount: shoppingList.list.length,
         itemBuilder: (context, index) {
           return GestureDetector(
-            onTap: () {
-              //TOGGLE ITEM STATE ON FIREBASE
-              firebaseVM.toggleStateOfShoppingListItemOnFirebase(
-                  shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex]
-                      .documentId,
-                  index);
-              //TOGGLE ITEM STATE LOCALLY
-              shoppingListsVM.toggleItemStateLocally(
-                  shoppingListsVM.currentListIndex, index);
-            },
+            onTap: () {},
             onLongPress: () {
+              shoppingListsVM.pickedListItemIndex = index;
               showDialog(
                   context: context,
                   builder: (context) {
-                    return AlertDialog(
-                      content: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                            child: Text("Delete the this item?",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center)),
-                      ),
-                      actions: [
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            //DELETE ITEM ON FIREBASE
-                            firebaseVM.deleteShoppingListItemOnFirebase(
-                                shoppingListsVM.currentListIndex,
-                                shoppingListsVM
-                                    .shoppingList[
-                                        shoppingListsVM.currentListIndex]
-                                    .documentId);
-                            //DELETE ITEM LOCALLY
-                            shoppingListsVM
-                                .deleteItemFromShoppingListLocally(index);
-                          },
-                          child: Text('Yes'),
-                        ),
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('No'),
-                        )
-                      ],
-                    );
+                    return DeleteNotification(
+                        _onLongPressShoppingListItem, "this item?", context);
                   });
             },
             child: Card(
@@ -161,7 +136,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                         child: Stack(
                           children: [
                             Icon(
-                                shoppingList.list[index].isFavorite
+                                !shoppingList.list[index].isFavorite
                                     ? null
                                     : Icons.star,
                                 color: Colors.yellow),

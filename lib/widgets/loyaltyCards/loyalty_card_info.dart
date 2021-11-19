@@ -19,6 +19,33 @@ class LoyaltyCardInfo extends ConsumerWidget {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
+          FlatButton(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(loyaltyCardsVM
+                        .loyaltyCardsList[
+                            loyaltyCardsVM.currentLoyaltyCardsListIndex]
+                        .isFavorite
+                    ? Icons.star
+                    : Icons.star_outlined),
+                SizedBox(width: 5),
+                Text("Favorite"),
+              ],
+            ),
+            onPressed: () {
+              String documentId = loyaltyCardsVM
+                  .loyaltyCardsList[loyaltyCardsVM.currentLoyaltyCardsListIndex]
+                  .documentId;
+              //FIREBASE
+              context
+                  .read(firebaseProvider)
+                  .toggleFavoriteOfLoyaltyCardOnFirebase(documentId);
+              //LOCALLY
+              loyaltyCardsVM.toggleLoyaltyCardFavoriteLocally();
+            },
+          ),
           SizedBox(height: 10),
           Container(
             height: 150,

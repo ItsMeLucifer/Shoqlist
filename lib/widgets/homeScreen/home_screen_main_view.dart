@@ -2,12 +2,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
+import 'package:shoqlist/widgets/components/notifications.dart';
 import 'package:shoqlist/widgets/homeScreen/shopping_list_display.dart';
 
 class HomeScreenMainView extends ConsumerWidget {
   void _navigateToShoppingList(BuildContext context) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => ShoppingListDisplay()));
+  }
+
+  void _onLongPressShoppingList(BuildContext context) {
+    Navigator.of(context).pop();
+    //DELETE LIST ON FIREBASE
+    context.read(firebaseProvider).deleteShoppingListOnFirebase(context
+        .read(shoppingListsProvider)
+        .shoppingList[context.read(shoppingListsProvider).currentListIndex]
+        .documentId);
+    //DELETE LIST LOCALLY
+    context.read(shoppingListsProvider).deleteShoppingListLocally(
+        context.read(shoppingListsProvider).currentListIndex);
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -40,48 +53,15 @@ class HomeScreenMainView extends ConsumerWidget {
                             _navigateToShoppingList(context);
                           },
                           onLongPress: () {
+                            shoppingListsVM.currentListIndex = index;
                             showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return AlertDialog(
-                                    content: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                          child: Text(
-                                              "Delete the '" +
-                                                  shoppingListsVM
-                                                      .shoppingList[index]
-                                                      .name +
-                                                  "' list?",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
-                                              textAlign: TextAlign.center)),
-                                    ),
-                                    actions: [
-                                      FlatButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          //DELETE LIST ON FIREBASE
-                                          firebaseVM
-                                              .deleteShoppingListOnFirebase(
-                                                  shoppingListsVM
-                                                      .shoppingList[index]
-                                                      .documentId);
-                                          //DELETE LIST LOCALLY
-                                          shoppingListsVM
-                                              .deleteShoppingListLocally(index);
-                                        },
-                                        child: Text('Yes'),
-                                      ),
-                                      FlatButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('No'),
-                                      )
-                                    ],
-                                  );
+                                  String title = "the '" +
+                                      shoppingListsVM.shoppingList[index].name +
+                                      "' list?";
+                                  return DeleteNotification(
+                                      _onLongPressShoppingList, title, context);
                                 });
                           },
                           child: Card(

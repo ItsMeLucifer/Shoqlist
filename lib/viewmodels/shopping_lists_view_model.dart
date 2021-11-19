@@ -51,4 +51,11 @@ class ShoppingListsViewModel extends ChangeNotifier {
     _currentListIndex = value;
     notifyListeners();
   }
+
+  int _pickedListItemIndex = 0;
+  int get pickedListItemIndex => _pickedListItemIndex;
+  set pickedListItemIndex(int value) {
+    _pickedListItemIndex = value;
+    notifyListeners();
+  }
 }

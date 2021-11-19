@@ -19,6 +19,7 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
 
   void overrideLoyaltyCardsListLocally(List<LoyaltyCard> newLoyaltyCardsList) {
     _loyaltyCardsList = newLoyaltyCardsList;
+    sortLoyaltyCardsListLocally();
     notifyListeners();
   }
 
@@ -30,5 +31,17 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
   void toggleLoyaltyCardFavoriteLocally() {
     _loyaltyCardsList[_currentLoyaltyCardsListIndex].toggleIsFavorite();
     notifyListeners();
+  }
+
+  void sortLoyaltyCardsListLocally() {
+    loyaltyCardsList.sort((a, b) {
+      if (a.isFavorite && !b.isFavorite) {
+        return -1;
+      }
+      if (!a.isFavorite && b.isFavorite) {
+        return 1;
+      }
+      return 0;
+    });
   }
 }

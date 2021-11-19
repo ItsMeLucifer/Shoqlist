@@ -283,7 +283,7 @@ class FirebaseViewModel extends ChangeNotifier {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
     }
-    bool isFavorite = document.get('listFavorite');
+    bool isFavorite = document.get('isFavorite');
     isFavorite = !isFavorite;
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
