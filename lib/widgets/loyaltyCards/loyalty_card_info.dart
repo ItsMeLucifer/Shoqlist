@@ -10,6 +10,7 @@ class LoyaltyCardInfo extends ConsumerWidget {
     return AlertDialog(
       contentPadding: EdgeInsets.fromLTRB(6, 6, 6, 6),
       content: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Align(
@@ -65,7 +66,8 @@ class LoyaltyCardInfo extends ConsumerWidget {
                   .barCode,
               showValue: true,
             ),
-          )
+          ),
+          SizedBox(height: 20),
         ],
       ),
     );

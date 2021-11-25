@@ -49,6 +49,11 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                 Text("Loyalty Cards",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+                Divider(
+                  color: Theme.of(context).accentColor,
+                  indent: 50,
+                  endIndent: 50,
+                ),
                 Expanded(
                   child: Padding(
                       padding: const EdgeInsets.all(8.0),

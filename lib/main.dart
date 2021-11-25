@@ -35,8 +35,9 @@ class MyApp extends StatelessWidget {
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.grey,
           primaryColor: Colors.white,
+          accentColor: Colors.black,
           textTheme: Typography.blackCupertino,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: Color.fromRGBO(237, 246, 249, 1),

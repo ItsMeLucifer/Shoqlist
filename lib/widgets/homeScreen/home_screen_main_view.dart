@@ -33,11 +33,17 @@ class HomeScreenMainView extends ConsumerWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              SizedBox(height: 5),
               Text("Shoqlist",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 40,
                       fontStyle: FontStyle.italic)),
+              Divider(
+                color: Theme.of(context).accentColor,
+                indent: 50,
+                endIndent: 50,
+              ),
               ListView.builder(
                   shrinkWrap: true,
                   itemCount: shoppingListsVM.shoppingList.length,
