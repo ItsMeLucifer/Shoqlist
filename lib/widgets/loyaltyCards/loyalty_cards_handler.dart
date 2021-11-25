@@ -99,7 +99,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
               child: LoyaltyCardButton(
                   loyaltyCardsVM.loyaltyCardsList[index].name,
                   loyaltyCardsVM.loyaltyCardsList[index].isFavorite,
-                  Colors.red[300]));
+                  loyaltyCardsVM.loyaltyCardsList[index].color));
         });
   }
 }

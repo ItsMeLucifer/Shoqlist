@@ -40,12 +40,6 @@ class Tools extends ChangeNotifier {
   TextEditingController newListNameController = TextEditingController();
   Key newListNameFormFieldKey;
   //Add new Item
-  Importance _newItemImportance = Importance.normal;
-  Importance get newItemImportance => _newItemImportance;
-  set newItemImportance(Importance value) {
-    _newItemImportance = value;
-    notifyListeners();
-  }
 
   TextEditingController newItemNameController = TextEditingController();
   Key addNewItemNameFormFieldKey;
@@ -80,6 +74,14 @@ class Tools extends ChangeNotifier {
   bool get showPassword => _showPassword;
   set showPassword(bool value) {
     _showPassword = value;
+    notifyListeners();
+  }
+
+  //Add new Loyalty Card
+  Color _newLoyaltyCardColor = Colors.white;
+  Color get newLoyaltyCardColor => _newLoyaltyCardColor;
+  set newLoyaltyCardColor(Color value) {
+    _newLoyaltyCardColor = value;
     notifyListeners();
   }
 }

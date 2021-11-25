@@ -247,13 +247,14 @@ class FirebaseViewModel extends ChangeNotifier {
         _loyaltyCardsFetchedFromFirebase[i].get('barCode'),
         _loyaltyCardsFetchedFromFirebase[i].get('isFavorite'),
         _loyaltyCardsFetchedFromFirebase[i].get('id'),
+        Color(_loyaltyCardsFetchedFromFirebase[i].get('color')),
       ));
     }
     _loyaltyCardsVM.overrideLoyaltyCardsListLocally(temp);
   }
 
   void addNewLoyaltyCardToFirebase(
-      String name, String barCode, String documentId) async {
+      String name, String barCode, String documentId, int colorValue) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     users
         .doc(_firebaseAuth.auth.currentUser.uid)
@@ -263,7 +264,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'name': name,
           'barCode': barCode,
           'isFavorite': false,
-          'id': documentId
+          'id': documentId,
+          'color': colorValue
         })
         .then((value) => print("Created new Loyalty card"))
         .catchError((error) => print("Failed to create Loyalty card: $error"));

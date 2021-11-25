@@ -12,8 +12,9 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
   }
 
   void addNewLoyaltyCardLocally(
-      String cardName, String barCode, String documentId) {
-    _loyaltyCardsList.add(LoyaltyCard(cardName, barCode, false, documentId));
+      String cardName, String barCode, String documentId, int colorValue) {
+    _loyaltyCardsList.add(
+        LoyaltyCard(cardName, barCode, false, documentId, Color(colorValue)));
     notifyListeners();
   }
 
@@ -33,6 +34,19 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<Color> _loyaltyCardsColorsToPick = [
+    Colors.red[300],
+    Colors.blue[300],
+    Colors.white,
+    Colors.purple[300],
+    Colors.pink[300],
+    Colors.teal[300],
+    Colors.green[300],
+    Colors.cyan[300],
+    Colors.brown[300],
+    Colors.orange[600]
+  ];
+  List<Color> get loyaltyCardsColorsToPick => _loyaltyCardsColorsToPick;
   void sortLoyaltyCardsListLocally() {
     loyaltyCardsList.sort((a, b) {
       if (a.isFavorite && !b.isFavorite) {
