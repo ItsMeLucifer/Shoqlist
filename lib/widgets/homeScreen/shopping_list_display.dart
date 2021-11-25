@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
+import 'package:shoqlist/viewmodels/firebase_view_model.dart';
+import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
+import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/components/notifications.dart';
-import 'package:shoqlist/widgets/homeScreen/add_new_item.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
   void _onLongPressShoppingListItem(BuildContext context) {
@@ -22,41 +24,48 @@ class ShoppingListDisplay extends ConsumerWidget {
         context.read(shoppingListsProvider).pickedListItemIndex);
   }
 
+  void _addNewItemToCurrentShoppingList(Tools toolsVM,
+      FirebaseViewModel firebaseVM, ShoppingListsViewModel shoppingListsVM) {
+    if (toolsVM.newItemNameController.text != "") {
+      //ADD ITEM TO FIREBASE
+      firebaseVM.addNewItemToShoppingListOnFirebase(
+          toolsVM.newItemNameController.text,
+          shoppingListsVM
+              .shoppingList[shoppingListsVM.currentListIndex].documentId);
+      //ADD ITEM LOCALLY
+      shoppingListsVM.addNewItemToShoppingListLocally(
+          toolsVM.newItemNameController.text, false, false);
+    }
+    toolsVM.clearNewItemTextEditingController();
+    FocusManager.instance.primaryFocus.unfocus();
+  }
+
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
-
+    final firebaseVM = watch(firebaseProvider);
+    const Color _disabledGreyColor = Color.fromRGBO(0, 0, 0, 0.3);
     return Scaffold(
       backgroundColor: Color.lerp(
           toolsVM.getImportanceColor(shoppingListsVM
               .shoppingList[shoppingListsVM.currentListIndex].importance),
           Colors.black,
           0.15),
-      floatingActionButton: SpeedDial(
-        overlayOpacity: 0,
-        animatedIcon: AnimatedIcons.menu_close,
-        backgroundColor:
-            Theme.of(context).floatingActionButtonTheme.backgroundColor,
-        children: [
-          SpeedDialChild(
-              onTap: () {
-                toolsVM.clearNewItemTextEditingController();
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AddNewItem();
-                    });
-              },
-              backgroundColor:
-                  Theme.of(context).floatingActionButtonTheme.backgroundColor,
-              child: Icon(Icons.add),
-              label: "Add item"),
-          SpeedDialChild(
-              child: Icon(Icons.add),
-              backgroundColor:
-                  Theme.of(context).floatingActionButtonTheme.backgroundColor,
-              label: "Edit details")
-        ],
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 60.0),
+        child: SpeedDial(
+          overlayOpacity: 0,
+          animatedIcon: AnimatedIcons.menu_close,
+          backgroundColor:
+              Theme.of(context).floatingActionButtonTheme.backgroundColor,
+          children: [
+            SpeedDialChild(
+                child: Icon(Icons.add),
+                backgroundColor:
+                    Theme.of(context).floatingActionButtonTheme.backgroundColor,
+                label: "Edit details")
+          ],
+        ),
       ),
       body: SafeArea(
         child: Stack(
@@ -76,6 +85,54 @@ class ShoppingListDisplay extends ConsumerWidget {
                 ),
               ],
             ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          key: toolsVM.addNewItemNameFormFieldKey,
+                          keyboardType: TextInputType.name,
+                          autofocus: false,
+                          autocorrect: false,
+                          obscureText: false,
+                          controller: toolsVM.newItemNameController,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          decoration: InputDecoration(
+                            hintText: "New Item name",
+                            hintStyle: TextStyle(
+                                color: _disabledGreyColor,
+                                fontWeight: FontWeight.bold),
+                            contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 1, color: _disabledGreyColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 1, color: _disabledGreyColor)),
+                          ),
+                          onFieldSubmitted: (value) {
+                            _addNewItemToCurrentShoppingList(
+                                toolsVM, firebaseVM, shoppingListsVM);
+                          },
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                          _addNewItemToCurrentShoppingList(
+                              toolsVM, firebaseVM, shoppingListsVM);
+                        },
+                        child: Icon(Icons.send)),
+                    SizedBox(width: 10)
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -93,7 +150,17 @@ class ShoppingListDisplay extends ConsumerWidget {
         itemCount: shoppingList.list.length,
         itemBuilder: (context, index) {
           return GestureDetector(
-            onTap: () {},
+            onTap: () {
+              shoppingListsVM.pickedListItemIndex = index;
+              //TOGGLE ITEM STATE ON FIREBASE
+              firebaseVM.toggleStateOfShoppingListItemOnFirebase(
+                  shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex]
+                      .documentId,
+                  index);
+              //TOGGLE ITEM STATE LOCALLY
+              shoppingListsVM.toggleItemStateLocally(
+                  shoppingListsVM.currentListIndex, index);
+            },
             onLongPress: () {
               shoppingListsVM.pickedListItemIndex = index;
               showDialog(

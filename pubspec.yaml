@@ -38,6 +38,7 @@ dependencies:
   sizer: ^1.1.8
   syncfusion_flutter_barcodes: ^18.4.49
   nanoid: ^0.1.0
+  scale: ^0.0.3
 
 dev_dependencies:
   flutter_test:
