@@ -26,23 +26,20 @@ class LoyaltyCardsHandler extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final toolsVM = watch(toolsProvider);
     return Scaffold(
-      floatingActionButton: SpeedDial(
-        overlayOpacity: 0,
-        animatedIcon: AnimatedIcons.menu_close,
-        backgroundColor:
-            Theme.of(context).floatingActionButtonTheme.backgroundColor,
-        children: [
-          SpeedDialChild(
-              onTap: () async {
-                toolsVM.clearLoyaltyCardTextEditingControllers();
-                showDialog(context: context, child: AddNewLoyaltyCard());
-              },
-              backgroundColor:
-                  Theme.of(context).floatingActionButtonTheme.backgroundColor,
-              child: Icon(Icons.add),
-              label: "Add new card"),
-        ],
-      ),
+      // floatingActionButton: SpeedDial(
+      //   overlayOpacity: 0,
+      //   animatedIcon: AnimatedIcons.menu_close,
+      //   backgroundColor:
+      //       Theme.of(context).floatingActionButtonTheme.backgroundColor,
+      //   children: [
+      //     SpeedDialChild(
+      //         onTap: () async {},
+      //         backgroundColor:
+      //             Theme.of(context).floatingActionButtonTheme.backgroundColor,
+      //         child: Icon(Icons.add),
+      //         label: "Something"),
+      //   ],
+      // ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -73,11 +70,27 @@ class LoyaltyCardsHandler extends ConsumerWidget {
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
         shrinkWrap: true,
-        itemCount: loyaltyCardsVM.loyaltyCardsList.length,
+        itemCount: loyaltyCardsVM.loyaltyCardsList.length + 1,
         itemBuilder: (context, index) {
+          if (index == 0) {
+            return GestureDetector(
+                onTap: () {
+                  toolsVM.clearLoyaltyCardTextEditingControllers();
+                  showDialog(context: context, child: AddNewLoyaltyCard());
+                },
+                child: Card(
+                  color: Colors.grey[400],
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                          child:
+                              Icon(Icons.add, size: 50, color: Colors.white))),
+                ));
+          }
+          int fixedIndex = index - 1;
           return GestureDetector(
               onTap: () {
-                loyaltyCardsVM.currentLoyaltyCardsListIndex = index;
+                loyaltyCardsVM.currentLoyaltyCardsListIndex = fixedIndex;
                 showDialog(
                     context: context,
                     builder: (context) {
@@ -85,21 +98,21 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                     });
               },
               onLongPress: () {
-                loyaltyCardsVM.currentLoyaltyCardsListIndex = index;
+                loyaltyCardsVM.currentLoyaltyCardsListIndex = fixedIndex;
                 showDialog(
                     context: context,
                     builder: (context) {
                       String title = "the '" +
-                          loyaltyCardsVM.loyaltyCardsList[index].name +
+                          loyaltyCardsVM.loyaltyCardsList[fixedIndex].name +
                           "' card?";
                       return DeleteNotification(
                           _onLongPressedLoyaltyCard, title, context);
                     });
               },
               child: LoyaltyCardButton(
-                  loyaltyCardsVM.loyaltyCardsList[index].name,
-                  loyaltyCardsVM.loyaltyCardsList[index].isFavorite,
-                  loyaltyCardsVM.loyaltyCardsList[index].color));
+                  loyaltyCardsVM.loyaltyCardsList[fixedIndex].name,
+                  loyaltyCardsVM.loyaltyCardsList[fixedIndex].isFavorite,
+                  loyaltyCardsVM.loyaltyCardsList[fixedIndex].color));
         });
   }
 }
