@@ -39,10 +39,16 @@ dependencies:
   syncfusion_flutter_barcodes: ^18.4.49
   nanoid: ^0.1.0
   scale: ^0.0.3
+  #HIVE DATABASE
+  hive: ^1.4.4+1
+  hive_flutter: ^0.3.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  #hive database generators
+  build_runner: ^1.11.1+1
+  hive_generator: ^0.8.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -7,6 +7,11 @@ import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import 'models/shopping_list.dart';
+import 'models/shopping_list_item.dart';
 
 final shoppingListsProvider =
     ChangeNotifierProvider((_) => ShoppingListsViewModel());
@@ -24,7 +29,16 @@ final firebaseProvider = ChangeNotifierProvider((_) {
 });
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  //Firebase - NoSQL databese in the cloud
   await Firebase.initializeApp();
+
+  //HIVE - Local NoSQL database
+  await Hive.initFlutter();
+  Hive.registerAdapter(ShoppingListAdapter());
+  Hive.registerAdapter(ShoppingListItemAdapter());
+  await Hive.openBox<ShoppingList>('shopping_lists');
+
   runApp(ProviderScope(child: MyApp()));
 }
 
