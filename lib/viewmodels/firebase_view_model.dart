@@ -18,7 +18,7 @@ class FirebaseViewModel extends ChangeNotifier {
 
   //SYNCHRONIZATION
   CollectionReference users = FirebaseFirestore.instance.collection('users');
-
+  int _cloudTimestamp = 0;
   // -- SHOPPING LISTS
   List<QueryDocumentSnapshot> _shoppingListsFetchedFromFirebase =
       List<QueryDocumentSnapshot>();

@@ -2,7 +2,17 @@ import 'package:shoqlist/models/shopping_list_item.dart';
 import 'package:hive/hive.dart';
 part 'shopping_list.g.dart';
 
-enum Importance { low, normal, important, urgent }
+@HiveType(typeId: 2)
+enum Importance {
+  @HiveField(0)
+  low,
+  @HiveField(1)
+  normal,
+  @HiveField(2)
+  important,
+  @HiveField(3)
+  urgent
+}
 
 ///An object that holds information about a single list.
 

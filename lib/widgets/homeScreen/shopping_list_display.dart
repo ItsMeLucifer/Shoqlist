@@ -17,7 +17,7 @@ class ShoppingListDisplay extends ConsumerWidget {
         context.read(shoppingListsProvider).currentListIndex,
         context
             .read(shoppingListsProvider)
-            .shoppingList[context.read(shoppingListsProvider).currentListIndex]
+            .shoppingLists[context.read(shoppingListsProvider).currentListIndex]
             .documentId);
     //DELETE ITEM LOCALLY
     context.read(shoppingListsProvider).deleteItemFromShoppingListLocally(
@@ -31,7 +31,7 @@ class ShoppingListDisplay extends ConsumerWidget {
       firebaseVM.addNewItemToShoppingListOnFirebase(
           toolsVM.newItemNameController.text,
           shoppingListsVM
-              .shoppingList[shoppingListsVM.currentListIndex].documentId);
+              .shoppingLists[shoppingListsVM.currentListIndex].documentId);
       //ADD ITEM LOCALLY
       shoppingListsVM.addNewItemToShoppingListLocally(
           toolsVM.newItemNameController.text, false, false);
@@ -48,7 +48,7 @@ class ShoppingListDisplay extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Color.lerp(
           toolsVM.getImportanceColor(shoppingListsVM
-              .shoppingList[shoppingListsVM.currentListIndex].importance),
+              .shoppingLists[shoppingListsVM.currentListIndex].importance),
           Colors.black,
           0.15),
       floatingActionButton: Padding(
@@ -63,7 +63,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                 child: Icon(Icons.add),
                 backgroundColor:
                     Theme.of(context).floatingActionButtonTheme.backgroundColor,
-                label: "Edit details")
+                label: "Edit details"),
           ],
         ),
       ),
@@ -75,7 +75,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                 SizedBox(height: 5),
                 Text(
                     shoppingListsVM
-                        .shoppingList[shoppingListsVM.currentListIndex].name,
+                        .shoppingLists[shoppingListsVM.currentListIndex].name,
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
                 Divider(
@@ -149,7 +149,7 @@ class ShoppingListDisplay extends ConsumerWidget {
     final toolsVM = watch(toolsProvider);
     final firebaseVM = watch(firebaseProvider);
     ShoppingList shoppingList =
-        shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex];
+        shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
     return ListView.builder(
         shrinkWrap: true,
         itemCount: shoppingList.list.length,
@@ -159,7 +159,8 @@ class ShoppingListDisplay extends ConsumerWidget {
               shoppingListsVM.pickedListItemIndex = index;
               //TOGGLE ITEM STATE ON FIREBASE
               firebaseVM.toggleStateOfShoppingListItemOnFirebase(
-                  shoppingListsVM.shoppingList[shoppingListsVM.currentListIndex]
+                  shoppingListsVM
+                      .shoppingLists[shoppingListsVM.currentListIndex]
                       .documentId,
                   index);
               //TOGGLE ITEM STATE LOCALLY
@@ -197,7 +198,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                           //TOGGLE ITEM FAVORITE ON FIREBASE
                           firebaseVM.toggleFavoriteOfShoppingListItemOnFirebase(
                               shoppingListsVM
-                                  .shoppingList[
+                                  .shoppingLists[
                                       shoppingListsVM.currentListIndex]
                                   .documentId,
                               index);

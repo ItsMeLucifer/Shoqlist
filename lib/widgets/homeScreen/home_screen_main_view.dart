@@ -16,7 +16,7 @@ class HomeScreenMainView extends ConsumerWidget {
     //DELETE LIST ON FIREBASE
     context.read(firebaseProvider).deleteShoppingListOnFirebase(context
         .read(shoppingListsProvider)
-        .shoppingList[context.read(shoppingListsProvider).currentListIndex]
+        .shoppingLists[context.read(shoppingListsProvider).currentListIndex]
         .documentId);
     //DELETE LIST LOCALLY
     context.read(shoppingListsProvider).deleteShoppingListLocally(
@@ -46,7 +46,7 @@ class HomeScreenMainView extends ConsumerWidget {
               ),
               ListView.builder(
                   shrinkWrap: true,
-                  itemCount: shoppingListsVM.shoppingList.length,
+                  itemCount: shoppingListsVM.shoppingLists.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(
@@ -64,7 +64,8 @@ class HomeScreenMainView extends ConsumerWidget {
                                 context: context,
                                 builder: (context) {
                                   String title = "the '" +
-                                      shoppingListsVM.shoppingList[index].name +
+                                      shoppingListsVM
+                                          .shoppingLists[index].name +
                                       "' list?";
                                   return DeleteNotification(
                                       _onLongPressShoppingList, title, context);
@@ -72,7 +73,7 @@ class HomeScreenMainView extends ConsumerWidget {
                           },
                           child: Card(
                               color: toolsVM.getImportanceColor(shoppingListsVM
-                                  .shoppingList[index].importance),
+                                  .shoppingLists[index].importance),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
@@ -80,24 +81,24 @@ class HomeScreenMainView extends ConsumerWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      shoppingListsVM.shoppingList[index].name,
+                                      shoppingListsVM.shoppingLists[index].name,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20),
                                     ),
                                     Row(
                                       children: [
-                                        shoppingListsVM.shoppingList[index].list
-                                                    .length !=
+                                        shoppingListsVM.shoppingLists[index]
+                                                    .list.length !=
                                                 0
                                             ? Container(
                                                 width: 100,
                                                 child: Text(
                                                   shoppingListsVM
-                                                          .shoppingList[index]
+                                                          .shoppingLists[index]
                                                           .list[0]
                                                           .itemName +
-                                                      "${shoppingListsVM.shoppingList[index].list.length > 1 ? ', ...' : ''}",
+                                                      "${shoppingListsVM.shoppingLists[index].list.length > 1 ? ', ...' : ''}",
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   maxLines: 1,
@@ -112,7 +113,7 @@ class HomeScreenMainView extends ConsumerWidget {
                                         Text(
                                           "   [" +
                                               shoppingListsVM
-                                                  .shoppingList[index]
+                                                  .shoppingLists[index]
                                                   .list
                                                   .length
                                                   .toString() +

@@ -36,8 +36,10 @@ void main() async {
   //HIVE - Local NoSQL database
   await Hive.initFlutter();
   Hive.registerAdapter(ShoppingListAdapter());
+  Hive.registerAdapter(ImportanceAdapter());
   Hive.registerAdapter(ShoppingListItemAdapter());
   await Hive.openBox<ShoppingList>('shopping_lists');
+  await Hive.openBox<int>('data_variables');
 
   runApp(ProviderScope(child: MyApp()));
 }
