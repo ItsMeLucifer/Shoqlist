@@ -19,11 +19,17 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   List<ShoppingList> getLocalShoppingList() {
-    List<ShoppingList> list;
+    List<ShoppingList> lists = List<ShoppingList>();
     _box.toMap().forEach((key, value) {
-      list.add(value);
+      lists.add(value);
     });
-    return list;
+    return lists;
+  }
+
+  void displayLocalShoppingLists() {
+    _box.toMap().forEach((key, value) {
+      _shoppingLists.add(value);
+    });
   }
 
   int getLocalTimestamp() {

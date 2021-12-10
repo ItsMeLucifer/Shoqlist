@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
@@ -22,9 +23,24 @@ class FirebaseViewModel extends ChangeNotifier {
   // -- SHOPPING LISTS
   List<QueryDocumentSnapshot> _shoppingListsFetchedFromFirebase =
       List<QueryDocumentSnapshot>();
-  void getShoppingListsFromFirebase(bool shouldUpdateLocalData) async {
+  void getShoppingListsFromFirebase(
+      bool shouldCompareCloudDataWithLocalOne) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     _shoppingListsFetchedFromFirebase.clear();
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .get()
+        .then((DocumentSnapshot snapshot) => {
+              if (snapshot.exists)
+                {
+                  snapshot.data().forEach((key, value) {
+                    if (key == "timestamp") {
+                      _cloudTimestamp = value;
+                      return;
+                    }
+                  })
+                }
+            });
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('lists')
@@ -39,7 +55,54 @@ class FirebaseViewModel extends ChangeNotifier {
             })
         .catchError((error) =>
             print("Failed to fetch shopping lists data from Firebase: $error"));
-    if (shouldUpdateLocalData) addFetchedShoppingListsDataToLocalList();
+    if (shouldCompareCloudDataWithLocalOne)
+      compareDiscrepanciesBetweenCloudAndLocalData();
+  }
+
+  void compareDiscrepanciesBetweenCloudAndLocalData() {
+    //Cloud data is newer
+    var localTimestamp = _shoppingListsVM.getLocalTimestamp();
+    if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
+      return addFetchedShoppingListsDataToLocalList();
+    }
+    return putLocalDataToFirebase();
+  }
+
+  void putLocalDataToFirebase() {
+    if (_firebaseAuth.auth.currentUser == null) return;
+    List<ShoppingList> localLists = _shoppingListsVM.getLocalShoppingList();
+    List<String> listContent = List<String>();
+    List<bool> listFavorite = List<bool>();
+    List<bool> listState = List<bool>();
+    for (ShoppingList localList in localLists) {
+      listContent.clear();
+      listFavorite.clear();
+      listState.clear();
+      localList.list.forEach((element) {
+        listContent.add(element.itemName);
+        listFavorite.add(element.isFavorite);
+        listState.add(element.gotItem);
+      });
+      users
+          .doc(_firebaseAuth.auth.currentUser.uid)
+          .collection('lists')
+          .doc(localList.documentId)
+          .set({
+            'name': localList.name,
+            'importance': _toolsVM.getImportanceLabel(localList.importance),
+            'listContent': listContent,
+            'listState': listState,
+            'listFavorite': listFavorite,
+            'id': localList.documentId
+          })
+          .then((value) => print("Updated list on Firebase"))
+          .catchError(
+              (error) => print("Failed to update list on Firebase: $error"));
+    }
+    users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .update({'timestamp': _shoppingListsVM.getLocalTimestamp()});
+    _shoppingListsVM.displayLocalShoppingLists();
   }
 
   void addFetchedShoppingListsDataToLocalList() {
@@ -63,7 +126,7 @@ class FirebaseViewModel extends ChangeNotifier {
               _shoppingListsFetchedFromFirebase[i].get('importance')),
           _shoppingListsFetchedFromFirebase[i].get('id')));
     }
-    _shoppingListsVM.overrideShoppingListLocally(temp);
+    _shoppingListsVM.overrideShoppingListLocally(temp, _cloudTimestamp);
   }
 
   void addNewShoppingListToFirebase(
@@ -78,9 +141,7 @@ class FirebaseViewModel extends ChangeNotifier {
           'importance': _toolsVM.getImportanceLabel(importance),
           'listContent': [],
           'listState': [],
-          'listImportance': [],
           'listFavorite': [],
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
           'id': documentId
         })
         .then((value) => print("Created new List"))
@@ -120,8 +181,6 @@ class FirebaseViewModel extends ChangeNotifier {
     listContent.add(itemName);
     List<dynamic> listState = document.get('listState');
     listState.add(false);
-    List<dynamic> listImportance = document.get('listImportance');
-    listImportance.add(false);
     List<dynamic> listFavorite = document.get('listFavorite');
     listFavorite.add(false);
     await users
@@ -131,7 +190,6 @@ class FirebaseViewModel extends ChangeNotifier {
         .update({
           'listContent': listContent,
           'listState': listState,
-          'listImportance': listImportance,
           'listFavorite': listFavorite
         })
         .then((value) => print("New item added"))
@@ -150,11 +208,9 @@ class FirebaseViewModel extends ChangeNotifier {
     }
     List<dynamic> listContent = document.get('listContent');
     List<dynamic> listState = document.get('listState');
-    List<dynamic> listImportance = document.get('listImportance');
     List<dynamic> listFavorite = document.get('listFavorite');
     listContent.removeAt(itemIndex);
     listState.removeAt(itemIndex);
-    listImportance.removeAt(itemIndex);
     listFavorite.removeAt(itemIndex);
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
@@ -163,7 +219,6 @@ class FirebaseViewModel extends ChangeNotifier {
         .update({
           'listContent': listContent,
           'listState': listState,
-          'listImportance': listImportance,
           'listFavorite': listFavorite
         })
         .then((value) => print("List item deleted"))
