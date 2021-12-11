@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
@@ -129,7 +128,7 @@ class FirebaseViewModel extends ChangeNotifier {
     _shoppingListsVM.overrideShoppingListLocally(temp, _cloudTimestamp);
   }
 
-  void addNewShoppingListToFirebase(
+  void putShoppingListToFirebase(
       String name, Importance importance, String documentId) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     users

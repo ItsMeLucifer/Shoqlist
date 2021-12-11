@@ -11,16 +11,35 @@ class HomeScreenMainView extends ConsumerWidget {
         MaterialPageRoute(builder: (context) => ShoppingListDisplay()));
   }
 
-  void _onLongPressShoppingList(BuildContext context) {
+  void _deleteShoppingList(BuildContext context) {
     Navigator.of(context).pop();
+    final firebaseVM = context.read(firebaseProvider);
+    final shoppingListsVM = context.read(shoppingListsProvider);
     //DELETE LIST ON FIREBASE
-    context.read(firebaseProvider).deleteShoppingListOnFirebase(context
-        .read(shoppingListsProvider)
-        .shoppingLists[context.read(shoppingListsProvider).currentListIndex]
-        .documentId);
+    firebaseVM.deleteShoppingListOnFirebase(shoppingListsVM
+        .shoppingLists[shoppingListsVM.currentListIndex].documentId);
     //DELETE LIST LOCALLY
-    context.read(shoppingListsProvider).deleteShoppingListLocally(
-        context.read(shoppingListsProvider).currentListIndex);
+    shoppingListsVM.deleteShoppingListLocally(shoppingListsVM.currentListIndex);
+  }
+
+  void _updateShoppingList(BuildContext context) {
+    if (context.read(toolsProvider).newListNameController.text != "") {
+      final firebaseVM = context.read(firebaseProvider);
+      final toolsVM = context.read(toolsProvider);
+      final shoppingListsVM = context.read(shoppingListsProvider);
+      //UPDATE LIST ON SERVER
+      firebaseVM.putShoppingListToFirebase(
+          toolsVM.newListNameController.text,
+          toolsVM.newListImportance,
+          shoppingListsVM
+              .shoppingLists[shoppingListsVM.currentListIndex].documentId);
+      //UPDATE LIST LOCALLY
+      shoppingListsVM.updateExistingShoppingList(
+          toolsVM.newListNameController.text,
+          toolsVM.newListImportance,
+          shoppingListsVM.currentListIndex);
+      Navigator.of(context).pop();
+    }
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -67,8 +86,15 @@ class HomeScreenMainView extends ConsumerWidget {
                                       shoppingListsVM
                                           .shoppingLists[index].name +
                                       "' list?";
-                                  return DeleteNotification(
-                                      _onLongPressShoppingList, title, context);
+                                  return ShoppingListData(
+                                    _updateShoppingList,
+                                    context,
+                                    shoppingListsVM
+                                        .shoppingLists[index].importance,
+                                    shoppingListsVM.shoppingLists[index].name,
+                                    title,
+                                    _deleteShoppingList,
+                                  );
                                 });
                           },
                           child: Card(

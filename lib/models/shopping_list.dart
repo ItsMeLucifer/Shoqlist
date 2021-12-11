@@ -19,11 +19,11 @@ enum Importance {
 @HiveType(typeId: 0)
 class ShoppingList extends HiveObject {
   @HiveField(0)
-  final String name;
+  String name;
   @HiveField(1)
   final List<ShoppingListItem> list;
   @HiveField(2)
-  final Importance importance;
+  Importance importance;
   @HiveField(3)
   final String documentId;
 

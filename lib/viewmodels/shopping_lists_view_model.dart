@@ -15,7 +15,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     //HIVE
     await _box.clear();
     _box.addAll(lists);
-    //OVERRIDE TIMESTAMP OF LOCAL DATABASE
+    _boxData.put('timestamp', timestamp);
   }
 
   List<ShoppingList> getLocalShoppingList() {
@@ -59,6 +59,16 @@ class ShoppingListsViewModel extends ChangeNotifier {
     //HIVE
     _box.add(newList);
     updateLocalTimestamp();
+    notifyListeners();
+  }
+
+  void updateExistingShoppingList(
+      String name, Importance importance, int index) {
+    _shoppingLists[index]
+      ..importance = importance
+      ..name = name;
+    //HIVE
+    _shoppingLists[index].save();
     notifyListeners();
   }
 
