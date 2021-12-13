@@ -62,7 +62,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateExistingShoppingList(
+  void updateExistingShoppingListLocally(
       String name, Importance importance, int index) {
     _shoppingLists[index]
       ..importance = importance

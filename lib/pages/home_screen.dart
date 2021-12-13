@@ -55,7 +55,6 @@ class _HomeScreen extends State<HomeScreen> {
           context.read(toolsProvider).newListImportance,
           id);
     }
-    Navigator.of(context).pop();
   }
 
   Widget build(BuildContext context) {
@@ -95,10 +94,11 @@ class _HomeScreen extends State<HomeScreen> {
                   label: 'Loyalty cards'),
               SpeedDialChild(
                   onTap: () {
+                    context.read(toolsProvider).resetNewListData();
                     showDialog(
                         context: context,
-                        builder: (context) =>
-                            ShoppingListData(_createNewShoppingList, context));
+                        builder: (context) => PutShoppingListData(
+                            _createNewShoppingList, context));
                   },
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme

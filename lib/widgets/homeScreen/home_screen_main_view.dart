@@ -12,7 +12,6 @@ class HomeScreenMainView extends ConsumerWidget {
   }
 
   void _deleteShoppingList(BuildContext context) {
-    Navigator.of(context).pop();
     final firebaseVM = context.read(firebaseProvider);
     final shoppingListsVM = context.read(shoppingListsProvider);
     //DELETE LIST ON FIREBASE
@@ -34,11 +33,10 @@ class HomeScreenMainView extends ConsumerWidget {
           shoppingListsVM
               .shoppingLists[shoppingListsVM.currentListIndex].documentId);
       //UPDATE LIST LOCALLY
-      shoppingListsVM.updateExistingShoppingList(
+      shoppingListsVM.updateExistingShoppingListLocally(
           toolsVM.newListNameController.text,
           toolsVM.newListImportance,
           shoppingListsVM.currentListIndex);
-      Navigator.of(context).pop();
     }
   }
 
@@ -86,12 +84,14 @@ class HomeScreenMainView extends ConsumerWidget {
                                       shoppingListsVM
                                           .shoppingLists[index].name +
                                       "' list?";
-                                  return ShoppingListData(
+                                  toolsVM.newListImportance = shoppingListsVM
+                                      .shoppingLists[index].importance;
+                                  toolsVM.setNewListNameControllerText(
+                                      shoppingListsVM
+                                          .shoppingLists[index].name);
+                                  return PutShoppingListData(
                                     _updateShoppingList,
                                     context,
-                                    shoppingListsVM
-                                        .shoppingLists[index].importance,
-                                    shoppingListsVM.shoppingLists[index].name,
                                     title,
                                     _deleteShoppingList,
                                   );

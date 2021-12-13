@@ -38,6 +38,17 @@ class Tools extends ChangeNotifier {
   }
 
   TextEditingController newListNameController = TextEditingController();
+  void setNewListNameControllerText(String newListName) {
+    newListNameController.text = newListName;
+    notifyListeners();
+  }
+
+  void resetNewListData() {
+    _newListImportance = Importance.normal;
+    newListNameController.text = "";
+    notifyListeners();
+  }
+
   Key newListNameFormFieldKey;
   //Add new Item
 

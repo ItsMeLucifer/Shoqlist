@@ -13,6 +13,7 @@ class DeleteNotification extends ConsumerWidget {
       this._onPressed, this.nameOfComponentToDelete, this.context);
   void _onPressDelete() {
     _onPressed(context);
+    Navigator.of(context).popUntil((route) => !route.navigator.canPop());
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -31,7 +32,8 @@ class DeleteNotification extends ConsumerWidget {
         ),
         FlatButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context)
+                .popUntil((route) => !route.navigator.canPop());
           },
           child: Text('No'),
         )
@@ -40,28 +42,21 @@ class DeleteNotification extends ConsumerWidget {
   }
 }
 
-class ShoppingListData extends ConsumerWidget {
+class PutShoppingListData extends ConsumerWidget {
   Function _onPressedSave;
   Function _onPressedDelete;
   BuildContext context;
-  Importance _shoppingListImportance;
-  String _shoppingListName;
   String _deleteNotificationTitle;
-  ShoppingListData(this._onPressedSave, this.context,
-      [this._shoppingListImportance = Importance.normal,
-      this._shoppingListName = '',
-      this._deleteNotificationTitle = '',
-      this._onPressedDelete]);
+  PutShoppingListData(this._onPressedSave, this.context,
+      [this._deleteNotificationTitle = '', this._onPressedDelete]);
 
   void _onPressSave() {
     _onPressedSave(context);
+    Navigator.of(context).pop();
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
     final toolsVM = watch(toolsProvider);
-    //ERR setState called during build
-    toolsVM.newListImportance = _shoppingListImportance;
-    toolsVM.newListNameController.text = _shoppingListName;
     return AlertDialog(
       content: Container(
           height: 300,
@@ -180,8 +175,12 @@ class ShoppingListData extends ConsumerWidget {
                       ? FlatButton(
                           color: Color.fromRGBO(0, 0, 0, 0.2),
                           onPressed: () {
-                            DeleteNotification(_onPressedDelete,
-                                _deleteNotificationTitle, context);
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return DeleteNotification(_onPressedDelete,
+                                      _deleteNotificationTitle, context);
+                                });
                           },
                           child: Text(
                             'Delete',
