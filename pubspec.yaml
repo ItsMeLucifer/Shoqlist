@@ -39,6 +39,7 @@ dependencies:
   syncfusion_flutter_barcodes: ^18.4.49
   nanoid: ^0.1.0
   scale: ^0.0.3
+  share: ^0.6.5+4
   #HIVE DATABASE
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1

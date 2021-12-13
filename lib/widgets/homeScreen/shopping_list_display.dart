@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:share/share.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/viewmodels/firebase_view_model.dart';
@@ -60,10 +61,15 @@ class ShoppingListDisplay extends ConsumerWidget {
               Theme.of(context).floatingActionButtonTheme.backgroundColor,
           children: [
             SpeedDialChild(
-                child: Icon(Icons.add),
+                child: Icon(Icons.share),
+                onTap: () {
+                  Share.share(
+                      shoppingListsVM.getCurrentShoppingListDataInString(),
+                      subject: 'A shared list for you');
+                },
                 backgroundColor:
                     Theme.of(context).floatingActionButtonTheme.backgroundColor,
-                label: "Edit details"),
+                label: "Share"),
           ],
         ),
       ),

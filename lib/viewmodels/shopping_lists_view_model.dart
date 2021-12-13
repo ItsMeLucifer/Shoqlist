@@ -116,4 +116,27 @@ class ShoppingListsViewModel extends ChangeNotifier {
     _pickedListItemIndex = value;
     notifyListeners();
   }
+
+  String getCurrentShoppingListDataInString() {
+    String result = "";
+    ShoppingList currentShoppingList = _shoppingLists[_currentListIndex];
+    result += "🛒 " + currentShoppingList.name + " list:\n";
+    result += "__________\n";
+    for (int i = 0; i < currentShoppingList.list.length; i++) {
+      String item = "";
+      if (currentShoppingList.list[i].gotItem) {
+        item += "▣ ";
+        for (int j = 0; j < currentShoppingList.list[i].itemName.length; j++) {
+          item += (j == 0
+                  ? currentShoppingList.list[i].itemName[j].toUpperCase()
+                  : currentShoppingList.list[i].itemName[j]) +
+              '\u{0336}';
+        }
+      } else {
+        item = "▢ " + currentShoppingList.list[i].itemName;
+      }
+      result += item + "\n";
+    }
+    return result;
+  }
 }

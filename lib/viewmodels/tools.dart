@@ -29,6 +29,10 @@ class Tools extends ChangeNotifier {
     }
   }
 
+  String getFirstCapitalLetter(String text) {
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
   //Add new List
   Importance _newListImportance = Importance.normal;
   Importance get newListImportance => _newListImportance;
