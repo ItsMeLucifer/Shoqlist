@@ -41,6 +41,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     //HIVE
     _shoppingLists[listIndex].save();
     updateLocalTimestamp();
+    sortShoppingListItemsDisplay();
     notifyListeners();
   }
 
@@ -49,6 +50,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     //HIVE
     _shoppingLists[listIndex].save();
     updateLocalTimestamp();
+    sortShoppingListItemsDisplay();
     notifyListeners();
   }
 
@@ -135,8 +137,23 @@ class ShoppingListsViewModel extends ChangeNotifier {
       } else {
         item = "▢ " + currentShoppingList.list[i].itemName;
       }
-      result += item + "\n";
+      result +=
+          item + (currentShoppingList.list[i].isFavorite ? " ★" : "") + "\n";
     }
     return result;
+  }
+
+  void sortShoppingListItemsDisplay() {
+    _shoppingLists[_currentListIndex].list.sort((a, b) {
+      if (a.gotItem) return 1;
+      if (b.gotItem) return -1;
+      if (a.isFavorite && !b.isFavorite) {
+        return -1;
+      }
+      if (!a.isFavorite && b.isFavorite) {
+        return 1;
+      }
+      return 0;
+    });
   }
 }

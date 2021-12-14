@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
-import 'package:shoqlist/widgets/components/notifications.dart';
+import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

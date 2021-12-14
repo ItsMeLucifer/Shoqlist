@@ -59,8 +59,7 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void compareDiscrepanciesBetweenCloudAndLocalData() {
-    //Cloud data is newer
-    var localTimestamp = _shoppingListsVM.getLocalTimestamp();
+    int localTimestamp = _shoppingListsVM.getLocalTimestamp();
     if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
       return addFetchedShoppingListsDataToLocalList();
     }

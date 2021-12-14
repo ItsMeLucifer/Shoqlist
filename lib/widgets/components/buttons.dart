@@ -12,13 +12,26 @@ class LoyaltyCardButton extends ConsumerWidget {
       child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
-              child: Text(cardName,
+              child: Stack(
+            children: <Widget>[
+              Text(cardName,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 2
+                        ..color = Colors.black)),
+              Text(cardName,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: isFavorite ? Colors.yellow : Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
-                  )))),
+                  )),
+            ],
+          ))),
     );
   }
 }

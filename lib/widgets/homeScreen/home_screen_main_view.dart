@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
-import 'package:shoqlist/widgets/components/notifications.dart';
+import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/shopping_list_display.dart';
 
 class HomeScreenMainView extends ConsumerWidget {
@@ -19,6 +19,7 @@ class HomeScreenMainView extends ConsumerWidget {
         .shoppingLists[shoppingListsVM.currentListIndex].documentId);
     //DELETE LIST LOCALLY
     shoppingListsVM.deleteShoppingListLocally(shoppingListsVM.currentListIndex);
+    Navigator.of(context).popUntil((route) => !route.navigator.canPop());
   }
 
   void _updateShoppingList(BuildContext context) {

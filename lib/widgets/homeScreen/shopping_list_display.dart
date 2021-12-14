@@ -8,7 +8,7 @@ import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/viewmodels/firebase_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
-import 'package:shoqlist/widgets/components/notifications.dart';
+import 'package:shoqlist/widgets/components/dialogs.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
   void _onLongPressShoppingListItem(BuildContext context) {

@@ -1,16 +1,90 @@
-# shoqlist
+# Shoqlist
 
-A new Flutter project.
+Shoqlist is an app for creating and sharing shopping lists. In addition to basic functionality, it also has the option to scan loyalty cards and store digital versions of them.
 
-## Getting Started
+## **Home Page**
 
-This project is a starting point for a Flutter application.
+The main page of the app displays shopping lists created by the user. The user can edit and delete lists by holding down a list for a little time. Moreover, the user has a menu where they can create a new shopping list and navigate to loyalty cards or settings (the option to scan the list will be available in the future).
+<div align='center'>
+<img src="./github/img/home_page.png"
+     alt="Home Page"
+     width="200" /><img src="./github/img/home_page_list_data_edit.png"
+     alt="Home Page - Shopping List's data edit"
+     width="200" /><img src="./github/img/home_page_floating_menu.png"
+     alt="Home Page - Menu"
+     width="200" /></div>
 
-A few resources to get you started if this is your first Flutter project:
+## **Shopping List's display**
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+When you click on a shopping list tile, you will be taken to a page where you can see what the list contains. Using the entry box at the bottom of the screen, the user can quickly add more items to the shopping list. With a long press on any item, the user has the option to delete the item. Additionally, by simply clicking on an item, the user can mark or unmark it as done - the done items will be moved to the bottom of the list. On the other hand, if the user clicks on the star, the item will be set as favorite and thrown to the top of the list.
+The last feature is the ability to share the list using the classic sharing tool built into Android.
+<div align='center'><img src="./github/img/shopping_list.png"
+     alt="Shopping List"
+     width="250" /><img src="./github/img/shopping_list_share_text.png"
+     alt="Shopping List - share"
+     width="250" /></div>
+Below I show what a text file that is shared looks like.
+<div align='center'><img src="./github/img/shopping_list_shared_text_example.png"
+     alt="Shopping List share text example"
+      /></div>
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## **Loyalty Cards**
+
+Users can store their loyalty cards in the app - saving space in their wallet. By clicking on a tile that represents a loyalty card - the user is able to view the barcode for that card and possibly set that card as a favorite so it will be displayed first. Besides, with the long press the user can delete a particular card. By clicking the first plus tile, the user can add a new loyalty card. The card code can be entered manually or scanned by clicking the scan icon to the right of the text entry field.
+<div align='center'><img src="./github/img/loyalty_cards.png"
+     alt="Loyalty Cards display"
+     width="200" /><img src="./github/img/loyalty_cards_card_display.png"
+     alt="Loyalty Cards - Card display"
+     width="200" /><img src="./github/img/loyalty_cards_add_card.png"
+     alt="Loyalty Cards - Add new card"
+     width="200" /></div>
+
+## **Backend**
+
+Because the application is intended to be used to quickly record things to buy, two NoSQL databases are implemented in Shoqlist. One is in the cloud (Firestore) and the other is local (Hive). Thanks to this solution, the user is not dependent on internet connection.
+
+Below is how the shopping list data is stored in firestore.
+```dart
+users
+    .doc(_firebaseAuth.auth.currentUser.uid)
+    .collection('lists')
+    .doc(documentId)
+    .set({
+        'name': name,         //Bakery
+        'importance': _toolsVM.getImportanceLabel(importance), //Urgent
+        'listContent': [],    //[Garlic Baguette, Bread, Buns]
+        'listState': [],      //[false, false, true]
+        'listFavorite': [],   //[true, false, false]
+        'id': documentId      //STTgMxILcyTSpvv7C_7R5
+    })
+    .then((value) => print("Created new list"))
+    .catchError((error) => print("Failed to create list: $error"));
+```
+In the case of Hive, you just need to extend the models accordingly, based on which Hive automatically generates adapters.
+```dart
+@HiveType(typeId: 0)
+class ShoppingList extends HiveObject {
+  @HiveField(0)
+  String name;
+  @HiveField(1)
+  final List<ShoppingListItem> list;
+  @HiveField(2)
+  Importance importance;
+  @HiveField(3)
+  final String documentId;
+
+  ShoppingList(this.name, this.list, this.importance, this.documentId);
+}
+```
+The advantage of using two databases is that the application can run offline. However, this solution causes additional problems that need to be solved. The basic problem is synchronization. The application somehow needs to know which data - local or in the cloud - should be displayed. Due to the fact that the application does not store very large data, nor are they so complicated - in solving this problem I used timestamps. 
+
+In short, every time I modify data I update the timestamp in both databases. If the application has no internet connection, only the local timestamp will be overwritten. The next time I run the application, the timestamps between the two databases are compared and the version that is newer is selected.
+```dart
+void compareDiscrepanciesBetweenCloudAndLocalData() {
+  int localTimestamp = _shoppingListsVM.getLocalTimestamp();
+  if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
+     return addFetchedShoppingListsDataToLocalList();
+  }
+  return putLocalDataToFirebase();
+}
+```

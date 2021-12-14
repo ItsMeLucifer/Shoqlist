@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
-import 'package:shoqlist/widgets/components/notifications.dart';
+import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/loyaltyCards/add_new_loyalty_card.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_card_info.dart';
 
