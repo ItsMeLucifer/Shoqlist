@@ -114,8 +114,15 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     if (_auth.currentUser == null) return;
     var doc = await users.doc(_auth.currentUser.uid).get();
     if (!doc.exists) {
-      users.doc(_auth.currentUser.uid).set(
-          {'email': auth.currentUser.email, 'userID': auth.currentUser.uid});
+      users.doc(_auth.currentUser.uid).set(!_auth.currentUser.isAnonymous
+          ? {
+              'email': auth.currentUser.email,
+              'userId': auth.currentUser.uid,
+              'nickname': auth.currentUser.email.split("@")[0]
+            }
+          : {
+              'userId': auth.currentUser.uid,
+            });
     }
   }
 
@@ -124,5 +131,13 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     _exceptionMessage = "";
     print('SIGN OUT');
     await _auth.signOut();
+  }
+
+  Future<String> get currentUserNickname => _getCurrentUserNickname();
+
+  Future<String> _getCurrentUserNickname() async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    var doc = await users.doc(_auth.currentUser.uid).get();
+    return doc.get('nickname');
   }
 }

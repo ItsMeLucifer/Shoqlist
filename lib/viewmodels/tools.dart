@@ -33,6 +33,10 @@ class Tools extends ChangeNotifier {
     return text[0].toUpperCase() + text.substring(1);
   }
 
+  String deleteAllWhitespacesFromString(String input) {
+    return input.replaceAll(' ', '');
+  }
+
   //Add new List
   Importance _newListImportance = Importance.normal;
   Importance get newListImportance => _newListImportance;

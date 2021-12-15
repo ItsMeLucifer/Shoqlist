@@ -78,13 +78,23 @@ class ShoppingList extends HiveObject {
 ```
 The advantage of using two databases is that the application can run offline. However, this solution causes additional problems that need to be solved. The basic problem is synchronization. The application somehow needs to know which data - local or in the cloud - should be displayed. Due to the fact that the application does not store very large data, nor are they so complicated - in solving this problem I used timestamps. 
 
-In short, every time I modify data I update the timestamp in both databases. If the application has no internet connection, only the local timestamp will be overwritten. The next time I run the application, the timestamps between the two databases are compared and the version that is newer is selected.
+In short, every time the data is modified, the timestamp in both databases is updated. If the application has no internet connection, only the local timestamp is overwritten. The next time the internet connection state changes, the timestamps between the two databases are compared and the version that is newer is selected.
 ```dart
 void compareDiscrepanciesBetweenCloudAndLocalData() {
   int localTimestamp = _shoppingListsVM.getLocalTimestamp();
   if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
      return addFetchedShoppingListsDataToLocalList();
   }
-  return putLocalDataToFirebase();
+  return putLocalShoppingListsDataToFirebase();
+}
+```
+```dart
+void whenInternetConnectionIsRestoredCompareDatabasesAgain() {
+  Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+   if (result == ConnectivityResult.mobile ||
+       result == ConnectivityResult.wifi) {
+     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
+   }
+ });
 }
 ```

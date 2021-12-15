@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -27,6 +28,16 @@ class _HomeScreen extends State<HomeScreen> {
     super.initState();
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
+    whenInternetConnectionIsRestoredCompareDatabasesAgain();
+  }
+
+  void whenInternetConnectionIsRestoredCompareDatabasesAgain() {
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result == ConnectivityResult.mobile ||
+          result == ConnectivityResult.wifi) {
+        context.read(firebaseProvider).getShoppingListsFromFirebase(true);
+      }
+    });
   }
 
   void _navigateToLoyaltyCardsHandler(BuildContext context) {

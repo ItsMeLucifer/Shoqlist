@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
@@ -19,9 +20,19 @@ class FirebaseViewModel extends ChangeNotifier {
   //SYNCHRONIZATION
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   int _cloudTimestamp = 0;
+
+  void compareDiscrepanciesBetweenCloudAndLocalData() {
+    int localTimestamp = _shoppingListsVM.getLocalTimestamp();
+    if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
+      return addFetchedShoppingListsDataToLocalList();
+    }
+    return putLocalShoppingListsDataToFirebase();
+  }
+
   // -- SHOPPING LISTS
   List<QueryDocumentSnapshot> _shoppingListsFetchedFromFirebase =
       List<QueryDocumentSnapshot>();
+
   void getShoppingListsFromFirebase(
       bool shouldCompareCloudDataWithLocalOne) async {
     if (_firebaseAuth.auth.currentUser == null) return;
@@ -58,15 +69,7 @@ class FirebaseViewModel extends ChangeNotifier {
       compareDiscrepanciesBetweenCloudAndLocalData();
   }
 
-  void compareDiscrepanciesBetweenCloudAndLocalData() {
-    int localTimestamp = _shoppingListsVM.getLocalTimestamp();
-    if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
-      return addFetchedShoppingListsDataToLocalList();
-    }
-    return putLocalDataToFirebase();
-  }
-
-  void putLocalDataToFirebase() {
+  void putLocalShoppingListsDataToFirebase() {
     if (_firebaseAuth.auth.currentUser == null) return;
     List<ShoppingList> localLists = _shoppingListsVM.getLocalShoppingList();
     List<String> listContent = List<String>();
@@ -355,5 +358,95 @@ class FirebaseViewModel extends ChangeNotifier {
         .then((value) => print("Changed favorite of loyalty card"))
         .catchError((error) =>
             print("Failed to toggle loyalty card's favorite: $error"));
+  }
+
+  //--FRIENDS
+  List<User> _friendsList = List<User>();
+  List<User> get friendsList => _friendsList;
+
+  List<User> _friendRequestsList = List<User>();
+  List<User> get friendRequestList => _friendRequestsList;
+
+  List<User> _usersList = List<User>();
+  List<User> get usersList => usersList;
+
+  void searchForUser(String input) async {
+    input = _toolsVM.deleteAllWhitespacesFromString(input);
+    await users.where("email", isEqualTo: input).get().then((querySnapshot) {
+      querySnapshot.docs.forEach((document) {
+        if (document.get('userId') != _firebaseAuth.auth.currentUser.uid) {
+          User _user = User(document.get('nickname'), document.get('email'),
+              document.get('userId'));
+          _usersList.add(_user);
+        }
+      });
+    });
+    notifyListeners();
+  }
+
+  void sendFriendRequest(User friendRequestReceiver) async {
+    //Check if friendRequestReceiver didnt invite currentUser before
+    if (await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('friendRequests')
+        .where('userId', isEqualTo: friendRequestReceiver.userId)
+        .get()
+        .then((querySnapshot) => querySnapshot.size > 0)) {
+      return acceptFriendRequest(friendRequestReceiver);
+    }
+    //Add current user to friendRequestReceiver's friend requests list
+    await users
+        .doc(friendRequestReceiver.userId)
+        .collection('friendRequests')
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .set({
+      'userId': _firebaseAuth.auth.currentUser.uid,
+      'nickname': _firebaseAuth.currentUserNickname,
+      'email': _firebaseAuth.auth.currentUser.email
+    });
+    notifyListeners();
+  }
+
+  void acceptFriendRequest(User friendRequestSender) async {
+    //Delete user from requests list
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('friendRequests')
+        .doc(friendRequestSender.userId)
+        .delete();
+    //Add user to currentUser's friends list
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('friends')
+        .doc(friendRequestSender.userId)
+        .set({
+      'userId': friendRequestSender.userId,
+      'nickname': friendRequestSender.nickname,
+      'email': friendRequestSender.email
+    });
+    //Add currentUser to friendRequestSender's friends list
+    await users
+        .doc(friendRequestSender.userId)
+        .collection('friends')
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .set({
+      'userId': _firebaseAuth.auth.currentUser.uid,
+      'nickname': _firebaseAuth.currentUserNickname,
+      'email': _firebaseAuth.auth.currentUser.email
+    });
+    friendRequestList.remove(friendRequestSender);
+    friendsList.add(friendRequestSender);
+    notifyListeners();
+  }
+
+  void declineFriendRequest(User friendRequestSender) async {
+    //Delete user from requests list
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('friendRequests')
+        .doc(friendRequestSender.userId)
+        .delete();
+    friendRequestList.remove(friendRequestSender);
+    notifyListeners();
   }
 }
