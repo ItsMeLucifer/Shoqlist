@@ -10,6 +10,8 @@ import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoqlist/widgets/social/friends_display.dart';
+import 'package:shoqlist/widgets/social/friends_search_display.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -50,6 +52,11 @@ class _HomeScreen extends State<HomeScreen> {
         context, MaterialPageRoute(builder: (context) => Settings()));
   }
 
+  void _navigateToFriendsDisplay(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => FriendsDisplay()));
+  }
+
   void _createNewShoppingList(
     BuildContext context,
   ) {
@@ -78,33 +85,6 @@ class _HomeScreen extends State<HomeScreen> {
             children: [
               SpeedDialChild(
                   onTap: () {
-                    _navigateToSettings(context);
-                  },
-                  backgroundColor: Theme.of(context)
-                      .floatingActionButtonTheme
-                      .backgroundColor,
-                  child: Icon(Icons.settings),
-                  label: 'Settings'),
-              SpeedDialChild(
-                  onTap: () {
-                    //SCAN
-                  },
-                  backgroundColor: Theme.of(context)
-                      .floatingActionButtonTheme
-                      .backgroundColor,
-                  child: Icon(Icons.qr_code_scanner_rounded),
-                  label: 'Scan your list'),
-              SpeedDialChild(
-                  onTap: () {
-                    _navigateToLoyaltyCardsHandler(context);
-                  },
-                  backgroundColor: Theme.of(context)
-                      .floatingActionButtonTheme
-                      .backgroundColor,
-                  child: Icon(Icons.card_membership),
-                  label: 'Loyalty cards'),
-              SpeedDialChild(
-                  onTap: () {
                     context.read(toolsProvider).resetNewListData();
                     showDialog(
                         context: context,
@@ -116,6 +96,43 @@ class _HomeScreen extends State<HomeScreen> {
                       .backgroundColor,
                   child: Icon(Icons.add),
                   label: 'Create new list'),
+              SpeedDialChild(
+                  onTap: () {
+                    _navigateToLoyaltyCardsHandler(context);
+                  },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  child: Icon(Icons.card_membership),
+                  label: 'Loyalty cards'),
+
+              SpeedDialChild(
+                  onTap: () {
+                    _navigateToFriendsDisplay(context);
+                  },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  child: Icon(Icons.people),
+                  label: 'Friends'),
+              SpeedDialChild(
+                  onTap: () {
+                    _navigateToSettings(context);
+                  },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  child: Icon(Icons.settings),
+                  label: 'Settings'),
+              // SpeedDialChild(
+              // onTap: () {
+              //   //SCAN
+              // },
+              // backgroundColor: Theme.of(context)
+              //     .floatingActionButtonTheme
+              //     .backgroundColor,
+              // child: Icon(Icons.qr_code_scanner_rounded),
+              // label: 'Scan your list'),
             ]),
         body: HomeScreenMainView());
   }

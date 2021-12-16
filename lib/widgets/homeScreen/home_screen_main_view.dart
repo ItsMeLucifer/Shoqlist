@@ -53,10 +53,7 @@ class HomeScreenMainView extends ConsumerWidget {
             children: [
               SizedBox(height: 5),
               Text("Shoqlist",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40,
-                      fontStyle: FontStyle.italic)),
+                  style: Theme.of(context).primaryTextTheme.headline3),
               Divider(
                 color: Theme.of(context).accentColor,
                 indent: 50,

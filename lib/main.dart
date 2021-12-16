@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
 import 'package:shoqlist/viewmodels/firebase_view_model.dart';
+import 'package:shoqlist/viewmodels/friends_service_view_model.dart';
 import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
@@ -27,6 +28,8 @@ final firebaseProvider = ChangeNotifierProvider((_) {
   final auth = _.watch(firebaseAuthProvider);
   return FirebaseViewModel(shoppingLists, loyaltyCards, tools, auth);
 });
+final friendsServiceProvider =
+    ChangeNotifierProvider((_) => FriendsServiceViewModel());
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -51,6 +54,11 @@ class MyApp extends StatelessWidget {
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+          primaryTextTheme: TextTheme(
+              headline3: TextStyle(
+                  color: Colors.black,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.bold)),
           primarySwatch: Colors.grey,
           primaryColor: Colors.white,
           accentColor: Colors.black,

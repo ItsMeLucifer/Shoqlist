@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/loyaltyCards/add_new_loyalty_card.dart';
@@ -24,22 +23,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
     return Scaffold(
-      // floatingActionButton: SpeedDial(
-      //   overlayOpacity: 0,
-      //   animatedIcon: AnimatedIcons.menu_close,
-      //   backgroundColor:
-      //       Theme.of(context).floatingActionButtonTheme.backgroundColor,
-      //   children: [
-      //     SpeedDialChild(
-      //         onTap: () async {},
-      //         backgroundColor:
-      //             Theme.of(context).floatingActionButtonTheme.backgroundColor,
-      //         child: Icon(Icons.add),
-      //         label: "Something"),
-      //   ],
-      // ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -47,8 +31,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
               children: [
                 SizedBox(height: 5),
                 Text("Loyalty Cards",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+                    style: Theme.of(context).primaryTextTheme.headline4),
                 Divider(
                   color: Theme.of(context).accentColor,
                   indent: 50,
@@ -70,7 +53,6 @@ class LoyaltyCardsHandler extends ConsumerWidget {
   Widget loyaltyCardsList(ScopedReader watch) {
     final loyaltyCardsVM = watch(loyaltyCardsProvider);
     final toolsVM = watch(toolsProvider);
-    final firebaseVM = watch(firebaseProvider);
     return GridView.builder(
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),

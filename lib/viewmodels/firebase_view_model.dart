@@ -374,7 +374,10 @@ class FirebaseViewModel extends ChangeNotifier {
     input = _toolsVM.deleteAllWhitespacesFromString(input);
     await users.where("email", isEqualTo: input).get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
-        if (document.get('userId') != _firebaseAuth.auth.currentUser.uid) {
+        if (document.get('userId') != _firebaseAuth.auth.currentUser.uid &&
+            !_friendsList.contains((element) => element.email == input) &&
+            !_friendRequestsList
+                .contains((element) => element.email == input)) {
           User _user = User(document.get('nickname'), document.get('email'),
               document.get('userId'));
           _usersList.add(_user);
@@ -447,6 +450,23 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(friendRequestSender.userId)
         .delete();
     friendRequestList.remove(friendRequestSender);
+    notifyListeners();
+  }
+
+  void removeFriendFromFriendsList(User friendToRemove) async {
+    //Delete friendToRemove from current user's friends list
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('friends')
+        .doc(friendToRemove.userId)
+        .delete();
+    //Delete current users from friendToRemove's friends list
+    await users
+        .doc(friendToRemove.userId)
+        .collection('friends')
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .delete();
+    friendsList.remove(friendToRemove);
     notifyListeners();
   }
 }
