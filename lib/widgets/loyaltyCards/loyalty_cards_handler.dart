@@ -89,11 +89,10 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                 showDialog(
                     context: context,
                     builder: (context) {
-                      String title = "the '" +
+                      String title = "Remove the '" +
                           loyaltyCardsVM.loyaltyCardsList[fixedIndex].name +
                           "' card?";
-                      return DeleteNotification(
-                          _onLongPressedLoyaltyCard, title, context);
+                      return YesNoDialog(_onLongPressedLoyaltyCard, title);
                     });
               },
               child: LoyaltyCardButton(

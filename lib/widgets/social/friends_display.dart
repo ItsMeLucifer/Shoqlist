@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
+import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/widgets/social/friends_search_display.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
 
 class FriendsDisplay extends ConsumerWidget {
-  void _removeUserFromFriendsListAfterTap() {
-    //Delete notification etc.
+  void _removeUserFromFriendsListAfterTap(BuildContext context) {
+    final firebaseVM = context.read(firebaseProvider);
+    final friendsServiceVM = context.read(friendsServiceProvider);
+    User user = friendsServiceVM.friendsList[friendsServiceVM.currentUserIndex];
+    firebaseVM.removeFriendFromFriendsList(user);
+    Navigator.of(context).pop();
   }
+
   void _navigateToFriendsSearchList(BuildContext context) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => FriendsSearchDisplay()));
@@ -60,7 +66,7 @@ class FriendsDisplay extends ConsumerWidget {
                       ],
                     )
                   : UsersList(_removeUserFromFriendsListAfterTap,
-                      friendsServiceVM.friendsList)
+                      friendsServiceVM.friendsList, "Remove from friends list?")
             ],
           ),
         ],

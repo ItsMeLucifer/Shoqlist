@@ -178,8 +178,8 @@ class ShoppingListDisplay extends ConsumerWidget {
               showDialog(
                   context: context,
                   builder: (context) {
-                    return DeleteNotification(
-                        _onLongPressShoppingListItem, "this item?", context);
+                    return YesNoDialog(
+                        _onLongPressShoppingListItem, "Remove this item?");
                   });
             },
             child: Card(

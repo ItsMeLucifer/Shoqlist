@@ -5,28 +5,25 @@ import 'package:shoqlist/models/shopping_list.dart';
 
 import '../../main.dart';
 
-class DeleteNotification extends ConsumerWidget {
-  Function _onPressed;
-  String nameOfComponentToDelete;
-  BuildContext context;
-  DeleteNotification(
-      this._onPressed, this.nameOfComponentToDelete, this.context);
-  void _onPressDelete() {
-    _onPressed(context);
-  }
+class YesNoDialog extends ConsumerWidget {
+  final Function _onPressed;
+  final String _titleToDisplay;
+  YesNoDialog(this._onPressed, this._titleToDisplay);
 
   Widget build(BuildContext context, ScopedReader watch) {
     return AlertDialog(
       content: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
-            child: Text("Delete " + nameOfComponentToDelete,
+            child: Text(_titleToDisplay,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center)),
       ),
       actions: [
         FlatButton(
-          onPressed: _onPressDelete,
+          onPressed: () {
+            _onPressed(context);
+          },
           child: Text('Yes'),
         ),
         FlatButton(
@@ -47,11 +44,6 @@ class PutShoppingListData extends ConsumerWidget {
   String _deleteNotificationTitle;
   PutShoppingListData(this._onPressedSave, this.context,
       [this._deleteNotificationTitle = '', this._onPressedDelete]);
-
-  void _onPressSave() {
-    _onPressedSave(context);
-    Navigator.of(context).pop();
-  }
 
   Widget build(BuildContext context, ScopedReader watch) {
     final toolsVM = watch(toolsProvider);
@@ -153,7 +145,10 @@ class PutShoppingListData extends ConsumerWidget {
               children: [
                 FlatButton(
                     color: Color.fromRGBO(0, 0, 0, 0.2),
-                    onPressed: _onPressSave,
+                    onPressed: () {
+                      _onPressedSave(context);
+                      Navigator.of(context).pop();
+                    },
                     child: Text(
                       'Save',
                     )),
@@ -164,12 +159,12 @@ class PutShoppingListData extends ConsumerWidget {
                           showDialog(
                               context: context,
                               builder: (context) {
-                                return DeleteNotification(_onPressedDelete,
-                                    _deleteNotificationTitle, context);
+                                return YesNoDialog(
+                                    _onPressedDelete, _deleteNotificationTitle);
                               });
                         },
                         child: Text(
-                          'Delete',
+                          'Remove',
                         ))
                     : SizedBox(),
               ],
