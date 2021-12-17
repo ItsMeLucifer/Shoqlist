@@ -21,8 +21,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreen extends State<HomeScreen> {
   @override
   void dispose() {
-    Hive.box('shopping_lists').close();
     super.dispose();
+    Hive.box('shopping_lists').close();
+    Hive.box('data_variables').close();
   }
 
   @override

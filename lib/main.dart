@@ -21,15 +21,17 @@ final loyaltyCardsProvider =
 final toolsProvider = ChangeNotifierProvider((_) => Tools());
 final firebaseAuthProvider =
     ChangeNotifierProvider((_) => FirebaseAuthViewModel());
+final friendsServiceProvider =
+    ChangeNotifierProvider((_) => FriendsServiceViewModel());
 final firebaseProvider = ChangeNotifierProvider((_) {
   final shoppingLists = _.watch(shoppingListsProvider);
   final loyaltyCards = _.watch(loyaltyCardsProvider);
   final tools = _.watch(toolsProvider);
   final auth = _.watch(firebaseAuthProvider);
-  return FirebaseViewModel(shoppingLists, loyaltyCards, tools, auth);
+  final friends = _.watch(friendsServiceProvider);
+  return FirebaseViewModel(shoppingLists, loyaltyCards, tools, auth, friends);
 });
-final friendsServiceProvider =
-    ChangeNotifierProvider((_) => FriendsServiceViewModel());
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

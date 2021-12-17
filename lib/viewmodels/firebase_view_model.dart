@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
 import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
+import 'package:shoqlist/viewmodels/friends_service_view_model.dart';
 import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
@@ -14,8 +16,9 @@ class FirebaseViewModel extends ChangeNotifier {
   LoyaltyCardsViewModel _loyaltyCardsVM;
   Tools _toolsVM;
   FirebaseAuthViewModel _firebaseAuth;
+  FriendsServiceViewModel _friendsServiceVM;
   FirebaseViewModel(this._shoppingListsVM, this._loyaltyCardsVM, this._toolsVM,
-      this._firebaseAuth);
+      this._firebaseAuth, this._friendsServiceVM);
 
   //SYNCHRONIZATION
   CollectionReference users = FirebaseFirestore.instance.collection('users');
@@ -260,6 +263,7 @@ class FirebaseViewModel extends ChangeNotifier {
           "Could not get document from Firebase, error: " + e.code.toString());
     }
     List<dynamic> listFavorite = document.get('listFavorite');
+    // When added to favorite last item in the list, there was an error related to index range - fix in future
     listFavorite[itemIndex] = !listFavorite[itemIndex];
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
@@ -361,30 +365,54 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   //--FRIENDS
-  List<User> _friendsList = List<User>();
-  List<User> get friendsList => _friendsList;
+  List<QueryDocumentSnapshot> _friendsFetchedFromFirebase =
+      List<QueryDocumentSnapshot>();
 
-  List<User> _friendRequestsList = List<User>();
-  List<User> get friendRequestList => _friendRequestsList;
-
-  List<User> _usersList = List<User>();
-  List<User> get usersList => usersList;
-
-  void searchForUser(String input) async {
+  Future<void> searchForUser(String input) async {
+    List<User> _usersGet = List<User>();
     input = _toolsVM.deleteAllWhitespacesFromString(input);
     await users.where("email", isEqualTo: input).get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
         if (document.get('userId') != _firebaseAuth.auth.currentUser.uid &&
-            !_friendsList.contains((element) => element.email == input) &&
-            !_friendRequestsList
+            !_friendsServiceVM.friendsList
+                .contains((element) => element.email == input) &&
+            !_friendsServiceVM.friendRequestsList
                 .contains((element) => element.email == input)) {
           User _user = User(document.get('nickname'), document.get('email'),
               document.get('userId'));
-          _usersList.add(_user);
+          _usersGet.add(_user);
         }
       });
     });
-    notifyListeners();
+  }
+
+  void fetchFriendsList() async {
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('friends')
+        .get()
+        .then((QuerySnapshot querySnapshot) => {
+              if (querySnapshot.size > 0)
+                {
+                  querySnapshot.docs.forEach((doc) {
+                    _friendsFetchedFromFirebase.add(doc);
+                  })
+                }
+            })
+        .catchError((error) =>
+            print("Failed to fetch friends data from Firebase: $error"));
+    addFetchedFriendsDataToLocalList();
+  }
+
+  void addFetchedFriendsDataToLocalList() {
+    List<User> newList = List<User>();
+    for (int i = 0; i < _friendsFetchedFromFirebase.length; i++) {
+      newList.add(User(
+          _friendsFetchedFromFirebase[i].get('nickname'),
+          _friendsFetchedFromFirebase[i].get('email'),
+          _friendsFetchedFromFirebase[i].get('userId')));
+    }
+    _friendsServiceVM.putFriendsList(newList);
   }
 
   void sendFriendRequest(User friendRequestReceiver) async {
@@ -437,9 +465,8 @@ class FirebaseViewModel extends ChangeNotifier {
       'nickname': _firebaseAuth.currentUserNickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
-    friendRequestList.remove(friendRequestSender);
-    friendsList.add(friendRequestSender);
-    notifyListeners();
+    //friendRequestList.remove(friendRequestSender);
+    //friendsList.add(friendRequestSender);
   }
 
   void declineFriendRequest(User friendRequestSender) async {
@@ -449,8 +476,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('friendRequests')
         .doc(friendRequestSender.userId)
         .delete();
-    friendRequestList.remove(friendRequestSender);
-    notifyListeners();
+    //friendRequestList.remove(friendRequestSender);
   }
 
   void removeFriendFromFriendsList(User friendToRemove) async {
@@ -466,7 +492,6 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('friends')
         .doc(_firebaseAuth.auth.currentUser.uid)
         .delete();
-    friendsList.remove(friendToRemove);
-    notifyListeners();
+    //friendsList.remove(friendToRemove);
   }
 }

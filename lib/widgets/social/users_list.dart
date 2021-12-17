@@ -6,34 +6,13 @@ import 'package:shoqlist/models/user.dart';
 import '../../main.dart';
 
 class UsersList extends ConsumerWidget {
-  Function _tapElementFunction;
-  UsersList(this._tapElementFunction);
+  final Function _tapElementFunction;
+  final List<User> _usersList;
+  UsersList(this._tapElementFunction, this._usersList);
   Widget build(BuildContext context, ScopedReader watch) {
-    final friendsServiceVM = watch(friendsServiceProvider);
-    if (friendsServiceVM.currentUsersList.length < 1) {
-      return Column(
-        children: [
-          SizedBox(height: 10),
-          Center(
-              child: Text('You have no Friends',
-                  style: Theme.of(context).primaryTextTheme.bodyText1)),
-          SizedBox(height: 10),
-          FlatButton(
-              onPressed: null,
-              child: Card(
-                color: Theme.of(context).buttonColor,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('Search for Friends',
-                      style: Theme.of(context).primaryTextTheme.button),
-                ),
-              ))
-        ],
-      );
-    }
     return ListView.builder(
         shrinkWrap: true,
-        itemCount: friendsServiceVM.currentUsersList.length,
+        itemCount: _usersList.length,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: _tapElementFunction,
@@ -45,7 +24,7 @@ class UsersList extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        friendsServiceVM.currentUsersList[index].email,
+                        _usersList[index].email,
                       ),
                     ),
                   ],
