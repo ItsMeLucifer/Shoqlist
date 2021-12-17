@@ -67,8 +67,8 @@ class MyApp extends StatelessWidget {
           textTheme: Typography.blackCupertino,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: Color.fromRGBO(237, 246, 249, 1),
-          floatingActionButtonTheme:
-              FloatingActionButtonThemeData(backgroundColor: Colors.white)),
+          floatingActionButtonTheme: FloatingActionButtonThemeData(
+              backgroundColor: Colors.white, foregroundColor: Colors.black38)),
       home: Wrapper(),
     );
   }

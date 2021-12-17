@@ -23,54 +23,52 @@ class FriendsDisplay extends ConsumerWidget {
     final friendsServiceVM = watch(friendsServiceProvider);
     final firebaseVM = watch(firebaseProvider);
     firebaseVM.fetchFriendsList();
-    //Make if statement, when loading data, display only
+    //Make if statement, when loading data, display only progress indicator
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              _navigateToFriendsSearchList(context);
+            },
+            backgroundColor:
+                Theme.of(context).floatingActionButtonTheme.backgroundColor,
+            child: Icon(
+              Icons.search,
+              color:
+                  Theme.of(context).floatingActionButtonTheme.foregroundColor,
+            )),
         body: SafeArea(
-      child: Stack(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: Stack(
             children: [
-              SizedBox(height: 5),
-              Text("Friends",
-                  style: Theme.of(context).primaryTextTheme.headline4),
-              Divider(
-                color: Theme.of(context).accentColor,
-                indent: 50,
-                endIndent: 50,
-              ),
-              friendsServiceVM.friendsList.isEmpty
-                  ? Column(
-                      children: [
-                        SizedBox(height: 10),
-                        Center(
-                            child: Text('You have no Friends',
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .bodyText1)),
-                        SizedBox(height: 10),
-                        FlatButton(
-                            onPressed: () {
-                              _navigateToFriendsSearchList(context);
-                            },
-                            child: Card(
-                              color: Theme.of(context).buttonColor,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Text('Search for Friends',
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: 5),
+                  Text("Friends",
+                      style: Theme.of(context).primaryTextTheme.headline4),
+                  Divider(
+                    color: Theme.of(context).accentColor,
+                    indent: 50,
+                    endIndent: 50,
+                  ),
+                  friendsServiceVM.friendsList.isEmpty
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                                child: Text('You have no Friends',
                                     style: Theme.of(context)
                                         .primaryTextTheme
-                                        .button),
-                              ),
-                            ))
-                      ],
-                    )
-                  : UsersList(_removeUserFromFriendsListAfterTap,
-                      friendsServiceVM.friendsList, "Remove from friends list?")
+                                        .bodyText1)),
+                          ],
+                        )
+                      : UsersList(
+                          _removeUserFromFriendsListAfterTap,
+                          friendsServiceVM.friendsList,
+                          "Remove from friends list?")
+                ],
+              ),
             ],
           ),
-        ],
-      ),
-    ));
+        ));
   }
 }

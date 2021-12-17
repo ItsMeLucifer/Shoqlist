@@ -31,6 +31,8 @@ class _HomeScreen extends State<HomeScreen> {
     super.initState();
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
+    context.read(firebaseProvider).fetchFriendsList();
+    context.read(firebaseProvider).fetchFriendRequestsList();
     whenInternetConnectionIsRestoredCompareDatabasesAgain();
   }
 

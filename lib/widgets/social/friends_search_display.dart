@@ -6,9 +6,12 @@ import 'package:shoqlist/widgets/social/users_list.dart';
 import '../../main.dart';
 
 class FriendsSearchDisplay extends ConsumerWidget {
-  _sendFriendRequestAfterTap(BuildContext context, User target) {
+  _sendFriendRequestAfterTap(BuildContext context) {
     final firebaseVM = context.read(firebaseProvider);
-    firebaseVM.sendFriendRequest(target);
+    final friendsServiceVM = context.read(friendsServiceProvider);
+    User user = friendsServiceVM.usersList[friendsServiceVM.currentUserIndex];
+    firebaseVM.sendFriendRequest(user);
+    Navigator.of(context).pop();
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -60,20 +63,20 @@ class FriendsSearchDisplay extends ConsumerWidget {
                           hintStyle: TextStyle(fontWeight: FontWeight.bold),
                           contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10))),
                 ),
-                // friendsServiceVM.usersList.isEmpty &&
-                //         friendsServiceVM.searchFriendTextController.text != ""
-                //     ? Column(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: [
-                //           Center(
-                //               child: Text("Can't find that user, try again",
-                //                   style: Theme.of(context)
-                //                       .primaryTextTheme
-                //                       .bodyText1)),
-                //         ],
-                //       )
-                //     : UsersList(
-                //         _sendFriendRequestAfterTap, friendsServiceVM.usersList)
+                friendsServiceVM.usersList.isEmpty &&
+                        friendsServiceVM.searchFriendTextController.text != ""
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                              child: Text("Can't find that user, try again",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .bodyText1)),
+                        ],
+                      )
+                    : UsersList(_sendFriendRequestAfterTap,
+                        friendsServiceVM.usersList, 'Send friend request?')
               ],
             ),
           ],

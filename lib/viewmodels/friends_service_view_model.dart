@@ -27,6 +27,31 @@ class FriendsServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeUserFromFriendsList(User user) {
+    _friendsList.remove(user);
+    notifyListeners();
+  }
+
+  void removeUserFromFriendRequestsList(User user) {
+    _friendRequestsList.remove(user);
+    notifyListeners();
+  }
+
+  void removeUserFromUsersList(User user) {
+    _usersList.remove(user);
+    notifyListeners();
+  }
+
+  void addUserToFriendsList(User user) {
+    _friendsList.add(user);
+    notifyListeners();
+  }
+
+  void addUserToFriendRequestsList(User user) {
+    _friendRequestsList.add(user);
+    notifyListeners();
+  }
+
   int _currentUserIndex;
   int get currentUserIndex => _currentUserIndex;
   set currentUserIndex(int newUserIndex) {

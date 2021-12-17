@@ -365,8 +365,6 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   //--FRIENDS
-  List<QueryDocumentSnapshot> _friendsFetchedFromFirebase =
-      List<QueryDocumentSnapshot>();
 
   Future<void> searchForUser(String input) async {
     List<User> _usersGet = List<User>();
@@ -374,19 +372,24 @@ class FirebaseViewModel extends ChangeNotifier {
     await users.where("email", isEqualTo: input).get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
         if (document.get('userId') != _firebaseAuth.auth.currentUser.uid &&
-            !_friendsServiceVM.friendsList
-                .contains((element) => element.email == input) &&
+            !_friendsServiceVM.friendsList.any((element) {
+              print('compare: ' + element.email + ' ' + input);
+              return element.email == input;
+            }) &&
             !_friendsServiceVM.friendRequestsList
-                .contains((element) => element.email == input)) {
+                .any((element) => element.email == input)) {
           User _user = User(document.get('nickname'), document.get('email'),
               document.get('userId'));
           _usersGet.add(_user);
         }
       });
     });
+    _friendsServiceVM.putUsersList(_usersGet);
   }
 
   void fetchFriendsList() async {
+    List<QueryDocumentSnapshot> _friendsFetchedFromFirebase =
+        List<QueryDocumentSnapshot>();
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friends')
@@ -401,10 +404,11 @@ class FirebaseViewModel extends ChangeNotifier {
             })
         .catchError((error) =>
             print("Failed to fetch friends data from Firebase: $error"));
-    addFetchedFriendsDataToLocalList();
+    addFetchedFriendsDataToLocalList(_friendsFetchedFromFirebase);
   }
 
-  void addFetchedFriendsDataToLocalList() {
+  void addFetchedFriendsDataToLocalList(
+      List<QueryDocumentSnapshot> _friendsFetchedFromFirebase) {
     List<User> newList = List<User>();
     for (int i = 0; i < _friendsFetchedFromFirebase.length; i++) {
       newList.add(User(
@@ -413,6 +417,38 @@ class FirebaseViewModel extends ChangeNotifier {
           _friendsFetchedFromFirebase[i].get('userId')));
     }
     _friendsServiceVM.putFriendsList(newList);
+  }
+
+  void fetchFriendRequestsList() async {
+    List<QueryDocumentSnapshot> _friendRequestsFetchedFromFirebase =
+        List<QueryDocumentSnapshot>();
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('friendRequests')
+        .get()
+        .then((QuerySnapshot querySnapshot) => {
+              if (querySnapshot.size > 0)
+                {
+                  querySnapshot.docs.forEach((doc) {
+                    _friendRequestsFetchedFromFirebase.add(doc);
+                  })
+                }
+            })
+        .catchError((error) =>
+            print("Failed to fetch friends data from Firebase: $error"));
+    addFetchedFriendRequestsDataToLocalList(_friendRequestsFetchedFromFirebase);
+  }
+
+  void addFetchedFriendRequestsDataToLocalList(
+      List<QueryDocumentSnapshot> _friendRequestsFetchedFromFirebase) {
+    List<User> newList = List<User>();
+    for (int i = 0; i < _friendRequestsFetchedFromFirebase.length; i++) {
+      newList.add(User(
+          _friendRequestsFetchedFromFirebase[i].get('nickname'),
+          _friendRequestsFetchedFromFirebase[i].get('email'),
+          _friendRequestsFetchedFromFirebase[i].get('userId')));
+    }
+    _friendsServiceVM.putFriendRequestsList(newList);
   }
 
   void sendFriendRequest(User friendRequestReceiver) async {
@@ -435,7 +471,8 @@ class FirebaseViewModel extends ChangeNotifier {
       'nickname': _firebaseAuth.currentUserNickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
-    notifyListeners();
+    _friendsServiceVM.addUserToFriendRequestsList(friendRequestReceiver);
+    _friendsServiceVM.removeUserFromUsersList(friendRequestReceiver);
   }
 
   void acceptFriendRequest(User friendRequestSender) async {
