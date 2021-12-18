@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/user.dart';
+import 'package:shoqlist/widgets/social/friend_requests_display.dart';
 import 'package:shoqlist/widgets/social/friends_search_display.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
 
@@ -19,23 +21,52 @@ class FriendsDisplay extends ConsumerWidget {
         MaterialPageRoute(builder: (context) => FriendsSearchDisplay()));
   }
 
+  void _navigateToFriendRequestsList(BuildContext context) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => FriendRequestsDisplay()));
+  }
+
   Widget build(BuildContext context, ScopedReader watch) {
     final friendsServiceVM = watch(friendsServiceProvider);
     final firebaseVM = watch(firebaseProvider);
     firebaseVM.fetchFriendsList();
     //Make if statement, when loading data, display only progress indicator
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              _navigateToFriendsSearchList(context);
-            },
+        floatingActionButton: SpeedDial(
+            overlayOpacity: 0,
+            animatedIcon: AnimatedIcons.menu_close,
             backgroundColor:
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,
-            child: Icon(
-              Icons.search,
-              color:
-                  Theme.of(context).floatingActionButtonTheme.foregroundColor,
-            )),
+            children: [
+              SpeedDialChild(
+                  onTap: () {
+                    _navigateToFriendsSearchList(context);
+                  },
+                  label: 'Search Friends',
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  child: Icon(
+                    Icons.search,
+                    color: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .foregroundColor,
+                  )),
+              SpeedDialChild(
+                  onTap: () {
+                    _navigateToFriendRequestsList(context);
+                  },
+                  label: 'Friend Requests',
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  child: Icon(
+                    Icons.people_alt,
+                    color: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .foregroundColor,
+                  ))
+            ]),
         body: SafeArea(
           child: Stack(
             children: [

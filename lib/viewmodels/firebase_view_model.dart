@@ -434,8 +434,8 @@ class FirebaseViewModel extends ChangeNotifier {
                   })
                 }
             })
-        .catchError((error) =>
-            print("Failed to fetch friends data from Firebase: $error"));
+        .catchError((error) => print(
+            "Failed to fetch friend requests data from Firebase: $error"));
     addFetchedFriendRequestsDataToLocalList(_friendRequestsFetchedFromFirebase);
   }
 
@@ -468,7 +468,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(_firebaseAuth.auth.currentUser.uid)
         .set({
       'userId': _firebaseAuth.auth.currentUser.uid,
-      'nickname': _firebaseAuth.currentUserNickname,
+      'nickname': await _firebaseAuth.currentUserNickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
     _friendsServiceVM.addUserToFriendRequestsList(friendRequestReceiver);

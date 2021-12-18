@@ -7,10 +7,12 @@ import 'package:shoqlist/widgets/components/dialogs.dart';
 import '../../main.dart';
 
 class UsersList extends ConsumerWidget {
-  final Function _tapElementFunction;
+  final Function _acceptAction;
   final List<User> _usersList;
   final String _dialogTitle;
-  UsersList(this._tapElementFunction, this._usersList, [this._dialogTitle]);
+  final Function _declineAction;
+  UsersList(this._acceptAction, this._usersList,
+      [this._dialogTitle, this._declineAction]);
   Widget build(BuildContext context, ScopedReader watch) {
     final friendsServiceVM = watch(friendsServiceProvider);
     return ListView.builder(
@@ -23,12 +25,13 @@ class UsersList extends ConsumerWidget {
               onTap: () {
                 friendsServiceVM.currentUserIndex = index;
                 if (_dialogTitle == null) {
-                  _tapElementFunction(context);
+                  _acceptAction(context);
                 } else {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return YesNoDialog(_tapElementFunction, _dialogTitle);
+                        return YesNoDialog(
+                            _acceptAction, _dialogTitle, _declineAction);
                       });
                 }
               },

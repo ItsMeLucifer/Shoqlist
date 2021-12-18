@@ -6,9 +6,10 @@ import 'package:shoqlist/models/shopping_list.dart';
 import '../../main.dart';
 
 class YesNoDialog extends ConsumerWidget {
-  final Function _onPressed;
+  final Function _onAccepted;
   final String _titleToDisplay;
-  YesNoDialog(this._onPressed, this._titleToDisplay);
+  final Function _onDeclined;
+  YesNoDialog(this._onAccepted, this._titleToDisplay, [this._onDeclined]);
 
   Widget build(BuildContext context, ScopedReader watch) {
     return AlertDialog(
@@ -22,15 +23,19 @@ class YesNoDialog extends ConsumerWidget {
       actions: [
         FlatButton(
           onPressed: () {
-            _onPressed(context);
+            _onAccepted(context);
           },
-          child: Text('Yes'),
+          child: _onDeclined == null ? Text('Yes') : Text('Accept'),
         ),
         FlatButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            if (_onDeclined == null) {
+              Navigator.of(context).pop();
+            } else {
+              _onDeclined(context);
+            }
           },
-          child: Text('No'),
+          child: _onDeclined == null ? Text('No') : Text('Decline'),
         )
       ],
     );
