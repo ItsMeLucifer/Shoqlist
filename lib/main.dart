@@ -10,6 +10,7 @@ import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sizer/sizer.dart';
 
 import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';

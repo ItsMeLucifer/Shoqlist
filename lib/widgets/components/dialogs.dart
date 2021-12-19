@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/models/shopping_list.dart';
-
+import 'package:shoqlist/models/user.dart';
+import 'package:shoqlist/widgets/social/users_list.dart';
 import '../../main.dart';
 
 class YesNoDialog extends ConsumerWidget {
@@ -43,10 +44,10 @@ class YesNoDialog extends ConsumerWidget {
 }
 
 class PutShoppingListData extends ConsumerWidget {
-  Function _onPressedSave;
-  Function _onPressedDelete;
-  BuildContext context;
-  String _deleteNotificationTitle;
+  final Function _onPressedSave;
+  final Function _onPressedDelete;
+  final BuildContext context;
+  final String _deleteNotificationTitle;
   PutShoppingListData(this._onPressedSave, this.context,
       [this._deleteNotificationTitle = '', this._onPressedDelete]);
 
@@ -178,5 +179,34 @@ class PutShoppingListData extends ConsumerWidget {
         ),
       ),
     ]);
+  }
+}
+
+class ChooseUser extends ConsumerWidget {
+  final Function _actionAfterTapUser;
+  final List<User> _usersList;
+  final String _titleToDisplay;
+  ChooseUser(this._actionAfterTapUser, this._usersList, this._titleToDisplay);
+
+  Widget build(BuildContext context, ScopedReader watch) {
+    var size = MediaQuery.of(context).size;
+    return Container(
+      height: 0.8 * size.height,
+      width: 0.8 * size.width,
+      child: AlertDialog(
+        content: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Choose User",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center),
+              UsersList(_actionAfterTapUser, _usersList, _titleToDisplay)
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

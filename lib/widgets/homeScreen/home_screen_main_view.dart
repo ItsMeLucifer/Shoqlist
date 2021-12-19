@@ -28,7 +28,7 @@ class HomeScreenMainView extends ConsumerWidget {
       final toolsVM = context.read(toolsProvider);
       final shoppingListsVM = context.read(shoppingListsProvider);
       //UPDATE LIST ON SERVER
-      firebaseVM.putShoppingListToFirebase(
+      firebaseVM.updateShoppingListToFirebase(
           toolsVM.newListNameController.text,
           toolsVM.newListImportance,
           shoppingListsVM
@@ -74,26 +74,29 @@ class HomeScreenMainView extends ConsumerWidget {
                             _navigateToShoppingList(context);
                           },
                           onLongPress: () {
-                            shoppingListsVM.currentListIndex = index;
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  String title = "the '" +
-                                      shoppingListsVM
-                                          .shoppingLists[index].name +
-                                      "' list?";
-                                  toolsVM.newListImportance = shoppingListsVM
-                                      .shoppingLists[index].importance;
-                                  toolsVM.setNewListNameControllerText(
-                                      shoppingListsVM
-                                          .shoppingLists[index].name);
-                                  return PutShoppingListData(
-                                    _updateShoppingList,
-                                    context,
-                                    title,
-                                    _deleteShoppingList,
-                                  );
-                                });
+                            if (shoppingListsVM.shoppingLists[index].ownerId ==
+                                null) {
+                              shoppingListsVM.currentListIndex = index;
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    String title = "the '" +
+                                        shoppingListsVM
+                                            .shoppingLists[index].name +
+                                        "' list?";
+                                    toolsVM.newListImportance = shoppingListsVM
+                                        .shoppingLists[index].importance;
+                                    toolsVM.setNewListNameControllerText(
+                                        shoppingListsVM
+                                            .shoppingLists[index].name);
+                                    return PutShoppingListData(
+                                      _updateShoppingList,
+                                      context,
+                                      title,
+                                      _deleteShoppingList,
+                                    );
+                                  });
+                            }
                           },
                           child: Card(
                               color: toolsVM.getImportanceColor(shoppingListsVM

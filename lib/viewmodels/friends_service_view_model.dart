@@ -59,13 +59,6 @@ class FriendsServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<User> _currentUsersList = List<User>();
-  List<User> get currentUsersList => _currentUsersList;
-  void setCurrentUsersListToDisplay(List<User> newList) {
-    _currentUsersList = newList;
-    notifyListeners();
-  }
-
   TextEditingController searchFriendTextController = TextEditingController();
   void clearSearchFriendTextController() {
     searchFriendTextController.clear();

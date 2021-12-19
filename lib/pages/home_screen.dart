@@ -2,17 +2,14 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:hive/hive.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
-import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/pages/settings.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/widgets/social/friends_display.dart';
-import 'package:shoqlist/widgets/social/friends_search_display.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -20,13 +17,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreen extends State<HomeScreen> {
-  @override
-  void dispose() {
-    super.dispose();
-    // Hive.box<ShoppingList>('shopping_lists').close();
-    // Hive.box<int>('data_variables').close();
-  }
-
   @override
   initState() {
     super.initState();
@@ -36,11 +26,6 @@ class _HomeScreen extends State<HomeScreen> {
     context.read(firebaseProvider).fetchFriendRequestsList();
     _whenInternetConnectionIsRestoredCompareDatabasesAgain();
   }
-
-  // void _openHiveBoxes() async {
-  //   await Hive.openBox<ShoppingList>('shopping_lists');
-  //   await Hive.openBox<int>('data_variables');
-  // }
 
   void _whenInternetConnectionIsRestoredCompareDatabasesAgain() {
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {

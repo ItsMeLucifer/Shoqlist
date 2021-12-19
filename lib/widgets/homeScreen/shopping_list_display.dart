@@ -12,21 +12,25 @@ import 'package:shoqlist/widgets/components/dialogs.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
   void _onLongPressShoppingListItem(BuildContext context) {
-    Navigator.of(context).pop();
+    final firebaseVM = context.read(firebaseProvider);
+    final shoppingListsVM = context.read(shoppingListsProvider);
     //DELETE ITEM ON FIREBASE
-    context.read(firebaseProvider).deleteShoppingListItemOnFirebase(
-        context.read(shoppingListsProvider).currentListIndex,
-        context
-            .read(shoppingListsProvider)
-            .shoppingLists[context.read(shoppingListsProvider).currentListIndex]
-            .documentId);
+    firebaseVM.deleteShoppingListItemOnFirebase(
+        shoppingListsVM.currentListIndex,
+        shoppingListsVM
+            .shoppingLists[shoppingListsVM.currentListIndex].documentId,
+        shoppingListsVM
+            .shoppingLists[shoppingListsVM.currentListIndex].ownerId);
     //DELETE ITEM LOCALLY
-    context.read(shoppingListsProvider).deleteItemFromShoppingListLocally(
-        context.read(shoppingListsProvider).pickedListItemIndex);
+    shoppingListsVM
+        .deleteItemFromShoppingListLocally(shoppingListsVM.pickedListItemIndex);
+    Navigator.of(context).pop();
   }
 
-  void _addNewItemToCurrentShoppingList(Tools toolsVM,
-      FirebaseViewModel firebaseVM, ShoppingListsViewModel shoppingListsVM) {
+  void _addNewItemToCurrentShoppingList(BuildContext context) {
+    final toolsVM = context.read(toolsProvider);
+    final firebaseVM = context.read(firebaseProvider);
+    final shoppingListsVM = context.read(shoppingListsProvider);
     if (toolsVM.newItemNameController.text != "") {
       //ADD ITEM TO FIREBASE
       firebaseVM.addNewItemToShoppingListOnFirebase(
@@ -41,10 +45,22 @@ class ShoppingListDisplay extends ConsumerWidget {
     FocusManager.instance.primaryFocus.unfocus();
   }
 
+  void _giveAccessToTheFriendAfterTap(BuildContext context) {
+    final friendsServiceVM = context.read(friendsServiceProvider);
+    final firebaseVM = context.read(firebaseProvider);
+    final shoppingListsVM = context.read(shoppingListsProvider);
+    //GIVE ACCESS
+    firebaseVM.giveFriendAccessToYourShoppingList(
+        friendsServiceVM.friendsList[friendsServiceVM.currentUserIndex],
+        shoppingListsVM
+            .shoppingLists[shoppingListsVM.currentListIndex].documentId);
+  }
+
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
     final firebaseVM = watch(firebaseProvider);
+    final friendsServiceVM = watch(friendsServiceProvider);
     const Color _disabledGreyColor = Color.fromRGBO(0, 0, 0, 0.3);
     return Scaffold(
       backgroundColor: Color.lerp(
@@ -59,18 +75,52 @@ class ShoppingListDisplay extends ConsumerWidget {
           animatedIcon: AnimatedIcons.menu_close,
           backgroundColor:
               Theme.of(context).floatingActionButtonTheme.backgroundColor,
-          children: [
-            SpeedDialChild(
-                child: Icon(Icons.share),
-                onTap: () {
-                  Share.share(
-                      shoppingListsVM.getCurrentShoppingListDataInString(),
-                      subject: 'A shared list for you');
-                },
-                backgroundColor:
-                    Theme.of(context).floatingActionButtonTheme.backgroundColor,
-                label: "Share"),
-          ],
+          children: shoppingListsVM
+                      .shoppingLists[shoppingListsVM.currentListIndex]
+                      .ownerId ==
+                  null
+              ? [
+                  SpeedDialChild(
+                      child: Icon(Icons.share),
+                      onTap: () {
+                        Share.share(
+                            shoppingListsVM
+                                .getCurrentShoppingListDataInString(),
+                            subject: 'A shared list for you');
+                      },
+                      backgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      label: "Share"),
+                  SpeedDialChild(
+                      child: Icon(Icons.add_moderator),
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => ChooseUser(
+                                _giveAccessToTheFriendAfterTap,
+                                friendsServiceVM.friendsList,
+                                "Give access to that Friend?"));
+                      },
+                      backgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      label: "Give access"),
+                ]
+              : [
+                  SpeedDialChild(
+                      child: Icon(Icons.share),
+                      onTap: () {
+                        Share.share(
+                            shoppingListsVM
+                                .getCurrentShoppingListDataInString(),
+                            subject: 'A shared list for you');
+                      },
+                      backgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      label: "Share"),
+                ],
         ),
       ),
       body: SafeArea(
@@ -127,18 +177,16 @@ class ShoppingListDisplay extends ConsumerWidget {
                                     width: 1, color: _disabledGreyColor)),
                           ),
                           onFieldSubmitted: (value) {
-                            _addNewItemToCurrentShoppingList(
-                                toolsVM, firebaseVM, shoppingListsVM);
+                            _addNewItemToCurrentShoppingList(context);
                           },
                         ),
                       ),
                     ),
                     GestureDetector(
                         onTap: () {
-                          _addNewItemToCurrentShoppingList(
-                              toolsVM, firebaseVM, shoppingListsVM);
+                          _addNewItemToCurrentShoppingList(context);
                         },
-                        child: Icon(Icons.send)),
+                        child: Icon(Icons.add)),
                     SizedBox(width: 10)
                   ],
                 ),
@@ -165,10 +213,7 @@ class ShoppingListDisplay extends ConsumerWidget {
               shoppingListsVM.pickedListItemIndex = index;
               //TOGGLE ITEM STATE ON FIREBASE
               firebaseVM.toggleStateOfShoppingListItemOnFirebase(
-                  shoppingListsVM
-                      .shoppingLists[shoppingListsVM.currentListIndex]
-                      .documentId,
-                  index);
+                  shoppingList.documentId, index);
               //TOGGLE ITEM STATE LOCALLY
               shoppingListsVM.toggleItemStateLocally(
                   shoppingListsVM.currentListIndex, index);
@@ -203,11 +248,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                         onTap: () {
                           //TOGGLE ITEM FAVORITE ON FIREBASE
                           firebaseVM.toggleFavoriteOfShoppingListItemOnFirebase(
-                              shoppingListsVM
-                                  .shoppingLists[
-                                      shoppingListsVM.currentListIndex]
-                                  .documentId,
-                              index);
+                              shoppingList.documentId, index);
                           //TOGGLE ITEM FAVORITE LOCALLY
                           shoppingListsVM.toggleItemFavoriteLocally(
                               shoppingListsVM.currentListIndex, index);

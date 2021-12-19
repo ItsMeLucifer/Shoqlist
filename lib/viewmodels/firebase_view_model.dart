@@ -149,14 +149,31 @@ class FirebaseViewModel extends ChangeNotifier {
           'listState': [],
           'listFavorite': [],
           'id': documentId,
-          'ownerId': _firebaseAuth.auth.currentUser.uid
+          'ownerId': null
         })
         .then((value) => print("Created new List"))
         .catchError((error) => print("Failed to create list: $error"));
   }
 
-//ONLY CURRENT USER'S LISTS, YOU CANT DELETE SHARED LIST
+  void updateShoppingListToFirebase(
+      String name, Importance importance, String documentId) async {
+    //ONLY FOR YOUR OWN LISTS, NOT SHARED ONE
+    if (_firebaseAuth.auth.currentUser == null) return;
+    users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .update({
+          'name': name,
+          'importance': _toolsVM.getImportanceLabel(importance),
+          'id': documentId,
+        })
+        .then((value) => print("Updated list"))
+        .catchError((error) => print("Failed to update list: $error"));
+  }
+
   void deleteShoppingListOnFirebase(String documentId) async {
+    //ONLY CURRENT USER'S LISTS, YOU CANT DELETE SHARED LIST
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('lists')
@@ -370,7 +387,7 @@ class FirebaseViewModel extends ChangeNotifier {
             print("Failed to toggle loyalty card's favorite: $error"));
   }
 
-  //--FRIENDS
+  // -- FRIENDS
 
   Future<void> searchForUser(String input) async {
     List<User> _usersGet = List<User>();
@@ -460,15 +477,6 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void sendFriendRequest(User friendRequestReceiver) async {
-    // //Check if friendRequestReceiver didnt invite currentUser before
-    // if (await users
-    //     .doc(_firebaseAuth.auth.currentUser.uid)
-    //     .collection('friendRequests')
-    //     .where('userId', isEqualTo: friendRequestReceiver.userId)
-    //     .get()
-    //     .then((querySnapshot) => querySnapshot.size > 0)) {
-    //   return acceptFriendRequest(friendRequestReceiver);
-    // }
     //Add current user to friendRequestReceiver's friend requests list
     await users
         .doc(friendRequestReceiver.userId)
@@ -538,5 +546,17 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(_firebaseAuth.auth.currentUser.uid)
         .delete();
     _friendsServiceVM.removeUserFromFriendsList(friendToRemove);
+  }
+
+  void giveFriendAccessToYourShoppingList(
+      User friend, String documentId) async {
+    await users
+        .doc(friend.userId)
+        .collection('sharedLists')
+        .doc(documentId)
+        .set({
+      'documentId': documentId,
+      'ownerId': _firebaseAuth.auth.currentUser.uid,
+    });
   }
 }
