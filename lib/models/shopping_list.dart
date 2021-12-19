@@ -26,6 +26,9 @@ class ShoppingList extends HiveObject {
   Importance importance;
   @HiveField(3)
   final String documentId;
+  @HiveField(5)
+  final String ownerId;
 
-  ShoppingList(this.name, this.list, this.importance, this.documentId);
+  ShoppingList(
+      this.name, this.list, this.importance, this.documentId, this.ownerId);
 }

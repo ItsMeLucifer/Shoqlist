@@ -5,6 +5,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hive/hive.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
+import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/pages/settings.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
@@ -22,8 +23,8 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   void dispose() {
     super.dispose();
-    Hive.box('shopping_lists').close();
-    Hive.box('data_variables').close();
+    // Hive.box<ShoppingList>('shopping_lists').close();
+    // Hive.box<int>('data_variables').close();
   }
 
   @override
@@ -33,10 +34,15 @@ class _HomeScreen extends State<HomeScreen> {
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
     context.read(firebaseProvider).fetchFriendsList();
     context.read(firebaseProvider).fetchFriendRequestsList();
-    whenInternetConnectionIsRestoredCompareDatabasesAgain();
+    _whenInternetConnectionIsRestoredCompareDatabasesAgain();
   }
 
-  void whenInternetConnectionIsRestoredCompareDatabasesAgain() {
+  // void _openHiveBoxes() async {
+  //   await Hive.openBox<ShoppingList>('shopping_lists');
+  //   await Hive.openBox<int>('data_variables');
+  // }
+
+  void _whenInternetConnectionIsRestoredCompareDatabasesAgain() {
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile ||
           result == ConnectivityResult.wifi) {

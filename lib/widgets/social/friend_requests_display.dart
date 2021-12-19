@@ -54,7 +54,7 @@ class FriendRequestsDisplay extends ConsumerWidget {
                     : UsersList(
                         _acceptFriendRequestAfterTap,
                         friendsServiceVM.friendRequestsList,
-                        'Send friend request?',
+                        'Accept friend request?',
                         _declineFriendRequestAfterTap)
               ],
             ),

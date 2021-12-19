@@ -55,8 +55,10 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void saveNewShoppingListLocally(
-      String name, Importance importance, String documentId) {
-    final ShoppingList newList = ShoppingList(name, [], importance, documentId);
+      String name, Importance importance, String documentId,
+      [String ownerId]) {
+    final ShoppingList newList =
+        ShoppingList(name, [], importance, documentId, ownerId);
     _shoppingLists.add(newList);
     //HIVE
     _box.add(newList);

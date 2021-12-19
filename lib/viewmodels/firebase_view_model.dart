@@ -97,7 +97,8 @@ class FirebaseViewModel extends ChangeNotifier {
             'listContent': listContent,
             'listState': listState,
             'listFavorite': listFavorite,
-            'id': localList.documentId
+            'id': localList.documentId,
+            'ownerId': localList.ownerId
           })
           .then((value) => print("Updated list on Firebase"))
           .catchError(
@@ -128,7 +129,8 @@ class FirebaseViewModel extends ChangeNotifier {
           items,
           _toolsVM.getImportanceValueFromLabel(
               _shoppingListsFetchedFromFirebase[i].get('importance')),
-          _shoppingListsFetchedFromFirebase[i].get('id')));
+          _shoppingListsFetchedFromFirebase[i].get('id'),
+          _shoppingListsFetchedFromFirebase[i].get('ownerId')));
     }
     _shoppingListsVM.overrideShoppingListLocally(temp, _cloudTimestamp);
   }
@@ -146,12 +148,14 @@ class FirebaseViewModel extends ChangeNotifier {
           'listContent': [],
           'listState': [],
           'listFavorite': [],
-          'id': documentId
+          'id': documentId,
+          'ownerId': _firebaseAuth.auth.currentUser.uid
         })
         .then((value) => print("Created new List"))
         .catchError((error) => print("Failed to create list: $error"));
   }
 
+//ONLY CURRENT USER'S LISTS, YOU CANT DELETE SHARED LIST
   void deleteShoppingListOnFirebase(String documentId) async {
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
@@ -163,20 +167,21 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   Future<DocumentSnapshot> getDocumentSnapshotFromFirebaseWithId(
-      String documentId, String collectionName) async {
+      String documentId, String collectionName,
+      [String ownerId]) async {
     return await users
-        .doc(_firebaseAuth.auth.currentUser.uid)
+        .doc(ownerId ?? _firebaseAuth.auth.currentUser.uid)
         .collection(collectionName)
         .doc(documentId)
         .get();
   }
 
-  void addNewItemToShoppingListOnFirebase(
-      String itemName, String documentId) async {
+  void addNewItemToShoppingListOnFirebase(String itemName, String documentId,
+      [String ownerId]) async {
     DocumentSnapshot document;
     try {
-      document =
-          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
+      document = await getDocumentSnapshotFromFirebaseWithId(
+          documentId, 'lists', ownerId);
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -188,7 +193,7 @@ class FirebaseViewModel extends ChangeNotifier {
     List<dynamic> listFavorite = document.get('listFavorite');
     listFavorite.add(false);
     await users
-        .doc(_firebaseAuth.auth.currentUser.uid)
+        .doc(ownerId ?? _firebaseAuth.auth.currentUser.uid)
         .collection('lists')
         .doc(documentId)
         .update({
@@ -200,12 +205,12 @@ class FirebaseViewModel extends ChangeNotifier {
         .catchError((error) => print("Failed to add new item: $error"));
   }
 
-  void deleteShoppingListItemOnFirebase(
-      int itemIndex, String documentId) async {
+  void deleteShoppingListItemOnFirebase(int itemIndex, String documentId,
+      [String ownerId]) async {
     DocumentSnapshot document;
     try {
-      document =
-          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
+      document = await getDocumentSnapshotFromFirebaseWithId(
+          documentId, 'lists', ownerId);
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -217,7 +222,7 @@ class FirebaseViewModel extends ChangeNotifier {
     listState.removeAt(itemIndex);
     listFavorite.removeAt(itemIndex);
     await users
-        .doc(_firebaseAuth.auth.currentUser.uid)
+        .doc(ownerId ?? _firebaseAuth.auth.currentUser.uid)
         .collection('lists')
         .doc(documentId)
         .update({
@@ -229,12 +234,12 @@ class FirebaseViewModel extends ChangeNotifier {
         .catchError((error) => print("Failed to delete item: $error"));
   }
 
-  void toggleStateOfShoppingListItemOnFirebase(
-      String documentId, int itemIndex) async {
+  void toggleStateOfShoppingListItemOnFirebase(String documentId, int itemIndex,
+      [String ownerId]) async {
     DocumentSnapshot document;
     try {
-      document =
-          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
+      document = await getDocumentSnapshotFromFirebaseWithId(
+          documentId, 'lists', ownerId);
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -242,7 +247,7 @@ class FirebaseViewModel extends ChangeNotifier {
     List<dynamic> listState = document.get('listState');
     listState[itemIndex] = !listState[itemIndex];
     await users
-        .doc(_firebaseAuth.auth.currentUser.uid)
+        .doc(ownerId ?? _firebaseAuth.auth.currentUser.uid)
         .collection('lists')
         .doc(documentId)
         .update({
@@ -253,11 +258,12 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void toggleFavoriteOfShoppingListItemOnFirebase(
-      String documentId, int itemIndex) async {
+      String documentId, int itemIndex,
+      [String ownerId]) async {
     DocumentSnapshot document;
     try {
-      document =
-          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
+      document = await getDocumentSnapshotFromFirebaseWithId(
+          documentId, 'lists', ownerId);
     } catch (e) {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
@@ -266,7 +272,7 @@ class FirebaseViewModel extends ChangeNotifier {
     // When added to favorite last item in the list, there was an error related to index range - fix in future
     listFavorite[itemIndex] = !listFavorite[itemIndex];
     await users
-        .doc(_firebaseAuth.auth.currentUser.uid)
+        .doc(ownerId ?? _firebaseAuth.auth.currentUser.uid)
         .collection('lists')
         .doc(documentId)
         .update({
@@ -390,6 +396,7 @@ class FirebaseViewModel extends ChangeNotifier {
   void fetchFriendsList() async {
     List<QueryDocumentSnapshot> _friendsFetchedFromFirebase =
         List<QueryDocumentSnapshot>();
+    if (_firebaseAuth.auth.currentUser == null) return;
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friends')
@@ -422,6 +429,7 @@ class FirebaseViewModel extends ChangeNotifier {
   void fetchFriendRequestsList() async {
     List<QueryDocumentSnapshot> _friendRequestsFetchedFromFirebase =
         List<QueryDocumentSnapshot>();
+    if (_firebaseAuth.auth.currentUser == null) return;
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friendRequests')
@@ -452,15 +460,15 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void sendFriendRequest(User friendRequestReceiver) async {
-    //Check if friendRequestReceiver didnt invite currentUser before
-    if (await users
-        .doc(_firebaseAuth.auth.currentUser.uid)
-        .collection('friendRequests')
-        .where('userId', isEqualTo: friendRequestReceiver.userId)
-        .get()
-        .then((querySnapshot) => querySnapshot.size > 0)) {
-      return acceptFriendRequest(friendRequestReceiver);
-    }
+    // //Check if friendRequestReceiver didnt invite currentUser before
+    // if (await users
+    //     .doc(_firebaseAuth.auth.currentUser.uid)
+    //     .collection('friendRequests')
+    //     .where('userId', isEqualTo: friendRequestReceiver.userId)
+    //     .get()
+    //     .then((querySnapshot) => querySnapshot.size > 0)) {
+    //   return acceptFriendRequest(friendRequestReceiver);
+    // }
     //Add current user to friendRequestReceiver's friend requests list
     await users
         .doc(friendRequestReceiver.userId)
@@ -499,11 +507,11 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(_firebaseAuth.auth.currentUser.uid)
         .set({
       'userId': _firebaseAuth.auth.currentUser.uid,
-      'nickname': _firebaseAuth.currentUserNickname,
+      'nickname': await _firebaseAuth.currentUserNickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
-    //friendRequestList.remove(friendRequestSender);
-    //friendsList.add(friendRequestSender);
+    _friendsServiceVM.addUserToFriendsList(friendRequestSender);
+    _friendsServiceVM.removeUserFromFriendRequestsList(friendRequestSender);
   }
 
   void declineFriendRequest(User friendRequestSender) async {
@@ -513,7 +521,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('friendRequests')
         .doc(friendRequestSender.userId)
         .delete();
-    //friendRequestList.remove(friendRequestSender);
+    _friendsServiceVM.removeUserFromFriendRequestsList(friendRequestSender);
   }
 
   void removeFriendFromFriendsList(User friendToRemove) async {
@@ -529,6 +537,6 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('friends')
         .doc(_firebaseAuth.auth.currentUser.uid)
         .delete();
-    //friendsList.remove(friendToRemove);
+    _friendsServiceVM.removeUserFromFriendsList(friendToRemove);
   }
 }

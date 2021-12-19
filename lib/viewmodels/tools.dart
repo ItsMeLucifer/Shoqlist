@@ -12,8 +12,8 @@ class Tools extends ChangeNotifier {
         return Colors.blue[200];
       case Importance.normal:
         return Colors.green[200];
-      // default:
-      //   return Colors.green[200];
+      default:
+        return Colors.green[200];
     }
   }
 
@@ -27,6 +27,7 @@ class Tools extends ChangeNotifier {
       if (getImportanceLabel(Importance.values[i]) == label)
         return Importance.values[i];
     }
+    return Importance.normal;
   }
 
   String getFirstCapitalLetter(String text) {
@@ -82,6 +83,12 @@ class Tools extends ChangeNotifier {
   //Authentication
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  void clearAuthenticationTextEditingControllers() {
+    emailController.clear();
+    passwordController.clear();
+    notifyListeners();
+  }
+
   bool _indicator = false;
   bool get indicator => _indicator;
   set indicator(bool value) {
