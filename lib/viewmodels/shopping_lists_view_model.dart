@@ -3,15 +3,41 @@ import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
 import 'package:shoqlist/utilities/boxes.dart';
 
+enum ShoppingListType { ownShoppingLists, sharedShoppingLists }
+
 class ShoppingListsViewModel extends ChangeNotifier {
   List<ShoppingList> _shoppingLists = [];
-  List<ShoppingList> get shoppingLists => _shoppingLists;
+  List<ShoppingList> _shoppingListsFiltered = [];
+  List<ShoppingList> get shoppingLists => _shoppingListsFiltered;
+
+  String currentUserId;
+
   final _box = Boxes.getShoppingLists();
   final _boxData = Boxes.getDataVariables();
+
+  ShoppingListType _currentlyDisplayedListType =
+      ShoppingListType.ownShoppingLists;
+  ShoppingListType get currentlyDisplayedListType =>
+      _currentlyDisplayedListType;
+  set currentlyDisplayedListType(ShoppingListType value) {
+    _currentlyDisplayedListType = value;
+    filterDisplayedShoppingLists();
+  }
+
+  void filterDisplayedShoppingLists() {
+    _shoppingListsFiltered = _shoppingLists.where((shoppingList) {
+      if (_currentlyDisplayedListType == ShoppingListType.ownShoppingLists) {
+        return shoppingList.ownerId == currentUserId;
+      }
+      return shoppingList.ownerId != currentUserId;
+    }).toList();
+    notifyListeners();
+  }
 
   void overrideShoppingListLocally(
       List<ShoppingList> lists, int timestamp) async {
     _shoppingLists = lists;
+    filterDisplayedShoppingLists();
     //HIVE
     await _box.clear();
     _box.addAll(lists);

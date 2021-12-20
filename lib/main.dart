@@ -10,12 +10,11 @@ import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:sizer/sizer.dart';
 
 import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';
 
-final shoppingListsProvider =
+final ChangeNotifierProvider<ShoppingListsViewModel> shoppingListsProvider =
     ChangeNotifierProvider((_) => ShoppingListsViewModel());
 final loyaltyCardsProvider =
     ChangeNotifierProvider((_) => LoyaltyCardsViewModel());
@@ -24,7 +23,8 @@ final firebaseAuthProvider =
     ChangeNotifierProvider((_) => FirebaseAuthViewModel());
 final friendsServiceProvider =
     ChangeNotifierProvider((_) => FriendsServiceViewModel());
-final firebaseProvider = ChangeNotifierProvider((_) {
+final ChangeNotifierProvider<FirebaseViewModel> firebaseProvider =
+    ChangeNotifierProvider((_) {
   final shoppingLists = _.watch(shoppingListsProvider);
   final loyaltyCards = _.watch(loyaltyCardsProvider);
   final tools = _.watch(toolsProvider);

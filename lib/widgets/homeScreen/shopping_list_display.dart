@@ -37,7 +37,9 @@ class ShoppingListDisplay extends ConsumerWidget {
       firebaseVM.addNewItemToShoppingListOnFirebase(
           toolsVM.newItemNameController.text,
           shoppingListsVM
-              .shoppingLists[shoppingListsVM.currentListIndex].documentId);
+              .shoppingLists[shoppingListsVM.currentListIndex].documentId,
+          shoppingListsVM
+              .shoppingLists[shoppingListsVM.currentListIndex].ownerId);
       //ADD ITEM LOCALLY
       shoppingListsVM.addNewItemToShoppingListLocally(
           toolsVM.newItemNameController.text, false, false);
@@ -85,7 +87,7 @@ class ShoppingListDisplay extends ConsumerWidget {
           children: shoppingListsVM
                       .shoppingLists[shoppingListsVM.currentListIndex]
                       .ownerId ==
-                  null
+                  firebaseVM.currentUserId
               ? [
                   SpeedDialChild(
                       child: Icon(Icons.share),
@@ -223,7 +225,10 @@ class ShoppingListDisplay extends ConsumerWidget {
               shoppingListsVM.pickedListItemIndex = index;
               //TOGGLE ITEM STATE ON FIREBASE
               firebaseVM.toggleStateOfShoppingListItemOnFirebase(
-                  shoppingList.documentId, index);
+                  shoppingList.documentId,
+                  index,
+                  shoppingListsVM
+                      .shoppingLists[shoppingListsVM.currentListIndex].ownerId);
               //TOGGLE ITEM STATE LOCALLY
               shoppingListsVM.toggleItemStateLocally(
                   shoppingListsVM.currentListIndex, index);

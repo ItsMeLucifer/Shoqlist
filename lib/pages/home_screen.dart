@@ -20,6 +20,8 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
+    context.read(shoppingListsProvider).currentUserId =
+        context.read(firebaseProvider).currentUserId;
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
     context.read(firebaseProvider).fetchFriendsList();
