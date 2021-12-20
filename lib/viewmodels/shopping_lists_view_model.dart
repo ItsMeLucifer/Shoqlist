@@ -158,4 +158,13 @@ class ShoppingListsViewModel extends ChangeNotifier {
       return 0;
     });
   }
+
+  List<String> getUsersWithAccessToCurrentList() {
+    return _shoppingLists[_currentListIndex].usersWithAccess;
+  }
+
+  void addUserIdToUsersWithAccessList(String userId) {
+    _shoppingLists[_currentListIndex].usersWithAccess.add(userId);
+    notifyListeners();
+  }
 }

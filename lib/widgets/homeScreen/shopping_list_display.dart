@@ -5,6 +5,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:share/share.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
+import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/viewmodels/firebase_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
@@ -49,11 +50,17 @@ class ShoppingListDisplay extends ConsumerWidget {
     final friendsServiceVM = context.read(friendsServiceProvider);
     final firebaseVM = context.read(firebaseProvider);
     final shoppingListsVM = context.read(shoppingListsProvider);
+    List<User> friendsWithoutAccess =
+        friendsServiceVM.getFriendsWithoutAccessToCurrentShoppingList(
+            shoppingListsVM.getUsersWithAccessToCurrentList());
     //GIVE ACCESS
     firebaseVM.giveFriendAccessToYourShoppingList(
-        friendsServiceVM.friendsList[friendsServiceVM.currentUserIndex],
+        friendsWithoutAccess[friendsServiceVM.currentUserIndex],
         shoppingListsVM
             .shoppingLists[shoppingListsVM.currentListIndex].documentId);
+    shoppingListsVM.addUserIdToUsersWithAccessList(
+        friendsWithoutAccess[friendsServiceVM.currentUserIndex].userId);
+    Navigator.of(context).popUntil((route) => Navigator.of(context).canPop());
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -99,7 +106,10 @@ class ShoppingListDisplay extends ConsumerWidget {
                             context: context,
                             builder: (context) => ChooseUser(
                                 _giveAccessToTheFriendAfterTap,
-                                friendsServiceVM.friendsList,
+                                friendsServiceVM
+                                    .getFriendsWithoutAccessToCurrentShoppingList(
+                                        shoppingListsVM
+                                            .getUsersWithAccessToCurrentList()),
                                 "Give access to that Friend?"));
                       },
                       backgroundColor: Theme.of(context)

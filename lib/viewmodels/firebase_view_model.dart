@@ -98,7 +98,8 @@ class FirebaseViewModel extends ChangeNotifier {
             'listState': listState,
             'listFavorite': listFavorite,
             'id': localList.documentId,
-            'ownerId': localList.ownerId
+            'ownerId': localList.ownerId,
+            'usersWithAccess': localList.usersWithAccess
           })
           .then((value) => print("Updated list on Firebase"))
           .catchError(
@@ -130,7 +131,8 @@ class FirebaseViewModel extends ChangeNotifier {
           _toolsVM.getImportanceValueFromLabel(
               _shoppingListsFetchedFromFirebase[i].get('importance')),
           _shoppingListsFetchedFromFirebase[i].get('id'),
-          _shoppingListsFetchedFromFirebase[i].get('ownerId')));
+          _shoppingListsFetchedFromFirebase[i].get('ownerId'),
+          _shoppingListsFetchedFromFirebase[i].get('usersWithAccess')));
     }
     _shoppingListsVM.overrideShoppingListLocally(temp, _cloudTimestamp);
   }
@@ -149,7 +151,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'listState': [],
           'listFavorite': [],
           'id': documentId,
-          'ownerId': null
+          'ownerId': null,
+          'usersWithAccess': []
         })
         .then((value) => print("Created new List"))
         .catchError((error) => print("Failed to create list: $error"));
@@ -550,6 +553,7 @@ class FirebaseViewModel extends ChangeNotifier {
 
   void giveFriendAccessToYourShoppingList(
       User friend, String documentId) async {
+    //Add shopping list's data to friend's sharedLists
     await users
         .doc(friend.userId)
         .collection('sharedLists')
@@ -558,5 +562,21 @@ class FirebaseViewModel extends ChangeNotifier {
       'documentId': documentId,
       'ownerId': _firebaseAuth.auth.currentUser.uid,
     });
+    //Add friend's id to shopping list's usersWithAccess list
+    DocumentSnapshot document;
+    try {
+      document =
+          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
+    } catch (e) {
+      return print(
+          "Could not get document from Firebase, error: " + e.code.toString());
+    }
+    List<String> usersWithAccess = document.get('usersWithAccess');
+    usersWithAccess.add(friend.userId);
+    await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('lists')
+        .doc(documentId)
+        .update({'usersWithAccess': usersWithAccess});
   }
 }

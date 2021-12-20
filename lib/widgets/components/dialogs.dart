@@ -190,21 +190,28 @@ class ChooseUser extends ConsumerWidget {
 
   Widget build(BuildContext context, ScopedReader watch) {
     var size = MediaQuery.of(context).size;
-    return Container(
-      height: 0.8 * size.height,
-      width: 0.8 * size.width,
-      child: AlertDialog(
-        content: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("Choose User",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center),
-              UsersList(_actionAfterTapUser, _usersList, _titleToDisplay)
-            ],
-          ),
+    return AlertDialog(
+      scrollable: true,
+      content: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Choose User",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+            SizedBox(height: 10),
+            _usersList.isNotEmpty
+                ? Container(
+                    height: size.height * 0.6,
+                    width: size.width * 0.7,
+                    child: UsersList(
+                        _actionAfterTapUser, _usersList, _titleToDisplay))
+                : Text(
+                    "You have no friends or every one of your friends already has access.",
+                    style: Theme.of(context).primaryTextTheme.bodyText1,
+                    textAlign: TextAlign.center),
+          ],
         ),
       ),
     );

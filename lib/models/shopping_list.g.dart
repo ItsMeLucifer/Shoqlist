@@ -71,13 +71,14 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
       fields[2] as Importance,
       fields[3] as String,
       fields[5] as String,
+      (fields[6] as List)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, ShoppingList obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -87,7 +88,9 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
       ..writeByte(3)
       ..write(obj.documentId)
       ..writeByte(5)
-      ..write(obj.ownerId);
+      ..write(obj.ownerId)
+      ..writeByte(6)
+      ..write(obj.usersWithAccess);
   }
 
   @override
