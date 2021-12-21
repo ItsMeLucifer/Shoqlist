@@ -7,10 +7,14 @@ enum ShoppingListType { ownShoppingLists, sharedShoppingLists }
 
 class ShoppingListsViewModel extends ChangeNotifier {
   List<ShoppingList> _shoppingLists = [];
-  List<ShoppingList> _shoppingListsFiltered = [];
-  List<ShoppingList> get shoppingLists => _shoppingListsFiltered;
+  List<ShoppingList> _ownShoppingLists = [];
+  List<ShoppingList> _sharedShoppingLists = [];
+  List<ShoppingList> get shoppingLists =>
+      _currentlyDisplayedListType == ShoppingListType.ownShoppingLists
+          ? _ownShoppingLists
+          : _sharedShoppingLists;
 
-  String currentUserId;
+  String currentUserId = "";
 
   final _box = Boxes.getShoppingLists();
   final _boxData = Boxes.getDataVariables();
@@ -21,22 +25,23 @@ class ShoppingListsViewModel extends ChangeNotifier {
       _currentlyDisplayedListType;
   set currentlyDisplayedListType(ShoppingListType value) {
     _currentlyDisplayedListType = value;
-    filterDisplayedShoppingLists();
+    notifyListeners();
   }
 
   void filterDisplayedShoppingLists() {
-    _shoppingListsFiltered = _shoppingLists.where((shoppingList) {
-      if (_currentlyDisplayedListType == ShoppingListType.ownShoppingLists) {
-        return shoppingList.ownerId == currentUserId;
-      }
+    _sharedShoppingLists = _shoppingLists.where((shoppingList) {
       return shoppingList.ownerId != currentUserId;
+    }).toList();
+    _ownShoppingLists = _shoppingLists.where((shoppingList) {
+      return shoppingList.ownerId == currentUserId;
     }).toList();
     notifyListeners();
   }
 
-  void overrideShoppingListLocally(
-      List<ShoppingList> lists, int timestamp) async {
+  void overrideShoppingListsLocally(
+      List<ShoppingList> lists, int timestamp, String userId) async {
     _shoppingLists = lists;
+    currentUserId = userId;
     filterDisplayedShoppingLists();
     //HIVE
     await _box.clear();
@@ -56,6 +61,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     _box.toMap().forEach((key, value) {
       _shoppingLists.add(value);
     });
+    filterDisplayedShoppingLists();
   }
 
   int getLocalTimestamp() {
@@ -63,18 +69,18 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void toggleItemStateLocally(int listIndex, int itemIndex) {
-    _shoppingLists[listIndex].list[itemIndex].toggleGotItem();
+    shoppingLists[listIndex].list[itemIndex].toggleGotItem();
     //HIVE
-    _shoppingLists[listIndex].save();
+    shoppingLists[listIndex].save();
     updateLocalTimestamp();
     sortShoppingListItemsDisplay();
     notifyListeners();
   }
 
   void toggleItemFavoriteLocally(int listIndex, int itemIndex) {
-    _shoppingLists[listIndex].list[itemIndex].toggleIsFavorite();
+    shoppingLists[listIndex].list[itemIndex].toggleIsFavorite();
     //HIVE
-    _shoppingLists[listIndex].save();
+    shoppingLists[listIndex].save();
     updateLocalTimestamp();
     sortShoppingListItemsDisplay();
     notifyListeners();
@@ -86,6 +92,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     final ShoppingList newList =
         ShoppingList(name, [], importance, documentId, ownerId);
     _shoppingLists.add(newList);
+    filterDisplayedShoppingLists();
     //HIVE
     _box.add(newList);
     updateLocalTimestamp();
@@ -94,37 +101,42 @@ class ShoppingListsViewModel extends ChangeNotifier {
 
   void updateExistingShoppingListLocally(
       String name, Importance importance, int index) {
-    _shoppingLists[index]
+    shoppingLists[index]
       ..importance = importance
       ..name = name;
     //HIVE
-    _shoppingLists[index].save();
+    shoppingLists[index].save();
     notifyListeners();
   }
 
   void addNewItemToShoppingListLocally(
       String itemName, bool itemGot, bool isFavorited) {
-    _shoppingLists[_currentListIndex]
+    shoppingLists[_currentListIndex]
         .list
         .add(ShoppingListItem(itemName, itemGot, isFavorited));
     //HIVE
-    _box.putAt(_currentListIndex, _shoppingLists[_currentListIndex]);
+    int index = _shoppingLists
+        .indexWhere((element) => element == shoppingLists[_currentListIndex]);
+    _box.putAt(index, shoppingLists[_currentListIndex]);
     updateLocalTimestamp();
     notifyListeners();
   }
 
   void deleteItemFromShoppingListLocally(int itemIndex) {
-    _shoppingLists[_currentListIndex].list.removeAt(itemIndex);
+    shoppingLists[_currentListIndex].list.removeAt(itemIndex);
     //HIVE
-    _shoppingLists[_currentListIndex].save();
+    shoppingLists[_currentListIndex].save();
     updateLocalTimestamp();
     notifyListeners();
   }
 
   void deleteShoppingListLocally(int index) {
-    _shoppingLists.removeAt(index);
+    shoppingLists.removeAt(index);
+    filterDisplayedShoppingLists();
     //HIVE
-    _box.deleteAt(index);
+    int fixedIndex =
+        _shoppingLists.indexWhere((element) => element == shoppingLists[index]);
+    _box.deleteAt(fixedIndex);
     updateLocalTimestamp();
     notifyListeners();
   }
@@ -149,7 +161,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
 
   String getCurrentShoppingListDataInString() {
     String result = "";
-    ShoppingList currentShoppingList = _shoppingLists[_currentListIndex];
+    ShoppingList currentShoppingList = shoppingLists[_currentListIndex];
     result += "🛒 " + currentShoppingList.name + " list:\n";
     result += "__________\n";
     for (int i = 0; i < currentShoppingList.list.length; i++) {
@@ -172,7 +184,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void sortShoppingListItemsDisplay() {
-    _shoppingLists[_currentListIndex].list.sort((a, b) {
+    shoppingLists[_currentListIndex].list.sort((a, b) {
       if (a.gotItem) return 1;
       if (b.gotItem) return -1;
       if (a.isFavorite && !b.isFavorite) {
@@ -186,11 +198,11 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   List<String> getUsersWithAccessToCurrentList() {
-    return _shoppingLists[_currentListIndex].usersWithAccess;
+    return shoppingLists[_currentListIndex].usersWithAccess;
   }
 
   void addUserIdToUsersWithAccessList(String userId) {
-    _shoppingLists[_currentListIndex].usersWithAccess.add(userId);
+    shoppingLists[_currentListIndex].usersWithAccess.add(userId);
     notifyListeners();
   }
 }

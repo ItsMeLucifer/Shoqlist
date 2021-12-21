@@ -46,7 +46,7 @@ class HomeScreenMainView extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
-    final firebaseVM = watch(firebaseProvider);
+    final firebaseAuthVM = watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Stack(
@@ -97,12 +97,12 @@ class HomeScreenMainView extends ConsumerWidget {
                               onLongPress: () {
                                 if (shoppingListsVM
                                         .shoppingLists[index].ownerId ==
-                                    firebaseVM.currentUserId) {
+                                    firebaseAuthVM.currentUser.userId) {
                                   shoppingListsVM.currentListIndex = index;
                                   showDialog(
                                       context: context,
                                       builder: (context) {
-                                        String title = "the '" +
+                                        String title = "Remove the '" +
                                             shoppingListsVM
                                                 .shoppingLists[index].name +
                                             "' list?";

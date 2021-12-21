@@ -68,7 +68,7 @@ class ShoppingListDisplay extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
-    final firebaseVM = watch(firebaseProvider);
+    final firebaseAuthVM = watch(firebaseAuthProvider);
     final friendsServiceVM = watch(friendsServiceProvider);
     const Color _disabledGreyColor = Color.fromRGBO(0, 0, 0, 0.3);
     return Scaffold(
@@ -87,7 +87,7 @@ class ShoppingListDisplay extends ConsumerWidget {
           children: shoppingListsVM
                       .shoppingLists[shoppingListsVM.currentListIndex]
                       .ownerId ==
-                  firebaseVM.currentUserId
+                  firebaseAuthVM.currentUser.userId
               ? [
                   SpeedDialChild(
                       child: Icon(Icons.share),

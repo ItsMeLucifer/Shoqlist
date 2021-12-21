@@ -20,8 +20,6 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
-    context.read(shoppingListsProvider).currentUserId =
-        context.read(firebaseProvider).currentUserId;
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
     context.read(firebaseProvider).fetchFriendsList();
@@ -56,18 +54,21 @@ class _HomeScreen extends State<HomeScreen> {
   void _createNewShoppingList(
     BuildContext context,
   ) {
-    if (context.read(toolsProvider).newListNameController.text != "") {
+    final toolsVM = context.read(toolsProvider);
+    final firebaseVM = context.read(firebaseProvider);
+    final shopingListsProviderVM = context.read(shoppingListsProvider);
+    final firebaseAuthVM = context.read(firebaseAuthProvider);
+    if (toolsVM.newListNameController.text != "") {
       String id = nanoid();
       //CREATE LIST ON SERVER
-      context.read(firebaseProvider).putShoppingListToFirebase(
-          context.read(toolsProvider).newListNameController.text,
-          context.read(toolsProvider).newListImportance,
-          id);
+      firebaseVM.putShoppingListToFirebase(
+          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
       //CREATE LIST LOCALLY
-      context.read(shoppingListsProvider).saveNewShoppingListLocally(
-          context.read(toolsProvider).newListNameController.text,
-          context.read(toolsProvider).newListImportance,
-          id);
+      shopingListsProviderVM.saveNewShoppingListLocally(
+          toolsVM.newListNameController.text,
+          toolsVM.newListImportance,
+          id,
+          firebaseAuthVM.currentUser.userId);
     }
   }
 
