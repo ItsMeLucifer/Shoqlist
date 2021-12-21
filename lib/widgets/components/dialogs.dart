@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/user.dart';
+import 'package:shoqlist/widgets/components/forms.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
 import '../../main.dart';
 
@@ -214,6 +215,56 @@ class ChooseUser extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ChangeName extends ConsumerWidget {
+  final Function _onAccepted;
+  final String _titleToDisplay;
+  ChangeName(this._onAccepted, this._titleToDisplay);
+  Widget build(BuildContext context, ScopedReader watch) {
+    final toolsVM = watch(toolsProvider);
+    final screenSize = MediaQuery.of(context).size;
+    return AlertDialog(
+      content: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          height: screenSize.height * 0.15,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                  child: Text(_titleToDisplay,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center)),
+              AuthenticationPageForm(
+                  TextInputType.name,
+                  toolsVM.newNicknameController,
+                  'Nickname',
+                  () => {},
+                  Icons.person,
+                  false)
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Container(
+            height: screenSize.height * 0.02,
+            child: FlatButton(
+              onPressed: () {
+                _onAccepted(context);
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

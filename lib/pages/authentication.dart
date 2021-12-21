@@ -71,9 +71,9 @@ class Authentication extends ConsumerWidget {
                   !toolsVM.showPassword,
                   _passwordVisibilityWidget),
               SizedBox(height: 5),
-              AuthenticationPageButton(_signInUserFirebase, 'Sign-in'),
+              ClassicButton(_signInUserFirebase, 'Sign-in', 0.6),
               SizedBox(height: 5),
-              AuthenticationPageButton(_registerUserFirebase, 'Register'),
+              ClassicButton(_registerUserFirebase, 'Register', 0.6),
             ],
           ),
         ));

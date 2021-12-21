@@ -18,11 +18,12 @@ class FirebaseViewModel extends ChangeNotifier {
   FriendsServiceViewModel _friendsServiceVM;
   FirebaseViewModel(this._shoppingListsVM, this._loyaltyCardsVM, this._toolsVM,
       this._firebaseAuth, this._friendsServiceVM);
-  String get currentUserId => _firebaseAuth.auth.currentUser != null
-      ? _firebaseAuth.auth.currentUser.uid
-      : '';
-  //SYNCHRONIZATION
+
   CollectionReference users = FirebaseFirestore.instance.collection('users');
+
+  String get currentUserId => _firebaseAuth.currentUser.userId;
+
+  //SYNCHRONIZATION
   int _cloudTimestamp = 0;
 
   void compareDiscrepanciesBetweenCloudAndLocalData() {
@@ -559,10 +560,9 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(currentUserId)
         .set({
       'userId': currentUserId,
-      'nickname': await _firebaseAuth.currentUserNickname,
+      'nickname': _firebaseAuth.currentUser.nickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
-    _friendsServiceVM.addUserToFriendRequestsList(friendRequestReceiver);
     _friendsServiceVM.removeUserFromUsersList(friendRequestReceiver);
   }
 
@@ -590,7 +590,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(currentUserId)
         .set({
       'userId': currentUserId,
-      'nickname': await _firebaseAuth.currentUserNickname,
+      'nickname': _firebaseAuth.currentUser.nickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
     _friendsServiceVM.addUserToFriendsList(friendRequestSender);

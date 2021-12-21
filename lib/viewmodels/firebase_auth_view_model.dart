@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shoqlist/models/user.dart' as model;
 
 enum Status { Authenticated, Unauthenticated, DuringAuthorization }
 
@@ -28,7 +29,17 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     _auth.authStateChanges().listen(_onAuthStateChanged);
   }
 
-  //User _user;
+  model.User currentUser = model.User('Nickname', 'Email', 'UserId');
+  void _setCurrentUserCredentials() async {
+    DocumentSnapshot document = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(auth.currentUser.uid)
+        .get();
+    currentUser = model.User(document.get('nickname'), document.get('email'),
+        document.get('userId'));
+    notifyListeners();
+  }
+
   Future<void> signIn(String email, String password) async {
     status = Status.DuringAuthorization;
     try {
@@ -55,7 +66,10 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   }
 
   Future<void> _onAuthStateChanged(User firebaseUser) async {
-    if (firebaseUser != null) status = Status.Authenticated;
+    if (firebaseUser != null) {
+      status = Status.Authenticated;
+      _setCurrentUserCredentials();
+    }
   }
 
   Future<void> register(String email, String password) async {
@@ -133,11 +147,12 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     await _auth.signOut();
   }
 
-  Future<String> get currentUserNickname => _getCurrentUserNickname();
-
-  Future<String> _getCurrentUserNickname() async {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    var doc = await users.doc(_auth.currentUser.uid).get();
-    return doc.get('nickname');
+  void changeNickname(String newNickname) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(auth.currentUser.uid)
+        .update({'nickname': newNickname});
+    currentUser = currentUser..nickname = newNickname;
+    notifyListeners();
   }
 }

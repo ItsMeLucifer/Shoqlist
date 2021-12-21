@@ -38,6 +38,13 @@ class Tools extends ChangeNotifier {
     return input.replaceAll(' ', '');
   }
 
+  //New nickname
+  TextEditingController newNicknameController = TextEditingController();
+  void clearNewNicknameController() {
+    newNicknameController.clear();
+    notifyListeners();
+  }
+
   //Add new List
   Importance _newListImportance = Importance.normal;
   Importance get newListImportance => _newListImportance;

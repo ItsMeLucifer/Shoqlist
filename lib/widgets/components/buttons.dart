@@ -63,10 +63,16 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
   }
 }
 
-class AuthenticationPageButton extends ConsumerWidget {
+///[_percentageOfScreenWidth] is what width of the screen this button should occupy.
+///The value is given in the range from 0 - 1.
+///Example: 60 percent of the screen width is [0.6].
+class ClassicButton extends ConsumerWidget {
   final Function _onTap;
   final String _buttonName;
-  AuthenticationPageButton(this._onTap, this._buttonName);
+  final double _percentageOfScreenWidth;
+  final IconData _iconData;
+  ClassicButton(this._onTap, this._buttonName, this._percentageOfScreenWidth,
+      [this._iconData]);
   Widget build(BuildContext context, ScopedReader watch) {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
@@ -74,17 +80,22 @@ class AuthenticationPageButton extends ConsumerWidget {
         _onTap(context);
       },
       child: Container(
-          width: screenSize.width * 0.6,
+          width: screenSize.width * _percentageOfScreenWidth,
           height: 40,
           decoration: BoxDecoration(
             color: Theme.of(context).buttonColor,
             borderRadius: BorderRadius.circular(5),
           ),
-          child: Center(
-            child: Text(
-              _buttonName,
-              style: Theme.of(context).primaryTextTheme.button,
-              textAlign: TextAlign.center,
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Center(
+              child: _iconData == null
+                  ? Text(
+                      _buttonName,
+                      style: Theme.of(context).primaryTextTheme.button,
+                      textAlign: TextAlign.center,
+                    )
+                  : Icon(_iconData),
             ),
           )),
     );
