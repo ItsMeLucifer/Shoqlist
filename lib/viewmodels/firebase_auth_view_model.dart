@@ -35,6 +35,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
         .collection('users')
         .doc(auth.currentUser.uid)
         .get();
+    if (!document.exists) return;
     currentUser = model.User(document.get('nickname'), document.get('email'),
         document.get('userId'));
     notifyListeners();
@@ -128,16 +129,18 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     if (_auth.currentUser == null) return;
     var doc = await users.doc(_auth.currentUser.uid).get();
     if (!doc.exists) {
+      String nickname = auth.currentUser.email.split("@")[0];
       users.doc(_auth.currentUser.uid).set(!_auth.currentUser.isAnonymous
           ? {
               'email': auth.currentUser.email,
               'userId': auth.currentUser.uid,
-              'nickname': auth.currentUser.email.split("@")[0]
+              'nickname': nickname[0].toUpperCase() + nickname.substring(1)
             }
           : {
               'userId': auth.currentUser.uid,
             });
     }
+    _setCurrentUserCredentials();
   }
 
   Future<void> signOut() async {

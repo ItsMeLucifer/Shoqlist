@@ -239,13 +239,8 @@ class ChangeName extends ConsumerWidget {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center)),
-              AuthenticationPageForm(
-                  TextInputType.name,
-                  toolsVM.newNicknameController,
-                  'Nickname',
-                  () => {},
-                  Icons.person,
-                  false)
+              BasicForm(TextInputType.name, toolsVM.newNicknameController,
+                  'Nickname', () => {}, Icons.person, false)
             ],
           ),
         ),

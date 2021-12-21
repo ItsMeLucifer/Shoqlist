@@ -41,6 +41,7 @@ class FriendsDisplay extends ConsumerWidget {
               SpeedDialChild(
                   onTap: () {
                     _navigateToFriendsSearchList(context);
+                    friendsServiceVM.clearSearchFriendTextController();
                   },
                   label: 'Search Friends',
                   backgroundColor: Theme.of(context)

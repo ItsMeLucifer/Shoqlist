@@ -15,6 +15,7 @@ class UsersList extends ConsumerWidget {
       [this._dialogTitle, this._declineAction]);
   Widget build(BuildContext context, ScopedReader watch) {
     final friendsServiceVM = watch(friendsServiceProvider);
+    final screenSize = MediaQuery.of(context).size;
     return ListView.builder(
         shrinkWrap: true,
         itemCount: _usersList.length,
@@ -36,17 +37,32 @@ class UsersList extends ConsumerWidget {
                 }
               },
               child: Card(
-                color: Theme.of(context).buttonColor,
+                color: Theme.of(context).primaryColor,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
                     children: [
                       Icon(Icons.person),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(
-                          _usersList[index].email,
-                        ),
+                      SizedBox(width: screenSize.width * 0.05),
+                      Column(
+                        children: [
+                          Container(
+                            width: screenSize.width * 0.7,
+                            child: Text(_usersList[index].nickname,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .headline6),
+                          ),
+                          Container(
+                            width: screenSize.width * 0.7,
+                            child: Text(_usersList[index].email,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .bodyText2),
+                          ),
+                        ],
                       ),
                     ],
                   ),

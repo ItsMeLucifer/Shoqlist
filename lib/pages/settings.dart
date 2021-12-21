@@ -101,14 +101,14 @@ class Settings extends ConsumerWidget {
                             ],
                           ),
                           SizedBox(width: screenSize.width * 0.1),
-                          ClassicButton(_showDialogWithChangeNickname,
+                          BasicButton(_showDialogWithChangeNickname,
                               'Change Nickname', 0.1, Icons.edit)
                         ],
                       ),
                     ),
                   ),
                   SizedBox(height: screenSize.height * 0.3),
-                  ClassicButton(_signOut, 'Sign-out', 0.6)
+                  BasicButton(_signOut, 'Sign-out', 0.6)
                 ],
               ),
             ),

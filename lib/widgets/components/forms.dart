@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AuthenticationPageForm extends ConsumerWidget {
+class BasicForm extends ConsumerWidget {
   final TextInputType _keyboardType;
   final TextEditingController _controller;
   final String _hintText;
@@ -9,9 +9,10 @@ class AuthenticationPageForm extends ConsumerWidget {
   final IconData _prefixIcon;
   final Widget _suffixIcon;
   final bool _obsureText;
-  AuthenticationPageForm(this._keyboardType, this._controller, this._hintText,
+  final Function _onSubmitted;
+  BasicForm(this._keyboardType, this._controller, this._hintText,
       this._onChanged, this._prefixIcon, this._obsureText,
-      [this._suffixIcon]);
+      [this._suffixIcon, this._onSubmitted]);
   Widget build(BuildContext context, ScopedReader watch) {
     final screenSize = MediaQuery.of(context).size;
     return Container(
@@ -24,6 +25,11 @@ class AuthenticationPageForm extends ConsumerWidget {
           controller: _controller,
           onChanged: (value) {
             _onChanged(context);
+          },
+          onFieldSubmitted: (value) {
+            if (_onSubmitted != null) {
+              _onSubmitted(context, value);
+            }
           },
           style: Theme.of(context).primaryTextTheme.bodyText1,
           textAlignVertical: TextAlignVertical.center,

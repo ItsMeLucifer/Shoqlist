@@ -54,15 +54,10 @@ class Authentication extends ConsumerWidget {
                 style: TextStyle(color: Colors.red, fontSize: 12),
                 textAlign: TextAlign.center,
               ),
-              AuthenticationPageForm(
-                  TextInputType.emailAddress,
-                  toolsVM.emailController,
-                  'E-mail',
-                  _resetExceptionMessage,
-                  Icons.email,
-                  false),
+              BasicForm(TextInputType.emailAddress, toolsVM.emailController,
+                  'E-mail', _resetExceptionMessage, Icons.email, false),
               SizedBox(height: 5),
-              AuthenticationPageForm(
+              BasicForm(
                   TextInputType.visiblePassword,
                   toolsVM.passwordController,
                   'Password',
@@ -71,9 +66,9 @@ class Authentication extends ConsumerWidget {
                   !toolsVM.showPassword,
                   _passwordVisibilityWidget),
               SizedBox(height: 5),
-              ClassicButton(_signInUserFirebase, 'Sign-in', 0.6),
+              BasicButton(_signInUserFirebase, 'Sign-in', 0.6),
               SizedBox(height: 5),
-              ClassicButton(_registerUserFirebase, 'Register', 0.6),
+              BasicButton(_registerUserFirebase, 'Register', 0.6),
             ],
           ),
         ));

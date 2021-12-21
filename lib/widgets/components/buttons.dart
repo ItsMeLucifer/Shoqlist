@@ -66,12 +66,12 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
 ///[_percentageOfScreenWidth] is what width of the screen this button should occupy.
 ///The value is given in the range from 0 - 1.
 ///Example: 60 percent of the screen width is [0.6].
-class ClassicButton extends ConsumerWidget {
+class BasicButton extends ConsumerWidget {
   final Function _onTap;
   final String _buttonName;
   final double _percentageOfScreenWidth;
   final IconData _iconData;
-  ClassicButton(this._onTap, this._buttonName, this._percentageOfScreenWidth,
+  BasicButton(this._onTap, this._buttonName, this._percentageOfScreenWidth,
       [this._iconData]);
   Widget build(BuildContext context, ScopedReader watch) {
     final screenSize = MediaQuery.of(context).size;
