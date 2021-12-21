@@ -18,7 +18,9 @@ class FirebaseViewModel extends ChangeNotifier {
   FriendsServiceViewModel _friendsServiceVM;
   FirebaseViewModel(this._shoppingListsVM, this._loyaltyCardsVM, this._toolsVM,
       this._firebaseAuth, this._friendsServiceVM);
-  String get currentUserId => _firebaseAuth.auth.currentUser.uid;
+  String get currentUserId => _firebaseAuth.auth.currentUser != null
+      ? _firebaseAuth.auth.currentUser.uid
+      : '';
   //SYNCHRONIZATION
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   int _cloudTimestamp = 0;

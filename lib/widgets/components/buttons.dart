@@ -62,3 +62,31 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
     );
   }
 }
+
+class AuthenticationPageButton extends ConsumerWidget {
+  final Function _onTap;
+  final String _buttonName;
+  AuthenticationPageButton(this._onTap, this._buttonName);
+  Widget build(BuildContext context, ScopedReader watch) {
+    final screenSize = MediaQuery.of(context).size;
+    return GestureDetector(
+      onTap: () {
+        _onTap(context);
+      },
+      child: Container(
+          width: screenSize.width * 0.6,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Theme.of(context).buttonColor,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Center(
+            child: Text(
+              _buttonName,
+              style: Theme.of(context).primaryTextTheme.button,
+              textAlign: TextAlign.center,
+            ),
+          )),
+    );
+  }
+}
