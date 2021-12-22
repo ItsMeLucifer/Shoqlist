@@ -70,8 +70,8 @@ class FirebaseViewModel extends ChangeNotifier {
                   })
                 }
             })
-        .catchError((error) =>
-            print("Failed to fetch shopping lists data from Firebase: $error"));
+        .catchError((error) => _toolsVM.printWarning(
+            "Failed to fetch shopping lists data from Firebase: $error"));
     //Fetch informations about shared shopping lists
     List<QueryDocumentSnapshot> _infoAboutSharedShoppingLists =
         List<QueryDocumentSnapshot>();
@@ -87,7 +87,7 @@ class FirebaseViewModel extends ChangeNotifier {
                   })
                 }
             })
-        .catchError((error) => print(
+        .catchError((error) => _toolsVM.printWarning(
             "Failed to fetch informations about shared shopping lists from Firebase: $error"));
     await getSharedShoppingListsData(_infoAboutSharedShoppingLists);
     if (shouldCompareCloudDataWithLocalOne)
@@ -103,7 +103,7 @@ class FirebaseViewModel extends ChangeNotifier {
           .collection('lists')
           .doc(_infoAboutSharedShoppingLists[i].get('documentId'))
           .get()
-          .catchError((error) => print(
+          .catchError((error) => _toolsVM.printWarning(
               "Failed to fetch shared shopping lists data from Firebase: $error"));
       _sharedShoppingListsFetchedFromFirebase.add(doc);
     }
@@ -139,8 +139,8 @@ class FirebaseViewModel extends ChangeNotifier {
             'usersWithAccess': localList.usersWithAccess
           })
           .then((value) => print("Updated list on Firebase"))
-          .catchError(
-              (error) => print("Failed to update list on Firebase: $error"));
+          .catchError((error) => _toolsVM
+              .printWarning("Failed to update list on Firebase: $error"));
     }
     users
         .doc(_firebaseAuth.auth.currentUser.uid)
@@ -233,7 +233,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'usersWithAccess': []
         })
         .then((value) => print("Created new List"))
-        .catchError((error) => print("Failed to create list: $error"));
+        .catchError(
+            (error) => _toolsVM.printWarning("Failed to create list: $error"));
   }
 
   void updateShoppingListToFirebase(
@@ -249,7 +250,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'importance': _toolsVM.getImportanceLabel(importance),
         })
         .then((value) => print("Updated list"))
-        .catchError((error) => print("Failed to update list: $error"));
+        .catchError(
+            (error) => _toolsVM.printWarning("Failed to update list: $error"));
   }
 
   void deleteShoppingListOnFirebase(String documentId) async {
@@ -260,7 +262,8 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(documentId)
         .delete()
         .then((value) => print("List Deleted"))
-        .catchError((error) => print("Failed to delete list: $error"));
+        .catchError(
+            (error) => _toolsVM.printWarning("Failed to delete list: $error"));
   }
 
   Future<DocumentSnapshot> getDocumentSnapshotFromFirebaseWithId(
@@ -280,7 +283,7 @@ class FirebaseViewModel extends ChangeNotifier {
       document = await getDocumentSnapshotFromFirebaseWithId(
           documentId, 'lists', ownerId);
     } catch (e) {
-      return print(
+      return _toolsVM.printWarning(
           "Could not get document from Firebase, error: " + e.code.toString());
     }
     List<dynamic> listContent = document.get('listContent');
@@ -299,7 +302,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'listFavorite': listFavorite
         })
         .then((value) => print("New item added"))
-        .catchError((error) => print("Failed to add new item: $error"));
+        .catchError(
+            (error) => _toolsVM.printWarning("Failed to add new item: $error"));
   }
 
   void deleteShoppingListItemOnFirebase(int itemIndex, String documentId,
@@ -309,7 +313,7 @@ class FirebaseViewModel extends ChangeNotifier {
       document = await getDocumentSnapshotFromFirebaseWithId(
           documentId, 'lists', ownerId);
     } catch (e) {
-      return print(
+      return _toolsVM.printWarning(
           "Could not get document from Firebase, error: " + e.code.toString());
     }
     List<dynamic> listContent = document.get('listContent');
@@ -328,7 +332,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'listFavorite': listFavorite
         })
         .then((value) => print("List item deleted"))
-        .catchError((error) => print("Failed to delete item: $error"));
+        .catchError(
+            (error) => _toolsVM.printWarning("Failed to delete item: $error"));
   }
 
   void toggleStateOfShoppingListItemOnFirebase(String documentId, int itemIndex,
@@ -338,7 +343,7 @@ class FirebaseViewModel extends ChangeNotifier {
       document = await getDocumentSnapshotFromFirebaseWithId(
           documentId, 'lists', ownerId);
     } catch (e) {
-      return print(
+      return _toolsVM.printWarning(
           "Could not get document from Firebase, error: " + e.code.toString());
     }
     List<dynamic> listState = document.get('listState');
@@ -351,7 +356,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'listState': listState,
         })
         .then((value) => print("Changed state of item"))
-        .catchError((error) => print("Failed to toggle item's state: $error"));
+        .catchError((error) =>
+            _toolsVM.printWarning("Failed to toggle item's state: $error"));
   }
 
   void toggleFavoriteOfShoppingListItemOnFirebase(
@@ -361,7 +367,7 @@ class FirebaseViewModel extends ChangeNotifier {
       document = await getDocumentSnapshotFromFirebaseWithId(
           documentId, 'lists', ownerId);
     } catch (e) {
-      return print(
+      return _toolsVM.printWarning(
           "Could not get document from Firebase, error: " + e.code.toString());
     }
     if (!document.exists) return print('Document does not exist');
@@ -376,7 +382,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'listFavorite': listFavorite,
         })
         .then((value) => print("Changed state of item"))
-        .catchError((error) => print("Failed to toggle item's state: $error"));
+        .catchError((error) =>
+            _toolsVM.printWarning("Failed to toggle item's state: $error"));
   }
 
   // -- LOYALTY CARDS
@@ -386,7 +393,7 @@ class FirebaseViewModel extends ChangeNotifier {
     if (_firebaseAuth.auth.currentUser == null) return;
     _loyaltyCardsFetchedFromFirebase.clear();
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('loyaltyCards')
         .get()
         .then((QuerySnapshot querySnapshot) => {
@@ -397,8 +404,8 @@ class FirebaseViewModel extends ChangeNotifier {
                   })
                 }
             })
-        .catchError((error) =>
-            print("Failed to fetch cards data from Firebase: $error"));
+        .catchError((error) => _toolsVM.printWarning(
+            "Failed to fetch loyalty cards data from Firebase: $error"));
     if (shouldUpdateLocalData) addFetchedLoyaltyCardsDataToLocalList();
   }
 
@@ -420,7 +427,7 @@ class FirebaseViewModel extends ChangeNotifier {
       String name, String barCode, String documentId, int colorValue) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('loyaltyCards')
         .doc(documentId)
         .set({
@@ -431,7 +438,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'color': colorValue
         })
         .then((value) => print("Created new Loyalty card"))
-        .catchError((error) => print("Failed to create Loyalty card: $error"));
+        .catchError((error) =>
+            _toolsVM.printWarning("Failed to create Loyalty card: $error"));
   }
 
   void deleteLoyaltyCardOnFirebase(String documentId) async {
@@ -441,7 +449,8 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(documentId)
         .delete()
         .then((value) => print("Loyalty card Deleted"))
-        .catchError((error) => print("Failed to delete loyalty card: $error"));
+        .catchError((error) =>
+            _toolsVM.printWarning("Failed to delete loyalty card: $error"));
   }
 
   void toggleFavoriteOfLoyaltyCardOnFirebase(String documentId) async {
@@ -450,7 +459,7 @@ class FirebaseViewModel extends ChangeNotifier {
       document = await getDocumentSnapshotFromFirebaseWithId(
           documentId, 'loyaltyCards');
     } catch (e) {
-      return print(
+      return _toolsVM.printWarning(
           "Could not get document from Firebase, error: " + e.code.toString());
     }
     bool isFavorite = document.get('isFavorite');
@@ -463,8 +472,8 @@ class FirebaseViewModel extends ChangeNotifier {
           'isFavorite': isFavorite,
         })
         .then((value) => print("Changed favorite of loyalty card"))
-        .catchError((error) =>
-            print("Failed to toggle loyalty card's favorite: $error"));
+        .catchError((error) => _toolsVM
+            .printWarning("Failed to toggle loyalty card's favorite: $error"));
   }
 
   // -- FRIENDS
@@ -476,7 +485,6 @@ class FirebaseViewModel extends ChangeNotifier {
       querySnapshot.docs.forEach((document) {
         if (document.get('userId') != _firebaseAuth.currentUser.userId &&
             !_friendsServiceVM.friendsList.any((element) {
-              print('compare: ' + element.email + ' ' + input);
               return element.email == input;
             }) &&
             !_friendsServiceVM.friendRequestsList
@@ -506,8 +514,8 @@ class FirebaseViewModel extends ChangeNotifier {
                   })
                 }
             })
-        .catchError((error) =>
-            print("Failed to fetch friends data from Firebase: $error"));
+        .catchError((error) => _toolsVM.printWarning(
+            "Failed to fetch friends data from Firebase: $error"));
     addFetchedFriendsDataToLocalList(_friendsFetchedFromFirebase);
   }
 
@@ -539,7 +547,7 @@ class FirebaseViewModel extends ChangeNotifier {
                   })
                 }
             })
-        .catchError((error) => print(
+        .catchError((error) => _toolsVM.printWarning(
             "Failed to fetch friend requests data from Firebase: $error"));
     addFetchedFriendRequestsDataToLocalList(_friendRequestsFetchedFromFirebase);
   }
@@ -644,8 +652,9 @@ class FirebaseViewModel extends ChangeNotifier {
       document =
           await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
     } catch (e) {
-      return print(
-          "Could not get document from Firebase, error: " + e.code.toString());
+      return _toolsVM.printWarning(
+          "Could not get document with friend's list data from Firebase, error: " +
+              e.code.toString());
     }
     List<String> usersWithAccess = document.get('usersWithAccess');
     usersWithAccess.add(friend.userId);

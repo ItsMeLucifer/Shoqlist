@@ -1,4 +1,4 @@
-package com.example.shoqlist
+package com.jocs.shoqlist
 
 import io.flutter.embedding.android.FlutterActivity
 

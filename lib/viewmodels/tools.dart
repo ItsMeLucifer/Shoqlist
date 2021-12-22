@@ -38,6 +38,10 @@ class Tools extends ChangeNotifier {
     return input.replaceAll(' ', '');
   }
 
+  void printWarning(String text) {
+    print('\x1B[33m$text\x1B[0m');
+  }
+
   //New nickname
   TextEditingController newNicknameController = TextEditingController();
   void clearNewNicknameController() {
