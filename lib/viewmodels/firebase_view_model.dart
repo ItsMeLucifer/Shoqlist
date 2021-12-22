@@ -145,7 +145,8 @@ class FirebaseViewModel extends ChangeNotifier {
     users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .update({'timestamp': _shoppingListsVM.getLocalTimestamp()});
-    _shoppingListsVM.displayLocalShoppingLists();
+    _shoppingListsVM
+        .displayLocalShoppingLists(_firebaseAuth.currentUser.userId);
   }
 
   void addFetchedShoppingListsDataToLocalList() {
@@ -354,8 +355,7 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void toggleFavoriteOfShoppingListItemOnFirebase(
-      String documentId, int itemIndex,
-      [String ownerId]) async {
+      String documentId, int itemIndex, String ownerId) async {
     DocumentSnapshot document;
     try {
       document = await getDocumentSnapshotFromFirebaseWithId(
@@ -364,6 +364,7 @@ class FirebaseViewModel extends ChangeNotifier {
       return print(
           "Could not get document from Firebase, error: " + e.code.toString());
     }
+    if (!document.exists) return print('Document does not exist');
     List<dynamic> listFavorite = document.get('listFavorite');
     // When added to favorite last item in the list, there was an error related to index range - fix in future
     listFavorite[itemIndex] = !listFavorite[itemIndex];

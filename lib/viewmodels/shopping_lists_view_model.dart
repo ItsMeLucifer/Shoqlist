@@ -28,6 +28,13 @@ class ShoppingListsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearDisplayedData() {
+    _shoppingLists.clear();
+    _ownShoppingLists.clear();
+    _sharedShoppingLists.clear();
+    notifyListeners();
+  }
+
   void filterDisplayedShoppingLists() {
     _sharedShoppingLists = _shoppingLists.where((shoppingList) {
       return shoppingList.ownerId != currentUserId;
@@ -57,7 +64,9 @@ class ShoppingListsViewModel extends ChangeNotifier {
     return lists;
   }
 
-  void displayLocalShoppingLists() {
+  void displayLocalShoppingLists(String userId) {
+    _shoppingLists.clear();
+    currentUserId = userId;
     _box.toMap().forEach((key, value) {
       _shoppingLists.add(value);
     });
@@ -87,10 +96,9 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void saveNewShoppingListLocally(
-      String name, Importance importance, String documentId,
-      [String ownerId]) {
+      String name, Importance importance, String documentId) {
     final ShoppingList newList =
-        ShoppingList(name, [], importance, documentId, ownerId);
+        ShoppingList(name, [], importance, documentId, currentUserId, []);
     _shoppingLists.add(newList);
     filterDisplayedShoppingLists();
     //HIVE
@@ -131,13 +139,12 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void deleteShoppingListLocally(int index) {
-    shoppingLists.removeAt(index);
-    filterDisplayedShoppingLists();
-    //HIVE
     int fixedIndex =
         _shoppingLists.indexWhere((element) => element == shoppingLists[index]);
     _box.deleteAt(fixedIndex);
+    _shoppingLists.removeAt(fixedIndex);
     updateLocalTimestamp();
+    shoppingLists.removeAt(index);
     notifyListeners();
   }
 
@@ -202,6 +209,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void addUserIdToUsersWithAccessList(String userId) {
+    if (userId == currentUserId) return;
     shoppingLists[_currentListIndex].usersWithAccess.add(userId);
     notifyListeners();
   }

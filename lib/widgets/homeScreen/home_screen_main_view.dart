@@ -95,10 +95,10 @@ class HomeScreenMainView extends ConsumerWidget {
                                 _navigateToShoppingList(context);
                               },
                               onLongPress: () {
+                                shoppingListsVM.currentListIndex = index;
                                 if (shoppingListsVM
                                         .shoppingLists[index].ownerId ==
                                     firebaseAuthVM.currentUser.userId) {
-                                  shoppingListsVM.currentListIndex = index;
                                   showDialog(
                                       context: context,
                                       builder: (context) {
@@ -106,12 +106,6 @@ class HomeScreenMainView extends ConsumerWidget {
                                             shoppingListsVM
                                                 .shoppingLists[index].name +
                                             "' list?";
-                                        toolsVM.newListImportance =
-                                            shoppingListsVM.shoppingLists[index]
-                                                .importance;
-                                        toolsVM.setNewListNameControllerText(
-                                            shoppingListsVM
-                                                .shoppingLists[index].name);
                                         return PutShoppingListData(
                                           _updateShoppingList,
                                           context,
@@ -119,6 +113,11 @@ class HomeScreenMainView extends ConsumerWidget {
                                           _deleteShoppingList,
                                         );
                                       });
+                                  toolsVM.newListImportance = shoppingListsVM
+                                      .shoppingLists[index].importance;
+                                  toolsVM.setNewListNameControllerText(
+                                      shoppingListsVM
+                                          .shoppingLists[index].name);
                                 }
                               },
                               child: Card(

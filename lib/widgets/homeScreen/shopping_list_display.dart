@@ -169,6 +169,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
                           key: toolsVM.addNewItemNameFormFieldKey,
+                          focusNode: toolsVM.newItemFocusNode,
                           keyboardType: TextInputType.name,
                           autofocus: false,
                           autocorrect: false,
@@ -190,6 +191,8 @@ class ShoppingListDisplay extends ConsumerWidget {
                           ),
                           onFieldSubmitted: (value) {
                             _addNewItemToCurrentShoppingList(context);
+                            toolsVM.clearNewItemTextEditingController();
+                            toolsVM.newItemFocusNode.requestFocus();
                           },
                         ),
                       ),
@@ -263,7 +266,9 @@ class ShoppingListDisplay extends ConsumerWidget {
                         onTap: () {
                           //TOGGLE ITEM FAVORITE ON FIREBASE
                           firebaseVM.toggleFavoriteOfShoppingListItemOnFirebase(
-                              shoppingList.documentId, index);
+                              shoppingList.documentId,
+                              index,
+                              shoppingList.ownerId);
                           //TOGGLE ITEM FAVORITE LOCALLY
                           shoppingListsVM.toggleItemFavoriteLocally(
                               shoppingListsVM.currentListIndex, index);

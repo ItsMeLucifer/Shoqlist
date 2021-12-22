@@ -67,7 +67,7 @@ class Tools extends ChangeNotifier {
 
   Key newListNameFormFieldKey;
   //Add new Item
-
+  FocusNode newItemFocusNode = FocusNode();
   TextEditingController newItemNameController = TextEditingController();
   Key addNewItemNameFormFieldKey;
   void clearNewItemTextEditingController() {

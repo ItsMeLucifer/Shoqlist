@@ -20,6 +20,7 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
+    context.read(shoppingListsProvider).clearDisplayedData();
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
     context.read(firebaseProvider).fetchFriendsList();
@@ -57,7 +58,6 @@ class _HomeScreen extends State<HomeScreen> {
     final toolsVM = context.read(toolsProvider);
     final firebaseVM = context.read(firebaseProvider);
     final shopingListsProviderVM = context.read(shoppingListsProvider);
-    final firebaseAuthVM = context.read(firebaseAuthProvider);
     if (toolsVM.newListNameController.text != "") {
       String id = nanoid();
       //CREATE LIST ON SERVER
@@ -65,10 +65,7 @@ class _HomeScreen extends State<HomeScreen> {
           toolsVM.newListNameController.text, toolsVM.newListImportance, id);
       //CREATE LIST LOCALLY
       shopingListsProviderVM.saveNewShoppingListLocally(
-          toolsVM.newListNameController.text,
-          toolsVM.newListImportance,
-          id,
-          firebaseAuthVM.currentUser.userId);
+          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
     }
   }
 
