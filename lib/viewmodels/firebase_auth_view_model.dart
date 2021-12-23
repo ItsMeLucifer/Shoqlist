@@ -147,7 +147,16 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     status = Status.Unauthenticated;
     _exceptionMessage = "";
     print('SIGN OUT');
+    notifyListeners();
     await _auth.signOut();
+  }
+
+  Future<void> deleteAccount() async {
+    status = Status.Unauthenticated;
+    _exceptionMessage = "";
+    print('SIGN OUT');
+    notifyListeners();
+    await _auth.currentUser.delete();
   }
 
   void changeNickname(String newNickname) async {

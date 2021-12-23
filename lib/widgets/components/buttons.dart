@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
+import 'package:shoqlist/widgets/components/dialogs.dart';
 
 class LoyaltyCardButton extends ConsumerWidget {
   final String cardName;
@@ -96,6 +97,48 @@ class BasicButton extends ConsumerWidget {
                       textAlign: TextAlign.center,
                     )
                   : Icon(_iconData),
+            ),
+          )),
+    );
+  }
+}
+
+class WarningButton extends ConsumerWidget {
+  final Function _onTap;
+  final String _buttonName;
+  final double _percentageOfScreenWidth;
+  WarningButton(this._onTap, this._buttonName, this._percentageOfScreenWidth);
+  Widget build(BuildContext context, ScopedReader watch) {
+    final screenSize = MediaQuery.of(context).size;
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return YesNoDialog(_onTap,
+                  'Are you sure you want to delete your account?\n\nThis change will be irreversible.');
+            });
+      },
+      child: Container(
+          width: screenSize.width * _percentageOfScreenWidth,
+          height: 40,
+          decoration: BoxDecoration(
+              color: Theme.of(context).buttonColor,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: Colors.red, width: 2)),
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Center(
+              child: Text(
+                _buttonName,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontFamily:
+                      Theme.of(context).primaryTextTheme.button.fontFamily,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           )),
     );

@@ -24,6 +24,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
 
   Widget build(BuildContext context, ScopedReader watch) {
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
       body: SafeArea(
         child: Stack(
           children: [

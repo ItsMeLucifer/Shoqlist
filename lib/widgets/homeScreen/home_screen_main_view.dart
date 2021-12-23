@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
+import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/shopping_list_display.dart';
@@ -47,6 +48,7 @@ class HomeScreenMainView extends ConsumerWidget {
     final shoppingListsVM = watch(shoppingListsProvider);
     final toolsVM = watch(toolsProvider);
     final firebaseAuthVM = watch(firebaseAuthProvider);
+    final firebaseVM = watch(firebaseProvider);
     final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Stack(
@@ -80,115 +82,126 @@ class HomeScreenMainView extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: 5),
-              shoppingListsVM.shoppingLists.isNotEmpty
-                  ? ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: shoppingListsVM.shoppingLists.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                          child: Container(
-                            height: 60,
-                            child: GestureDetector(
-                              onTap: () {
-                                shoppingListsVM.currentListIndex = index;
-                                _navigateToShoppingList(context);
-                              },
-                              onLongPress: () {
-                                shoppingListsVM.currentListIndex = index;
-                                if (shoppingListsVM
-                                        .shoppingLists[index].ownerId ==
-                                    firebaseAuthVM.currentUser.userId) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        String title = "Remove the '" +
-                                            shoppingListsVM
-                                                .shoppingLists[index].name +
-                                            "' list?";
-                                        return PutShoppingListData(
-                                          _updateShoppingList,
-                                          context,
-                                          title,
-                                          _deleteShoppingList,
-                                        );
-                                      });
-                                  toolsVM.newListImportance = shoppingListsVM
-                                      .shoppingLists[index].importance;
-                                  toolsVM.setNewListNameControllerText(
-                                      shoppingListsVM
-                                          .shoppingLists[index].name);
-                                }
-                              },
-                              child: Card(
-                                  color: toolsVM.getImportanceColor(
-                                      shoppingListsVM
-                                          .shoppingLists[index].importance),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
+              toolsVM.fetchStatus == FetchStatus.fetched
+                  ? shoppingListsVM.shoppingLists.isNotEmpty
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: shoppingListsVM.shoppingLists.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, right: 8.0),
+                              child: Container(
+                                height: 60,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    shoppingListsVM.currentListIndex = index;
+                                    _navigateToShoppingList(context);
+                                  },
+                                  onLongPress: () {
+                                    shoppingListsVM.currentListIndex = index;
+                                    if (shoppingListsVM
+                                            .shoppingLists[index].ownerId ==
+                                        firebaseAuthVM.currentUser.userId) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            String title = "Remove the '" +
+                                                shoppingListsVM
+                                                    .shoppingLists[index].name +
+                                                "' list?";
+                                            return PutShoppingListData(
+                                              _updateShoppingList,
+                                              context,
+                                              title,
+                                              _deleteShoppingList,
+                                            );
+                                          });
+                                      toolsVM.newListImportance =
                                           shoppingListsVM
-                                              .shoppingLists[index].name,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
-                                        ),
-                                        Row(
+                                              .shoppingLists[index].importance;
+                                      toolsVM.setNewListNameControllerText(
+                                          shoppingListsVM
+                                              .shoppingLists[index].name);
+                                    }
+                                  },
+                                  child: Card(
+                                      color: toolsVM.getImportanceColor(
+                                          shoppingListsVM
+                                              .shoppingLists[index].importance),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            shoppingListsVM.shoppingLists[index]
-                                                        .list.length !=
-                                                    0
-                                                ? Container(
-                                                    width: 100,
-                                                    child: Text(
-                                                      shoppingListsVM
-                                                              .shoppingLists[
-                                                                  index]
-                                                              .list[0]
-                                                              .itemName +
-                                                          "${shoppingListsVM.shoppingLists[index].list.length > 1 ? ', ...' : ''}",
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines: 1,
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                          fontSize: 15),
-                                                      textAlign: TextAlign.end,
-                                                    ),
-                                                  )
-                                                : Container(),
                                             Text(
-                                              "   [" +
-                                                  shoppingListsVM
-                                                      .shoppingLists[index]
-                                                      .list
-                                                      .length
-                                                      .toString() +
-                                                  "]",
+                                              shoppingListsVM
+                                                  .shoppingLists[index].name,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  fontSize: 15),
+                                                  fontSize: 20),
+                                            ),
+                                            Row(
+                                              children: [
+                                                shoppingListsVM
+                                                            .shoppingLists[
+                                                                index]
+                                                            .list
+                                                            .length !=
+                                                        0
+                                                    ? Container(
+                                                        width: 100,
+                                                        child: Text(
+                                                          shoppingListsVM
+                                                                  .shoppingLists[
+                                                                      index]
+                                                                  .list[0]
+                                                                  .itemName +
+                                                              "${shoppingListsVM.shoppingLists[index].list.length > 1 ? ', ...' : ''}",
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 15),
+                                                          textAlign:
+                                                              TextAlign.end,
+                                                        ),
+                                                      )
+                                                    : Container(),
+                                                Text(
+                                                  "   [" +
+                                                      shoppingListsVM
+                                                          .shoppingLists[index]
+                                                          .list
+                                                          .length
+                                                          .toString() +
+                                                      "]",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  )),
-                            ),
-                          ),
-                        );
-                      })
-                  : Text(
-                      shoppingListsVM.currentlyDisplayedListType ==
-                              ShoppingListType.ownShoppingLists
-                          ? 'You have no shopping lists'
-                          : 'You have no shared lists',
-                      style: Theme.of(context).primaryTextTheme.bodyText1)
+                                      )),
+                                ),
+                              ),
+                            );
+                          })
+                      : Text(
+                          shoppingListsVM.currentlyDisplayedListType ==
+                                  ShoppingListType.ownShoppingLists
+                              ? 'You have no shopping lists'
+                              : 'You have no shared lists',
+                          style: Theme.of(context).primaryTextTheme.bodyText1)
+                  : Container(
+                      height: 30, width: 30, child: CircularProgressIndicator())
             ],
           ),
         ],

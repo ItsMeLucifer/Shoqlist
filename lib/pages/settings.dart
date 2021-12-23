@@ -14,8 +14,8 @@ class Settings extends ConsumerWidget {
     Hive.box<ShoppingList>('shopping_lists').clear();
     Hive.box<int>('data_variables').clear();
     toolsVM.clearAuthenticationTextEditingControllers();
-    firebaseAuthVM.signOut();
     Navigator.pop(context);
+    firebaseAuthVM.signOut();
   }
 
   void _changeNickname(BuildContext context) {
@@ -33,88 +33,98 @@ class Settings extends ConsumerWidget {
         });
   }
 
+  void _deleteAccount(BuildContext context) {
+    context.read(firebaseProvider).deleteEveryDataRelatedToCurrentUser();
+    Navigator.of(context).pop();
+  }
+
   Widget build(BuildContext context, ScopedReader watch) {
     final toolsVM = watch(toolsProvider);
     final firebaseVM = watch(firebaseProvider);
     final firebaseAuthVM = watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         body: SingleChildScrollView(
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(height: 5),
-            Text("Settings",
-                style: Theme.of(context).primaryTextTheme.headline3),
-            Divider(
-              color: Theme.of(context).accentColor,
-              indent: 50,
-              endIndent: 50,
-            ),
-            Container(
-              height: screenSize.height * 0.8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: screenSize.height * 0.02),
-                  Container(
-                    height: screenSize.height * 0.1,
-                    width: screenSize.width,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.person,
-                            size: 70,
-                          ),
-                          SizedBox(width: screenSize.width * 0.02),
-                          VerticalDivider(
-                            color: Theme.of(context).accentColor,
-                            indent: screenSize.height * 0.01,
-                            endIndent: screenSize.height * 0.01,
-                          ),
-                          SizedBox(width: screenSize.width * 0.02),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 5),
+                Text("Settings",
+                    style: Theme.of(context).primaryTextTheme.headline3),
+                Divider(
+                  color: Theme.of(context).accentColor,
+                  indent: 50,
+                  endIndent: 50,
+                ),
+                Container(
+                  height: screenSize.height * 0.8,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: screenSize.height * 0.02),
+                      Container(
+                        height: screenSize.height * 0.1,
+                        width: screenSize.width,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Container(
-                                width: screenSize.width * 0.4,
-                                child: Text(firebaseAuthVM.currentUser.nickname,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .headline5),
+                              Icon(
+                                Icons.person,
+                                size: 70,
                               ),
-                              Container(
-                                width: screenSize.width * 0.4,
-                                child: Text(firebaseAuthVM.currentUser.email,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .bodyText2),
-                              )
+                              SizedBox(width: screenSize.width * 0.02),
+                              VerticalDivider(
+                                color: Theme.of(context).accentColor,
+                                indent: screenSize.height * 0.01,
+                                endIndent: screenSize.height * 0.01,
+                              ),
+                              SizedBox(width: screenSize.width * 0.02),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: screenSize.width * 0.4,
+                                    child: Text(
+                                        firebaseAuthVM.currentUser.nickname,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .headline5),
+                                  ),
+                                  Container(
+                                    width: screenSize.width * 0.4,
+                                    child: Text(
+                                        firebaseAuthVM.currentUser.email,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .bodyText2),
+                                  )
+                                ],
+                              ),
+                              SizedBox(width: screenSize.width * 0.1),
+                              BasicButton(_showDialogWithChangeNickname,
+                                  'Change Nickname', 0.1, Icons.edit)
                             ],
                           ),
-                          SizedBox(width: screenSize.width * 0.1),
-                          BasicButton(_showDialogWithChangeNickname,
-                              'Change Nickname', 0.1, Icons.edit)
-                        ],
+                        ),
                       ),
-                    ),
+                      SizedBox(height: screenSize.height * 0.3),
+                      BasicButton(_signOut, 'Sign-out', 0.6),
+                      SizedBox(height: screenSize.height * 0.1),
+                      WarningButton(_deleteAccount, 'Delete Account', 0.6)
+                    ],
                   ),
-                  SizedBox(height: screenSize.height * 0.3),
-                  BasicButton(_signOut, 'Sign-out', 0.6)
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
   }
 }

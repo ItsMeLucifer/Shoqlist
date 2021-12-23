@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
@@ -42,6 +43,7 @@ class FirebaseViewModel extends ChangeNotifier {
       bool shouldCompareCloudDataWithLocalOne) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     //Fetch shopping lists
+    _toolsVM.fetchStatus = FetchStatus.duringFetching;
     _shoppingListsFetchedFromFirebase.clear();
     _sharedShoppingListsFetchedFromFirebase.clear();
     await users
@@ -90,6 +92,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .catchError((error) => _toolsVM.printWarning(
             "Failed to fetch informations about shared shopping lists from Firebase: $error"));
     await getSharedShoppingListsData(_infoAboutSharedShoppingLists);
+    _toolsVM.fetchStatus = FetchStatus.fetched;
     if (shouldCompareCloudDataWithLocalOne)
       compareDiscrepanciesBetweenCloudAndLocalData();
   }
@@ -479,6 +482,7 @@ class FirebaseViewModel extends ChangeNotifier {
   // -- FRIENDS
 
   Future<void> searchForUser(String input) async {
+    _toolsVM.friendsFetchStatus = FetchStatus.duringFetching;
     List<User> _usersGet = List<User>();
     input = _toolsVM.deleteAllWhitespacesFromString(input);
     await users.where("email", isEqualTo: input).get().then((querySnapshot) {
@@ -495,6 +499,7 @@ class FirebaseViewModel extends ChangeNotifier {
         }
       });
     });
+    _toolsVM.friendsFetchStatus = FetchStatus.fetched;
     _friendsServiceVM.putUsersList(_usersGet);
   }
 
@@ -520,11 +525,13 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void addFetchedFriendsDataToLocalList(
-      List<QueryDocumentSnapshot> _friendsFetchedFromFirebase) {
+      List<QueryDocumentSnapshot> _friendsFetchedFromFirebase) async {
     List<User> newList = List<User>();
     for (int i = 0; i < _friendsFetchedFromFirebase.length; i++) {
+      DocumentSnapshot doc =
+          await users.doc(_friendsFetchedFromFirebase[i].get('userId')).get();
       newList.add(User(
-          _friendsFetchedFromFirebase[i].get('nickname'),
+          doc.get('nickname') ?? 'No nickname',
           _friendsFetchedFromFirebase[i].get('email'),
           _friendsFetchedFromFirebase[i].get('userId')));
     }
@@ -553,11 +560,14 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void addFetchedFriendRequestsDataToLocalList(
-      List<QueryDocumentSnapshot> _friendRequestsFetchedFromFirebase) {
+      List<QueryDocumentSnapshot> _friendRequestsFetchedFromFirebase) async {
     List<User> newList = List<User>();
     for (int i = 0; i < _friendRequestsFetchedFromFirebase.length; i++) {
+      DocumentSnapshot doc = await users
+          .doc(_friendRequestsFetchedFromFirebase[i].get('userId'))
+          .get();
       newList.add(User(
-          _friendRequestsFetchedFromFirebase[i].get('nickname'),
+          doc.get('nickname') ?? 'No nickname',
           _friendRequestsFetchedFromFirebase[i].get('email'),
           _friendRequestsFetchedFromFirebase[i].get('userId')));
     }
@@ -572,7 +582,6 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(_firebaseAuth.currentUser.userId)
         .set({
       'userId': _firebaseAuth.currentUser.userId,
-      'nickname': _firebaseAuth.currentUser.nickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
     _friendsServiceVM.removeUserFromUsersList(friendRequestReceiver);
@@ -592,7 +601,6 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(friendRequestSender.userId)
         .set({
       'userId': friendRequestSender.userId,
-      'nickname': friendRequestSender.nickname,
       'email': friendRequestSender.email
     });
     //Add currentUser to friendRequestSender's friends list
@@ -602,7 +610,6 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(_firebaseAuth.currentUser.userId)
         .set({
       'userId': _firebaseAuth.currentUser.userId,
-      'nickname': _firebaseAuth.currentUser.nickname,
       'email': _firebaseAuth.auth.currentUser.email
     });
     _friendsServiceVM.addUserToFriendsList(friendRequestSender);
@@ -663,5 +670,44 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('lists')
         .doc(documentId)
         .update({'usersWithAccess': usersWithAccess});
+  }
+
+  // -- SETTINGS
+
+  void deleteEveryDataRelatedToCurrentUser() async {
+    //Go through shared lists and delete currentUserId from usersWithAccess
+    QuerySnapshot lists = await users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('sharedLists')
+        .get()
+        .catchError((onError) => _toolsVM
+            .printWarning("Failet to fetch sharedLists data: $onError"));
+    lists.docs.forEach((list) async {
+      try {
+        DocumentSnapshot docSnap = await users
+            .doc(list.get('ownerId'))
+            .collection('lists')
+            .doc(list.get('documentId'))
+            .get();
+        if (docSnap.exists) {
+          List<dynamic> usersWithAccess = docSnap.get('usersWithAccess');
+          usersWithAccess.remove(_firebaseAuth.auth.currentUser.uid);
+          await users
+              .doc(list.get('ownerId'))
+              .collection('lists')
+              .doc(list.get('documentId'))
+              .update({'usersWithAccess': usersWithAccess});
+        }
+      } catch (err) {
+        _toolsVM.printWarning(
+            "Failed to delete current user's id from usersWithAccess list in sharedLists: $err");
+      }
+    });
+    _toolsVM.clearAuthenticationTextEditingControllers();
+    //Delete account and Sign-out
+    await Hive.box<ShoppingList>('shopping_lists').clear();
+    await Hive.box<int>('data_variables').clear();
+    await users.doc(_firebaseAuth.auth.currentUser.uid).delete();
+    await _firebaseAuth.deleteAccount();
   }
 }

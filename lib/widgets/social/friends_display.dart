@@ -17,6 +17,7 @@ class FriendsDisplay extends ConsumerWidget {
   }
 
   void _navigateToFriendsSearchList(BuildContext context) {
+    context.read(friendsServiceProvider).clearUsersList();
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => FriendsSearchDisplay()));
   }
@@ -32,6 +33,7 @@ class FriendsDisplay extends ConsumerWidget {
     firebaseVM.fetchFriendsList();
     //Make if statement, when loading data, display only progress indicator
     return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: SpeedDial(
             overlayOpacity: 0,
             animatedIcon: AnimatedIcons.menu_close,

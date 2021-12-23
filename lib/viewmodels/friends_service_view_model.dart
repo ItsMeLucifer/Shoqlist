@@ -12,6 +12,10 @@ class FriendsServiceViewModel extends ChangeNotifier {
   List<User> _usersList = List<User>();
   List<User> get usersList => _usersList;
 
+  void clearUsersList() {
+    _usersList.clear();
+  }
+
   void putFriendsList(List<User> newList) {
     _friendsList = newList;
     notifyListeners();

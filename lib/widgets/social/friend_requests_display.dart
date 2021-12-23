@@ -25,42 +25,44 @@ class FriendRequestsDisplay extends ConsumerWidget {
     final firebaseVM = watch(firebaseProvider);
     final friendsServiceVM = watch(friendsServiceProvider);
     return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         body: SingleChildScrollView(
-      child: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+          child: SafeArea(
+            child: Stack(
               children: [
-                SizedBox(height: 5),
-                Text("Friend Requests",
-                    style: Theme.of(context).primaryTextTheme.headline4),
-                Divider(
-                  color: Theme.of(context).accentColor,
-                  indent: 50,
-                  endIndent: 50,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 5),
+                    Text("Friend Requests",
+                        style: Theme.of(context).primaryTextTheme.headline4),
+                    Divider(
+                      color: Theme.of(context).accentColor,
+                      indent: 50,
+                      endIndent: 50,
+                    ),
+                    friendsServiceVM.friendRequestsList.isEmpty
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: Text(
+                                      "You don't have any friend requests",
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .bodyText1)),
+                            ],
+                          )
+                        : UsersList(
+                            _acceptFriendRequestAfterTap,
+                            friendsServiceVM.friendRequestsList,
+                            'Accept friend request?',
+                            _declineFriendRequestAfterTap)
+                  ],
                 ),
-                friendsServiceVM.friendRequestsList.isEmpty
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Center(
-                              child: Text("You don't have any friend requests",
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .bodyText1)),
-                        ],
-                      )
-                    : UsersList(
-                        _acceptFriendRequestAfterTap,
-                        friendsServiceVM.friendRequestsList,
-                        'Accept friend request?',
-                        _declineFriendRequestAfterTap)
               ],
             ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
   }
 }

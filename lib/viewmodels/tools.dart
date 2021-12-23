@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 
+enum FetchStatus { unfetched, fetched, duringFetching }
+
 class Tools extends ChangeNotifier {
   Color getImportanceColor(Importance importance) {
     switch (importance) {
@@ -40,6 +42,14 @@ class Tools extends ChangeNotifier {
 
   void printWarning(String text) {
     print('\x1B[33m$text\x1B[0m');
+  }
+
+  //Home Page
+  FetchStatus _fetchStatus = FetchStatus.unfetched;
+  FetchStatus get fetchStatus => _fetchStatus;
+  set fetchStatus(FetchStatus status) {
+    _fetchStatus = status;
+    notifyListeners();
   }
 
   //New nickname
@@ -119,6 +129,14 @@ class Tools extends ChangeNotifier {
   Color get newLoyaltyCardColor => _newLoyaltyCardColor;
   set newLoyaltyCardColor(Color value) {
     _newLoyaltyCardColor = value;
+    notifyListeners();
+  }
+
+  //Friends
+  FetchStatus _friendsFetchStatus = FetchStatus.unfetched;
+  FetchStatus get friendsFetchStatus => _friendsFetchStatus;
+  set friendsFetchStatus(FetchStatus status) {
+    _friendsFetchStatus = status;
     notifyListeners();
   }
 }

@@ -71,6 +71,7 @@ class _HomeScreen extends State<HomeScreen> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: SpeedDial(
             overlayOpacity: 0,
             animatedIcon: AnimatedIcons.menu_close,
