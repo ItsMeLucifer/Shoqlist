@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
+enum RefreshStatus { duringRefresh, refreshed }
 
 class Tools extends ChangeNotifier {
   Color getImportanceColor(Importance importance) {
@@ -137,6 +138,14 @@ class Tools extends ChangeNotifier {
   FetchStatus get friendsFetchStatus => _friendsFetchStatus;
   set friendsFetchStatus(FetchStatus status) {
     _friendsFetchStatus = status;
+    notifyListeners();
+  }
+
+  //Refresh
+  RefreshStatus _refreshStatus = RefreshStatus.refreshed;
+  RefreshStatus get refreshStatus => _refreshStatus;
+  set refreshStatus(RefreshStatus newStatus) {
+    _refreshStatus = newStatus;
     notifyListeners();
   }
 }

@@ -71,6 +71,7 @@ class ShoppingListDisplay extends ConsumerWidget {
     final firebaseAuthVM = watch(firebaseAuthProvider);
     final friendsServiceVM = watch(friendsServiceProvider);
     const Color _disabledGreyColor = Color.fromRGBO(0, 0, 0, 0.3);
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color.lerp(
           toolsVM.getImportanceColor(shoppingListsVM
@@ -153,14 +154,18 @@ class ShoppingListDisplay extends ConsumerWidget {
                 ),
                 Expanded(
                   child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8),
                       child: shoppingList(watch)),
                 ),
+                SizedBox(
+                  height: 65,
+                )
               ],
             ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
+                height: 65,
                 color: Colors.white,
                 child: Row(
                   children: [
@@ -245,46 +250,51 @@ class ShoppingListDisplay extends ConsumerWidget {
                         _onLongPressShoppingListItem, "Remove this item?");
                   });
             },
-            child: Card(
-              color: Theme.of(context).primaryColor,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(shoppingList.list[index].gotItem
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off),
-                    SizedBox(width: 5),
-                    Expanded(
-                      child: Text(shoppingList.list[index].itemName,
-                          style: TextStyle(
-                              decoration: shoppingList.list[index].gotItem
-                                  ? TextDecoration.lineThrough
-                                  : TextDecoration.none)),
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          //TOGGLE ITEM FAVORITE ON FIREBASE
-                          firebaseVM.toggleFavoriteOfShoppingListItemOnFirebase(
-                              shoppingList.documentId,
-                              index,
-                              shoppingList.ownerId);
-                          //TOGGLE ITEM FAVORITE LOCALLY
-                          shoppingListsVM.toggleItemFavoriteLocally(
-                              shoppingListsVM.currentListIndex, index);
-                        },
-                        child: Stack(
-                          children: [
-                            Icon(
-                                !shoppingList.list[index].isFavorite
-                                    ? null
-                                    : Icons.star,
-                                color: Colors.yellow),
-                            Icon(Icons.star_border_outlined,
-                                color: Colors.black),
-                          ],
-                        )),
-                  ],
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: shoppingList.list.length - 1 == index ? 70 : 0),
+              child: Card(
+                color: Theme.of(context).primaryColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Icon(shoppingList.list[index].gotItem
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Text(shoppingList.list[index].itemName,
+                            style: TextStyle(
+                                decoration: shoppingList.list[index].gotItem
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none)),
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            //TOGGLE ITEM FAVORITE ON FIREBASE
+                            firebaseVM
+                                .toggleFavoriteOfShoppingListItemOnFirebase(
+                                    shoppingList.documentId,
+                                    index,
+                                    shoppingList.ownerId);
+                            //TOGGLE ITEM FAVORITE LOCALLY
+                            shoppingListsVM.toggleItemFavoriteLocally(
+                                shoppingListsVM.currentListIndex, index);
+                          },
+                          child: Stack(
+                            children: [
+                              Icon(
+                                  !shoppingList.list[index].isFavorite
+                                      ? null
+                                      : Icons.star,
+                                  color: Colors.yellow),
+                              Icon(Icons.star_border_outlined,
+                                  color: Colors.black),
+                            ],
+                          )),
+                    ],
+                  ),
                 ),
               ),
             ),

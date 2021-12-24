@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
@@ -20,12 +21,7 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
-    context.read(shoppingListsProvider).clearDisplayedData();
-    context.read(firebaseProvider).getShoppingListsFromFirebase(true);
-    context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
-    context.read(firebaseProvider).fetchFriendsList();
-    context.read(firebaseProvider).fetchFriendRequestsList();
-    _whenInternetConnectionIsRestoredCompareDatabasesAgain();
+    fetchData();
   }
 
   void _whenInternetConnectionIsRestoredCompareDatabasesAgain() {
@@ -36,6 +32,20 @@ class _HomeScreen extends State<HomeScreen> {
       }
     });
   }
+
+  void fetchData() {
+    context.read(shoppingListsProvider).clearDisplayedData();
+    context.read(firebaseProvider).getShoppingListsFromFirebase(true);
+    context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
+    context.read(firebaseProvider).fetchFriendsList();
+    context.read(firebaseProvider).fetchFriendRequestsList();
+    _whenInternetConnectionIsRestoredCompareDatabasesAgain();
+  }
+
+  // void _onRefresh() {
+  //   context.read(shoppingListsProvider).clearDisplayedData();
+  //   context.read(firebaseProvider).getShoppingListsFromFirebase(true);
+  // }
 
   void _navigateToLoyaltyCardsHandler(BuildContext context) {
     Navigator.push(context,

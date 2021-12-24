@@ -86,6 +86,8 @@ class AddNewLoyaltyCard extends ConsumerWidget {
                         toolsVM.loyaltyCardBarCodeController.text =
                             await FlutterBarcodeScanner.scanBarcode(
                                 "#ff6666", "Cancel", true, ScanMode.DEFAULT);
+                        if (toolsVM.loyaltyCardBarCodeController.text == '-1')
+                          toolsVM.loyaltyCardBarCodeController.text = '';
                       },
                       child: Icon(Icons.qr_code),
                     ),

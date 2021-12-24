@@ -74,10 +74,10 @@ class FriendsServiceViewModel extends ChangeNotifier {
     List<User> result = _friendsList.where((user) {
       usersWithAccess.forEach((userWithAccessId) {
         if (user.userId == userWithAccessId) {
-          return true;
+          return false;
         }
       });
-      return false;
+      return true;
     }).toList();
     return result;
   }

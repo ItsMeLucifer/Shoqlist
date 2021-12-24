@@ -93,6 +93,9 @@ class FirebaseViewModel extends ChangeNotifier {
             "Failed to fetch informations about shared shopping lists from Firebase: $error"));
     await getSharedShoppingListsData(_infoAboutSharedShoppingLists);
     _toolsVM.fetchStatus = FetchStatus.fetched;
+    if (_toolsVM.refreshStatus == RefreshStatus.duringRefresh) {
+      _toolsVM.refreshStatus = RefreshStatus.refreshed;
+    }
     if (shouldCompareCloudDataWithLocalOne)
       compareDiscrepanciesBetweenCloudAndLocalData();
   }
@@ -508,18 +511,14 @@ class FirebaseViewModel extends ChangeNotifier {
         List<QueryDocumentSnapshot>();
     if (_firebaseAuth.auth.currentUser == null) return;
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friends')
         .get()
-        .then((QuerySnapshot querySnapshot) => {
-              if (querySnapshot.size > 0)
-                {
-                  querySnapshot.docs.forEach((doc) {
-                    _friendsFetchedFromFirebase.add(doc);
-                  })
-                }
-            })
-        .catchError((error) => _toolsVM.printWarning(
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        _friendsFetchedFromFirebase.add(doc);
+      });
+    }).catchError((error) => _toolsVM.printWarning(
             "Failed to fetch friends data from Firebase: $error"));
     addFetchedFriendsDataToLocalList(_friendsFetchedFromFirebase);
   }
@@ -543,18 +542,14 @@ class FirebaseViewModel extends ChangeNotifier {
         List<QueryDocumentSnapshot>();
     if (_firebaseAuth.auth.currentUser == null) return;
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friendRequests')
         .get()
-        .then((QuerySnapshot querySnapshot) => {
-              if (querySnapshot.size > 0)
-                {
-                  querySnapshot.docs.forEach((doc) {
-                    _friendRequestsFetchedFromFirebase.add(doc);
-                  })
-                }
-            })
-        .catchError((error) => _toolsVM.printWarning(
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        _friendRequestsFetchedFromFirebase.add(doc);
+      });
+    }).catchError((error) => _toolsVM.printWarning(
             "Failed to fetch friend requests data from Firebase: $error"));
     addFetchedFriendRequestsDataToLocalList(_friendRequestsFetchedFromFirebase);
   }

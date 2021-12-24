@@ -11,8 +11,9 @@ class UsersList extends ConsumerWidget {
   final List<User> _usersList;
   final String _dialogTitle;
   final Function _declineAction;
+  final double _elementWidth;
   UsersList(this._acceptAction, this._usersList,
-      [this._dialogTitle, this._declineAction]);
+      [this._dialogTitle, this._declineAction, this._elementWidth = 0.7]);
   Widget build(BuildContext context, ScopedReader watch) {
     final friendsServiceVM = watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
@@ -43,21 +44,25 @@ class UsersList extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(Icons.person),
-                      SizedBox(width: screenSize.width * 0.05),
+                      SizedBox(width: screenSize.width * 0.05 * _elementWidth),
                       Column(
                         children: [
                           Container(
-                            width: screenSize.width * 0.7,
+                            width: screenSize.width * _elementWidth,
                             child: Text(_usersList[index].nickname,
-                                overflow: TextOverflow.ellipsis,
+                                overflow: TextOverflow.fade,
+                                maxLines: 1,
+                                softWrap: false,
                                 style: Theme.of(context)
                                     .primaryTextTheme
                                     .headline6),
                           ),
                           Container(
-                            width: screenSize.width * 0.7,
+                            width: screenSize.width * _elementWidth,
                             child: Text(_usersList[index].email,
-                                overflow: TextOverflow.ellipsis,
+                                overflow: TextOverflow.fade,
+                                maxLines: 1,
+                                softWrap: false,
                                 style: Theme.of(context)
                                     .primaryTextTheme
                                     .bodyText2),

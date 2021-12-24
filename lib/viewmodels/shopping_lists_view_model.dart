@@ -119,9 +119,14 @@ class ShoppingListsViewModel extends ChangeNotifier {
 
   void addNewItemToShoppingListLocally(
       String itemName, bool itemGot, bool isFavorited) {
-    shoppingLists[_currentListIndex]
+    ShoppingListItem firstGotItem = shoppingLists[_currentListIndex]
         .list
-        .add(ShoppingListItem(itemName, itemGot, isFavorited));
+        .firstWhere((element) => element.gotItem, orElse: () => null);
+    int firstDoneItemIndex = firstGotItem != null
+        ? shoppingLists[_currentListIndex].list.indexOf(firstGotItem)
+        : shoppingLists[_currentListIndex].list.length;
+    shoppingLists[_currentListIndex].list.insert(
+        firstDoneItemIndex, ShoppingListItem(itemName, itemGot, isFavorited));
     //HIVE
     int index = _shoppingLists
         .indexWhere((element) => element == shoppingLists[_currentListIndex]);

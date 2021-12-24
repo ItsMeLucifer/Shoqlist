@@ -64,7 +64,9 @@ class LoyaltyCardsHandler extends ConsumerWidget {
             return GestureDetector(
                 onTap: () {
                   toolsVM.clearLoyaltyCardTextEditingControllers();
-                  showDialog(context: context, child: AddNewLoyaltyCard());
+                  showDialog(
+                      context: context,
+                      builder: (context) => AddNewLoyaltyCard());
                 },
                 child: Card(
                   color: Colors.grey[400],
