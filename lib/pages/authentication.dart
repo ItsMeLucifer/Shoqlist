@@ -43,51 +43,53 @@ class Authentication extends ConsumerWidget {
         backgroundColor: Theme.of(context).backgroundColor,
         body: Center(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'images/icon.png',
-                      height: 40,
-                    ),
-                    SizedBox(width: 5),
-                    Text('Shoqlist',
-                        style: Theme.of(context).primaryTextTheme.headline3),
-                  ],
-                ),
-                SizedBox(height: screenSize.height * 0.025),
-                Container(
-                    width: 30,
-                    height: 30,
-                    child: firebaseAuthVM.status == Status.DuringAuthorization
-                        ? CircularProgressIndicator()
-                        : Container()),
-                Text(
-                  firebaseAuthVM.exceptionMessage,
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 5),
-                BasicForm(TextInputType.emailAddress, toolsVM.emailController,
-                    'E-mail', _resetExceptionMessage, Icons.email, false),
-                SizedBox(height: 5),
-                BasicForm(
-                    TextInputType.visiblePassword,
-                    toolsVM.passwordController,
-                    'Password',
-                    _resetExceptionMessage,
-                    Icons.vpn_key,
-                    !toolsVM.showPassword,
-                    _passwordVisibilityWidget),
-                SizedBox(height: 5),
-                BasicButton(_signInUserFirebase, 'Sign-in', 0.6),
-                SizedBox(height: 5),
-                BasicButton(_registerUserFirebase, 'Register', 0.6),
-              ],
+            child: SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'images/icon.png',
+                        height: 40,
+                      ),
+                      SizedBox(width: 5),
+                      Text('Shoqlist',
+                          style: Theme.of(context).primaryTextTheme.headline3),
+                    ],
+                  ),
+                  SizedBox(height: screenSize.height * 0.025),
+                  Container(
+                      width: 30,
+                      height: 30,
+                      child: firebaseAuthVM.status == Status.DuringAuthorization
+                          ? CircularProgressIndicator()
+                          : Container()),
+                  Text(
+                    firebaseAuthVM.exceptionMessage,
+                    style: TextStyle(color: Colors.red, fontSize: 12),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 5),
+                  BasicForm(TextInputType.emailAddress, toolsVM.emailController,
+                      'E-mail', _resetExceptionMessage, Icons.email, false),
+                  SizedBox(height: 5),
+                  BasicForm(
+                      TextInputType.visiblePassword,
+                      toolsVM.passwordController,
+                      'Password',
+                      _resetExceptionMessage,
+                      Icons.vpn_key,
+                      !toolsVM.showPassword,
+                      _passwordVisibilityWidget),
+                  SizedBox(height: 5),
+                  BasicButton(_signInUserFirebase, 'Sign-in', 0.6),
+                  SizedBox(height: 5),
+                  BasicButton(_registerUserFirebase, 'Register', 0.6),
+                ],
+              ),
             ),
           ),
         ));

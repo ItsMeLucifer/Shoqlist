@@ -261,7 +261,26 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void deleteShoppingListOnFirebase(String documentId) async {
-    //ONLY CURRENT USER'S LISTS, YOU CANT DELETE SHARED LIST
+    //If this list was shared to someone, delete his reference to this list
+    DocumentSnapshot document;
+    try {
+      document =
+          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
+    } catch (e) {
+      return _toolsVM.printWarning(
+          "Could not get document from Firebase during deleting a shopping list, error: " +
+              e.code.toString());
+    }
+    if (document.exists && document.get('usersWithAccess').isNotEmpty) {
+      document.get('usersWithAccess').forEach((user) async {
+        await users
+            .doc(user)
+            .collection('sharedLists')
+            .doc(documentId)
+            .delete();
+      });
+    }
+    //Delete shopping list
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('lists')
@@ -290,7 +309,8 @@ class FirebaseViewModel extends ChangeNotifier {
           documentId, 'lists', ownerId);
     } catch (e) {
       return _toolsVM.printWarning(
-          "Could not get document from Firebase, error: " + e.code.toString());
+          "Could not get document from Firebase during adding new item to shopping list, error: " +
+              e.code.toString());
     }
     List<dynamic> listContent = document.get('listContent');
     listContent.add(itemName);
@@ -320,7 +340,8 @@ class FirebaseViewModel extends ChangeNotifier {
           documentId, 'lists', ownerId);
     } catch (e) {
       return _toolsVM.printWarning(
-          "Could not get document from Firebase, error: " + e.code.toString());
+          "Could not get document from Firebase during deleting shopping list's item, error: " +
+              e.code.toString());
     }
     List<dynamic> listContent = document.get('listContent');
     List<dynamic> listState = document.get('listState');
@@ -350,7 +371,8 @@ class FirebaseViewModel extends ChangeNotifier {
           documentId, 'lists', ownerId);
     } catch (e) {
       return _toolsVM.printWarning(
-          "Could not get document from Firebase, error: " + e.code.toString());
+          "Could not get document from Firebase during toogling state of shopping list, error: " +
+              e.code.toString());
     }
     List<dynamic> listState = document.get('listState');
     listState[itemIndex] = !listState[itemIndex];
@@ -374,7 +396,8 @@ class FirebaseViewModel extends ChangeNotifier {
           documentId, 'lists', ownerId);
     } catch (e) {
       return _toolsVM.printWarning(
-          "Could not get document from Firebase, error: " + e.code.toString());
+          "Could not get document from Firebase during toggling favorite of shopping list, error: " +
+              e.code.toString());
     }
     if (!document.exists) return print('Document does not exist');
     List<dynamic> listFavorite = document.get('listFavorite');
@@ -466,7 +489,8 @@ class FirebaseViewModel extends ChangeNotifier {
           documentId, 'loyaltyCards');
     } catch (e) {
       return _toolsVM.printWarning(
-          "Could not get document from Firebase, error: " + e.code.toString());
+          "Could not get document from Firebase during toogling favorite of loyalty list, error: " +
+              e.code.toString());
     }
     bool isFavorite = document.get('isFavorite');
     isFavorite = !isFavorite;
@@ -646,7 +670,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(documentId)
         .set({
       'documentId': documentId,
-      'ownerId': _firebaseAuth.currentUser.userId,
+      'ownerId': _firebaseAuth.auth.currentUser.uid,
     });
     //Add friend's id to shopping list's usersWithAccess list
     DocumentSnapshot document;
@@ -658,7 +682,10 @@ class FirebaseViewModel extends ChangeNotifier {
           "Could not get document with friend's list data from Firebase, error: " +
               e.code.toString());
     }
-    List<String> usersWithAccess = document.get('usersWithAccess');
+    List<dynamic> usersWithAccess = List<dynamic>();
+    document
+        .get('usersWithAccess')
+        .forEach((user) => usersWithAccess.add(user));
     usersWithAccess.add(friend.userId);
     await users
         .doc(_firebaseAuth.currentUser.userId)

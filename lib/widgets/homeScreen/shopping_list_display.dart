@@ -59,7 +59,7 @@ class ShoppingListDisplay extends ConsumerWidget {
             .shoppingLists[shoppingListsVM.currentListIndex].documentId);
     shoppingListsVM.addUserIdToUsersWithAccessList(
         friendsWithoutAccess[friendsServiceVM.currentUserIndex].userId);
-    Navigator.of(context).popUntil((route) => Navigator.of(context).canPop());
+    Navigator.of(context).popUntil((route) => !Navigator.of(context).canPop());
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -67,7 +67,6 @@ class ShoppingListDisplay extends ConsumerWidget {
     final toolsVM = watch(toolsProvider);
     final firebaseAuthVM = watch(firebaseAuthProvider);
     final friendsServiceVM = watch(friendsServiceProvider);
-    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color.lerp(
           toolsVM.getImportanceColor(shoppingListsVM
@@ -90,6 +89,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                   firebaseAuthVM.currentUser.userId
               ? [
                   SpeedDialChild(
+                      labelBackgroundColor: Theme.of(context).primaryColor,
                       labelStyle: Theme.of(context).textTheme.bodyText2,
                       child: Icon(Icons.share,
                           color: Theme.of(context)
@@ -106,6 +106,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                           .backgroundColor,
                       label: "Share"),
                   SpeedDialChild(
+                      labelBackgroundColor: Theme.of(context).primaryColor,
                       labelStyle: Theme.of(context).textTheme.bodyText2,
                       child: Icon(Icons.add_moderator,
                           color: Theme.of(context)
@@ -129,6 +130,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                 ]
               : [
                   SpeedDialChild(
+                      labelBackgroundColor: Theme.of(context).primaryColor,
                       labelStyle: Theme.of(context).textTheme.bodyText2,
                       child: Icon(Icons.share,
                           color: Theme.of(context)
@@ -231,7 +233,6 @@ class ShoppingListDisplay extends ConsumerWidget {
 
   Widget shoppingList(ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
-    final toolsVM = watch(toolsProvider);
     final firebaseVM = watch(firebaseProvider);
     ShoppingList shoppingList =
         shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];

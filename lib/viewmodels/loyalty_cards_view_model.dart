@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 
 class LoyaltyCardsViewModel extends ChangeNotifier {

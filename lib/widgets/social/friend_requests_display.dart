@@ -27,7 +27,6 @@ class FriendRequestsDisplay extends ConsumerWidget {
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
-    final firebaseVM = watch(firebaseProvider);
     final friendsServiceVM = watch(friendsServiceProvider);
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,

@@ -11,6 +11,7 @@ class Settings extends ConsumerWidget {
   void _signOut(BuildContext context) {
     final toolsVM = context.read(toolsProvider);
     final firebaseAuthVM = context.read(firebaseAuthProvider);
+    context.read(shoppingListsProvider).clearDisplayedData();
     Hive.box<ShoppingList>('shopping_lists').clear();
     Hive.box<int>('data_variables').clear();
     toolsVM.clearAuthenticationTextEditingControllers();
@@ -39,10 +40,9 @@ class Settings extends ConsumerWidget {
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
-    final firebaseVM = watch(firebaseProvider);
     final firebaseAuthVM = watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
+    final toolsVM = watch(toolsProvider);
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: SingleChildScrollView(
@@ -115,7 +115,40 @@ class Settings extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenSize.height * 0.3),
+                      SizedBox(height: screenSize.height * 0.1),
+                      GestureDetector(
+                        onTap: () {
+                          toolsVM.triggerDarkMode();
+                        },
+                        child: Container(
+                          width: screenSize.width * 0.6,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).buttonColor,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  toolsVM.darkMode
+                                      ? Icon(Icons.check,
+                                          color: Theme.of(context).accentColor)
+                                      : Container(),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Dark Mode',
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .button,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              )),
+                        ),
+                      ),
+                      SizedBox(height: screenSize.height * 0.1),
                       BasicButton(_signOut, 'Sign-out', 0.6),
                       SizedBox(height: screenSize.height * 0.1),
                       WarningButton(_deleteAccount, 'Delete Account', 0.6)

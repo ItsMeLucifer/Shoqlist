@@ -7,24 +7,15 @@ enum RefreshStatus { duringRefresh, refreshed }
 
 class Tools extends ChangeNotifier {
   Color getImportanceColor(Importance importance) {
-    var brightness = SchedulerBinding.instance.window.platformBrightness;
     switch (importance) {
       case Importance.important:
-        return brightness != Brightness.dark
-            ? Colors.orange[200]
-            : Color.fromRGBO(94, 79, 58, 1);
+        return !darkMode ? Colors.orange[200] : Color.fromRGBO(94, 79, 58, 1);
       case Importance.urgent:
-        return brightness != Brightness.dark
-            ? Colors.red[300]
-            : Color.fromRGBO(108, 49, 51, 1);
+        return !darkMode ? Colors.red[300] : Color.fromRGBO(108, 49, 51, 1);
       case Importance.low:
-        return brightness != Brightness.dark
-            ? Colors.blue[200]
-            : Color.fromRGBO(67, 111, 122, 1);
+        return !darkMode ? Colors.blue[200] : Color.fromRGBO(67, 111, 122, 1);
       default: //Importance.normal
-        return brightness != Brightness.dark
-            ? Colors.green[200]
-            : Color.fromRGBO(55, 70, 53, 1);
+        return !darkMode ? Colors.green[200] : Color.fromRGBO(55, 70, 53, 1);
     }
   }
 
@@ -154,6 +145,15 @@ class Tools extends ChangeNotifier {
   RefreshStatus get refreshStatus => _refreshStatus;
   set refreshStatus(RefreshStatus newStatus) {
     _refreshStatus = newStatus;
+    notifyListeners();
+  }
+
+  //Settings
+  bool _darkMode =
+      SchedulerBinding.instance.window.platformBrightness == Brightness.dark;
+  bool get darkMode => _darkMode;
+  void triggerDarkMode() {
+    _darkMode = !_darkMode;
     notifyListeners();
   }
 }

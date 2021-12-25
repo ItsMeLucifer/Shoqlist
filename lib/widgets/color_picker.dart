@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
 
 class ColorPicker extends ConsumerWidget {
-  double _colorPickerWidth;
-  double _colorPickerHeight;
+  final double _colorPickerWidth;
+  final double _colorPickerHeight;
   ColorPicker(this._colorPickerWidth, this._colorPickerHeight);
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -24,7 +24,6 @@ class ColorPicker extends ConsumerWidget {
               padding: const EdgeInsets.all(2.0),
               child: GestureDetector(
                 onTap: () {
-                  print(loyaltyCardsVM.loyaltyCardsColorsToPick[index].value);
                   toolsVM.newLoyaltyCardColor =
                       loyaltyCardsVM.loyaltyCardsColorsToPick[index];
                 },
@@ -32,27 +31,17 @@ class ColorPicker extends ConsumerWidget {
                   width: 20,
                   height: 20,
                   decoration: BoxDecoration(
-                      color: toolsVM.newLoyaltyCardColor ==
-                              loyaltyCardsVM.loyaltyCardsColorsToPick[index]
-                          ? loyaltyCardsVM.loyaltyCardsColorsToPick[index]
-                          : Color.lerp(
-                              loyaltyCardsVM.loyaltyCardsColorsToPick[index],
-                              Colors.black,
-                              0.2),
+                      color: loyaltyCardsVM.loyaltyCardsColorsToPick[index],
                       border: Border.all(
                           color: toolsVM.newLoyaltyCardColor !=
                                   loyaltyCardsVM.loyaltyCardsColorsToPick[index]
-                              ? Color.lerp(
-                                  loyaltyCardsVM
-                                      .loyaltyCardsColorsToPick[index],
-                                  Colors.black,
-                                  0.2)
+                              ? loyaltyCardsVM.loyaltyCardsColorsToPick[index]
                               : Color.lerp(
                                   loyaltyCardsVM
                                       .loyaltyCardsColorsToPick[index],
                                   Colors.black,
                                   0.5),
-                          width: 2),
+                          width: 4),
                       borderRadius: BorderRadius.circular(5)),
                 ),
               ),

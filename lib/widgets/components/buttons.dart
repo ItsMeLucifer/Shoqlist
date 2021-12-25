@@ -11,7 +11,9 @@ class LoyaltyCardButton extends ConsumerWidget {
   LoyaltyCardButton(this.cardName, this.isFavorite, this.color);
   Widget build(BuildContext context, ScopedReader watch) {
     return Card(
-      color: color,
+      color: !context.read(toolsProvider).darkMode
+          ? color
+          : Color.lerp(color, Colors.black, 0.4),
       child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
@@ -51,10 +53,13 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
         shoppingListsVM.currentlyDisplayedListType = _shoppingListType;
       },
       child: Container(
+          decoration: BoxDecoration(
+              color: shoppingListsVM.currentlyDisplayedListType ==
+                      _shoppingListType
+                  ? Theme.of(context).accentColor.withOpacity(0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(5)),
           width: screenSize.width * 0.45,
-          color: shoppingListsVM.currentlyDisplayedListType == _shoppingListType
-              ? Color.fromRGBO(0, 0, 0, 0.1)
-              : Colors.transparent,
           child: Center(
             child: Text(_buttonName,
                 textAlign: TextAlign.center,
@@ -109,8 +114,6 @@ class WarningButton extends ConsumerWidget {
   WarningButton(this._onTap, this._buttonName, this._percentageOfScreenWidth);
   Widget build(BuildContext context, ScopedReader watch) {
     final screenSize = MediaQuery.of(context).size;
-    final darkMode =
-        MediaQuery.of(context).platformBrightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         showDialog(

@@ -25,6 +25,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
       _currentlyDisplayedListType;
   set currentlyDisplayedListType(ShoppingListType value) {
     _currentlyDisplayedListType = value;
+    sortShoppingListsDisplay();
     notifyListeners();
   }
 
@@ -42,6 +43,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     _ownShoppingLists = _shoppingLists.where((shoppingList) {
       return shoppingList.ownerId == currentUserId;
     }).toList();
+    sortShoppingListsDisplay();
     notifyListeners();
   }
 
@@ -204,6 +206,18 @@ class ShoppingListsViewModel extends ChangeNotifier {
       }
       if (!a.isFavorite && b.isFavorite) {
         return 1;
+      }
+      return 0;
+    });
+  }
+
+  void sortShoppingListsDisplay() {
+    shoppingLists.sort((a, b) {
+      if (a.importance.index < b.importance.index) {
+        return 1;
+      }
+      if (a.importance.index > b.importance.index) {
+        return -1;
       }
       return 0;
     });

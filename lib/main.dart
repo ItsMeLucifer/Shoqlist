@@ -50,9 +50,10 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ScopedReader watch) {
+    final toolsVM = watch(toolsProvider);
     return MaterialApp(
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
@@ -90,6 +91,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Color.fromRGBO(237, 246, 249, 1),
           floatingActionButtonTheme: FloatingActionButtonThemeData(
               backgroundColor: Colors.white, foregroundColor: Colors.black)),
+      themeMode: toolsVM.darkMode ? ThemeMode.dark : ThemeMode.light,
       home: Wrapper(),
     );
   }

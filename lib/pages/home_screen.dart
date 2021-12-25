@@ -2,7 +2,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
@@ -34,19 +33,12 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void fetchData() {
-    print('init fetch data');
-    context.read(shoppingListsProvider).clearDisplayedData();
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
     context.read(firebaseProvider).fetchFriendsList();
     context.read(firebaseProvider).fetchFriendRequestsList();
     _whenInternetConnectionIsRestoredCompareDatabasesAgain();
   }
-
-  // void _onRefresh() {
-  //   context.read(shoppingListsProvider).clearDisplayedData();
-  //   context.read(firebaseProvider).getShoppingListsFromFirebase(true);
-  // }
 
   void _navigateToLoyaltyCardsHandler(BuildContext context) {
     Navigator.push(context,
@@ -92,6 +84,7 @@ class _HomeScreen extends State<HomeScreen> {
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,
             children: [
               SpeedDialChild(
+                  labelBackgroundColor: Theme.of(context).primaryColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     context.read(toolsProvider).resetNewListData();
@@ -111,6 +104,7 @@ class _HomeScreen extends State<HomeScreen> {
                   ),
                   label: 'Create new list'),
               SpeedDialChild(
+                  labelBackgroundColor: Theme.of(context).primaryColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToLoyaltyCardsHandler(context);
@@ -127,6 +121,7 @@ class _HomeScreen extends State<HomeScreen> {
                   label: 'Loyalty cards'),
 
               SpeedDialChild(
+                  labelBackgroundColor: Theme.of(context).primaryColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToFriendsDisplay(context);
@@ -142,6 +137,7 @@ class _HomeScreen extends State<HomeScreen> {
                   ),
                   label: 'Friends'),
               SpeedDialChild(
+                  labelBackgroundColor: Theme.of(context).primaryColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToSettings(context);

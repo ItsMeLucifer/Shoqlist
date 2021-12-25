@@ -218,6 +218,7 @@ class ChangeName extends ConsumerWidget {
     final toolsVM = watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
     return AlertDialog(
+      backgroundColor: Theme.of(context).backgroundColor,
       content: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
