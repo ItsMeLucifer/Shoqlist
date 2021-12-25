@@ -276,7 +276,7 @@ class FirebaseViewModel extends ChangeNotifier {
       String documentId, String collectionName,
       [String ownerId]) async {
     return await users
-        .doc(ownerId)
+        .doc(ownerId ?? _firebaseAuth.auth.currentUser.uid)
         .collection(collectionName)
         .doc(documentId)
         .get();
@@ -471,7 +471,7 @@ class FirebaseViewModel extends ChangeNotifier {
     bool isFavorite = document.get('isFavorite');
     isFavorite = !isFavorite;
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('loyaltyCards')
         .doc(documentId)
         .update({

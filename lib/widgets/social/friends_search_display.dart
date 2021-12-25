@@ -29,49 +29,51 @@ class FriendsSearchDisplay extends ConsumerWidget {
     final friendsServiceVM = watch(friendsServiceProvider);
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        body: SingleChildScrollView(
-          child: SafeArea(
-            child: Stack(
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 5),
-                    Text("Search for Friends",
-                        style: Theme.of(context).primaryTextTheme.headline4),
-                    Divider(
-                      color: Theme.of(context).accentColor,
-                      indent: 50,
-                      endIndent: 50,
-                    ),
-                    BasicForm(
-                        TextInputType.emailAddress,
-                        friendsServiceVM.searchFriendTextController,
-                        'Type in email',
-                        _onChanged,
-                        Icons.email,
-                        false,
-                        null,
-                        _searchForFriend),
-                    SizedBox(height: 5),
-                    friendsServiceVM.usersList.isEmpty &&
-                            toolsVM.friendsFetchStatus == FetchStatus.fetched
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                  child: Text("Can't find that user, try again",
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .bodyText1)),
-                            ],
-                          )
-                        : UsersList(_sendFriendRequestAfterTap,
-                            friendsServiceVM.usersList, 'Send friend request?')
-                  ],
-                ),
-              ],
-            ),
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: 5),
+                  Text("Search for Friends",
+                      style: Theme.of(context).primaryTextTheme.headline4),
+                  Divider(
+                    color: Theme.of(context).accentColor,
+                    indent: 50,
+                    endIndent: 50,
+                  ),
+                  BasicForm(
+                      TextInputType.emailAddress,
+                      friendsServiceVM.searchFriendTextController,
+                      'Type in email',
+                      _onChanged,
+                      Icons.email,
+                      false,
+                      null,
+                      _searchForFriend),
+                  SizedBox(height: 5),
+                  Expanded(
+                      child: friendsServiceVM.usersList.isEmpty &&
+                              toolsVM.friendsFetchStatus == FetchStatus.fetched
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Center(
+                                    child: Text(
+                                        "Can't find that user, try again",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .bodyText1)),
+                              ],
+                            )
+                          : UsersList(
+                              _sendFriendRequestAfterTap,
+                              friendsServiceVM.usersList,
+                              'Send friend request?'))
+                ],
+              ),
+            ],
           ),
         ));
   }

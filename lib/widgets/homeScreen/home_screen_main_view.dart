@@ -92,14 +92,16 @@ class HomeScreenMainView extends ConsumerWidget {
               toolsVM.fetchStatus == FetchStatus.fetched ||
                       toolsVM.refreshStatus == RefreshStatus.duringRefresh
                   ? shoppingListsVM.shoppingLists.isNotEmpty
-                      ? LiquidPullToRefresh(
-                          height: 50,
-                          animSpeedFactor: 5,
-                          showChildOpacityTransition: false,
-                          onRefresh: () async {
-                            _onRefresh(context);
-                          },
-                          child: Expanded(
+                      ? Expanded(
+                          child: LiquidPullToRefresh(
+                            backgroundColor: Theme.of(context).accentColor,
+                            color: Theme.of(context).primaryColor,
+                            height: 50,
+                            animSpeedFactor: 5,
+                            showChildOpacityTransition: false,
+                            onRefresh: () async {
+                              _onRefresh(context);
+                            },
                             child: ListView.builder(
                                 itemCount: shoppingListsVM.shoppingLists.length,
                                 itemBuilder: (context, index) {

@@ -18,7 +18,7 @@ class UsersList extends ConsumerWidget {
     final friendsServiceVM = watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
     return ListView.builder(
-        shrinkWrap: true,
+        shrinkWrap: false,
         itemCount: _usersList.length,
         itemBuilder: (context, index) {
           return Padding(
@@ -43,7 +43,10 @@ class UsersList extends ConsumerWidget {
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
                     children: [
-                      Icon(Icons.person),
+                      Icon(
+                        Icons.person,
+                        color: Theme.of(context).accentColor,
+                      ),
                       SizedBox(width: screenSize.width * 0.05 * _elementWidth),
                       Column(
                         children: [

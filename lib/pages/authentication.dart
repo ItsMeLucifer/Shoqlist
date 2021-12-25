@@ -47,9 +47,19 @@ class Authentication extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Shoqlist',
-                    style: Theme.of(context).primaryTextTheme.headline3),
-                SizedBox(height: screenSize.height * 0.03),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'images/icon.png',
+                      height: 40,
+                    ),
+                    SizedBox(width: 5),
+                    Text('Shoqlist',
+                        style: Theme.of(context).primaryTextTheme.headline3),
+                  ],
+                ),
+                SizedBox(height: screenSize.height * 0.025),
                 Container(
                     width: 30,
                     height: 30,
@@ -61,6 +71,7 @@ class Authentication extends ConsumerWidget {
                   style: TextStyle(color: Colors.red, fontSize: 12),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: 5),
                 BasicForm(TextInputType.emailAddress, toolsVM.emailController,
                     'E-mail', _resetExceptionMessage, Icons.email, false),
                 SizedBox(height: 5),

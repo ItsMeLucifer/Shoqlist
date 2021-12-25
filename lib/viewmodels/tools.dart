@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
@@ -6,17 +7,24 @@ enum RefreshStatus { duringRefresh, refreshed }
 
 class Tools extends ChangeNotifier {
   Color getImportanceColor(Importance importance) {
+    var brightness = SchedulerBinding.instance.window.platformBrightness;
     switch (importance) {
       case Importance.important:
-        return Colors.orange[200];
+        return brightness != Brightness.dark
+            ? Colors.orange[200]
+            : Color.fromRGBO(94, 79, 58, 1);
       case Importance.urgent:
-        return Colors.red[300];
+        return brightness != Brightness.dark
+            ? Colors.red[300]
+            : Color.fromRGBO(108, 49, 51, 1);
       case Importance.low:
-        return Colors.blue[200];
-      case Importance.normal:
-        return Colors.green[200];
-      default:
-        return Colors.green[200];
+        return brightness != Brightness.dark
+            ? Colors.blue[200]
+            : Color.fromRGBO(67, 111, 122, 1);
+      default: //Importance.normal
+        return brightness != Brightness.dark
+            ? Colors.green[200]
+            : Color.fromRGBO(55, 70, 53, 1);
     }
   }
 

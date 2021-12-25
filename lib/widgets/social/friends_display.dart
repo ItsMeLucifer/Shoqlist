@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/widgets/social/friend_requests_display.dart';
@@ -27,20 +28,24 @@ class FriendsDisplay extends ConsumerWidget {
         MaterialPageRoute(builder: (context) => FriendRequestsDisplay()));
   }
 
+  void _onRefresh(BuildContext context) {
+    context.read(firebaseProvider).fetchFriendsList();
+  }
+
   Widget build(BuildContext context, ScopedReader watch) {
     final friendsServiceVM = watch(friendsServiceProvider);
-    final firebaseVM = watch(firebaseProvider);
-    firebaseVM.fetchFriendsList();
-    //Make if statement, when loading data, display only progress indicator
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: SpeedDial(
             overlayOpacity: 0,
             animatedIcon: AnimatedIcons.menu_close,
+            foregroundColor:
+                Theme.of(context).floatingActionButtonTheme.foregroundColor,
             backgroundColor:
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,
             children: [
               SpeedDialChild(
+                  labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToFriendsSearchList(context);
                     friendsServiceVM.clearSearchFriendTextController();
@@ -56,6 +61,7 @@ class FriendsDisplay extends ConsumerWidget {
                         .foregroundColor,
                   )),
               SpeedDialChild(
+                  labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToFriendRequestsList(context);
                   },
@@ -84,21 +90,33 @@ class FriendsDisplay extends ConsumerWidget {
                     indent: 50,
                     endIndent: 50,
                   ),
-                  friendsServiceVM.friendsList.isEmpty
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Center(
-                                child: Text('You have no Friends',
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .bodyText1)),
-                          ],
-                        )
-                      : UsersList(
-                          _removeUserFromFriendsListAfterTap,
-                          friendsServiceVM.friendsList,
-                          "Remove from friends list?")
+                  Expanded(
+                    child: LiquidPullToRefresh(
+                        backgroundColor: Theme.of(context).accentColor,
+                        color: Theme.of(context).primaryColor,
+                        height: 50,
+                        animSpeedFactor: 5,
+                        showChildOpacityTransition: false,
+                        onRefresh: () async {
+                          _onRefresh(context);
+                        },
+                        child: friendsServiceVM.friendsList.isEmpty
+                            ? ListView(
+                                children: [
+                                  SizedBox(height: 10),
+                                  Center(
+                                    child: Text("You have no friends",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .bodyText1),
+                                  )
+                                ],
+                              )
+                            : UsersList(
+                                _removeUserFromFriendsListAfterTap,
+                                friendsServiceVM.friendsList,
+                                "Remove from friends list?")),
+                  )
                 ],
               ),
             ],

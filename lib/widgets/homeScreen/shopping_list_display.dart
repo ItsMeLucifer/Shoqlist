@@ -6,9 +6,6 @@ import 'package:share/share.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/user.dart';
-import 'package:shoqlist/viewmodels/firebase_view_model.dart';
-import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
-import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
@@ -70,7 +67,6 @@ class ShoppingListDisplay extends ConsumerWidget {
     final toolsVM = watch(toolsProvider);
     final firebaseAuthVM = watch(firebaseAuthProvider);
     final friendsServiceVM = watch(friendsServiceProvider);
-    const Color _disabledGreyColor = Color.fromRGBO(0, 0, 0, 0.3);
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color.lerp(
@@ -78,11 +74,14 @@ class ShoppingListDisplay extends ConsumerWidget {
               .shoppingLists[shoppingListsVM.currentListIndex].importance),
           Colors.black,
           0.15),
+      //backgroundColor: Theme.of(context).backgroundColor,
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 60.0),
         child: SpeedDial(
           overlayOpacity: 0,
           animatedIcon: AnimatedIcons.menu_close,
+          foregroundColor:
+              Theme.of(context).floatingActionButtonTheme.foregroundColor,
           backgroundColor:
               Theme.of(context).floatingActionButtonTheme.backgroundColor,
           children: shoppingListsVM
@@ -91,7 +90,11 @@ class ShoppingListDisplay extends ConsumerWidget {
                   firebaseAuthVM.currentUser.userId
               ? [
                   SpeedDialChild(
-                      child: Icon(Icons.share),
+                      labelStyle: Theme.of(context).textTheme.bodyText2,
+                      child: Icon(Icons.share,
+                          color: Theme.of(context)
+                              .floatingActionButtonTheme
+                              .foregroundColor),
                       onTap: () {
                         Share.share(
                             shoppingListsVM
@@ -103,7 +106,11 @@ class ShoppingListDisplay extends ConsumerWidget {
                           .backgroundColor,
                       label: "Share"),
                   SpeedDialChild(
-                      child: Icon(Icons.add_moderator),
+                      labelStyle: Theme.of(context).textTheme.bodyText2,
+                      child: Icon(Icons.add_moderator,
+                          color: Theme.of(context)
+                              .floatingActionButtonTheme
+                              .foregroundColor),
                       onTap: () {
                         showDialog(
                             context: context,
@@ -122,7 +129,11 @@ class ShoppingListDisplay extends ConsumerWidget {
                 ]
               : [
                   SpeedDialChild(
-                      child: Icon(Icons.share),
+                      labelStyle: Theme.of(context).textTheme.bodyText2,
+                      child: Icon(Icons.share,
+                          color: Theme.of(context)
+                              .floatingActionButtonTheme
+                              .foregroundColor),
                       onTap: () {
                         Share.share(
                             shoppingListsVM
@@ -154,19 +165,17 @@ class ShoppingListDisplay extends ConsumerWidget {
                 ),
                 Expanded(
                   child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.only(
+                          left: 8, top: 8, right: 8, bottom: 65),
                       child: shoppingList(watch)),
                 ),
-                SizedBox(
-                  height: 65,
-                )
               ],
             ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
                 height: 65,
-                color: Colors.white,
+                color: Theme.of(context).backgroundColor,
                 child: Row(
                   children: [
                     Expanded(
@@ -183,16 +192,17 @@ class ShoppingListDisplay extends ConsumerWidget {
                           style: TextStyle(fontWeight: FontWeight.bold),
                           decoration: InputDecoration(
                             hintText: "New Item name",
-                            hintStyle: TextStyle(
-                                color: _disabledGreyColor,
-                                fontWeight: FontWeight.bold),
+                            hintStyle:
+                                Theme.of(context).primaryTextTheme.bodyText2,
                             contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                             enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    width: 1, color: _disabledGreyColor)),
+                                    width: 1,
+                                    color: Theme.of(context).primaryColorDark)),
                             focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    width: 1, color: _disabledGreyColor)),
+                                    width: 1,
+                                    color: Theme.of(context).accentColor)),
                           ),
                           onFieldSubmitted: (value) {
                             _addNewItemToCurrentShoppingList(context);
@@ -206,7 +216,8 @@ class ShoppingListDisplay extends ConsumerWidget {
                         onTap: () {
                           _addNewItemToCurrentShoppingList(context);
                         },
-                        child: Icon(Icons.add)),
+                        child: Icon(Icons.add,
+                            color: Theme.of(context).accentColor)),
                     SizedBox(width: 10)
                   ],
                 ),
@@ -254,14 +265,16 @@ class ShoppingListDisplay extends ConsumerWidget {
               padding: EdgeInsets.only(
                   bottom: shoppingList.list.length - 1 == index ? 70 : 0),
               child: Card(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).primaryColor.withOpacity(0.5),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      Icon(shoppingList.list[index].gotItem
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off),
+                      Icon(
+                          shoppingList.list[index].gotItem
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          color: Theme.of(context).accentColor),
                       SizedBox(width: 5),
                       Expanded(
                         child: Text(shoppingList.list[index].itemName,
@@ -288,9 +301,15 @@ class ShoppingListDisplay extends ConsumerWidget {
                                   !shoppingList.list[index].isFavorite
                                       ? null
                                       : Icons.star,
-                                  color: Colors.yellow),
-                              Icon(Icons.star_border_outlined,
-                                  color: Colors.black),
+                                  color: MediaQuery.of(context)
+                                              .platformBrightness !=
+                                          Brightness.dark
+                                      ? Colors.yellow
+                                      : Color.fromRGBO(191, 127, 53, 1)),
+                              Icon(
+                                Icons.star_border_outlined,
+                                color: Theme.of(context).accentColor,
+                              )
                             ],
                           )),
                     ],

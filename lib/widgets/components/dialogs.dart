@@ -15,6 +15,7 @@ class YesNoDialog extends ConsumerWidget {
 
   Widget build(BuildContext context, ScopedReader watch) {
     return AlertDialog(
+      backgroundColor: Theme.of(context).backgroundColor,
       content: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -27,7 +28,7 @@ class YesNoDialog extends ConsumerWidget {
           onPressed: () {
             _onAccepted(context);
           },
-          child: _onDeclined == null ? Text('Yes') : Text('Accept'),
+          child: Text(_onDeclined == null ? 'Yes' : 'Accept'),
         ),
         FlatButton(
           onPressed: () {
@@ -37,7 +38,7 @@ class YesNoDialog extends ConsumerWidget {
               _onDeclined(context);
             }
           },
-          child: _onDeclined == null ? Text('No') : Text('Decline'),
+          child: Text(_onDeclined == null ? 'No' : 'Decline'),
         )
       ],
     );
@@ -54,132 +55,124 @@ class PutShoppingListData extends ConsumerWidget {
 
   Widget build(BuildContext context, ScopedReader watch) {
     final toolsVM = watch(toolsProvider);
-    return SimpleDialog(children: [
-      Container(
-        height: 250,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              _onPressedDelete == null ? "Add new List" : "Edit List's data",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return SimpleDialog(
+        backgroundColor: Theme.of(context).backgroundColor,
+        children: [
+          Container(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 210,
-                  child: TextFormField(
-                    key: toolsVM.newListNameFormFieldKey,
-                    keyboardType: TextInputType.name,
-                    autofocus: false,
-                    autocorrect: false,
-                    obscureText: false,
-                    controller: toolsVM.newListNameController,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    decoration: InputDecoration(
-                      hintText: "List name",
-                      hintStyle: TextStyle(
-                          color: Color.fromRGBO(
-                            0,
-                            0,
-                            0,
-                            0.3,
-                          ),
-                          fontWeight: FontWeight.bold),
-                      contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              width: 1,
-                              color: Color.fromRGBO(
-                                0,
-                                0,
-                                0,
-                                0.3,
-                              ))),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              width: 1,
-                              color: Color.fromRGBO(
-                                0,
-                                0,
-                                0,
-                                1,
-                              ))),
-                    ),
-                  ),
+                Text(
+                  _onPressedDelete == null
+                      ? "Add new List"
+                      : "Edit List's data",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text("Importance:"),
-                DropdownButton<Importance>(
-                  value: toolsVM.newListImportance,
-                  icon: Icon(Icons.keyboard_arrow_down, color: Colors.black),
-                  iconSize: 24,
-                  elevation: 16,
-                  underline: Container(
-                    height: 2,
-                    color: Colors.white,
-                  ),
-                  onChanged: (Importance imp) {
-                    toolsVM.newListImportance = imp;
-                  },
-                  items: <Importance>[
-                    Importance.low,
-                    Importance.normal,
-                    Importance.important,
-                    Importance.urgent
-                  ].map<DropdownMenuItem<Importance>>((Importance value) {
-                    return DropdownMenuItem<Importance>(
-                      value: value,
-                      child: Text(
-                        toolsVM.getImportanceLabel(value),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 210,
+                      child: TextFormField(
+                        key: toolsVM.newListNameFormFieldKey,
+                        keyboardType: TextInputType.name,
+                        autofocus: false,
+                        autocorrect: false,
+                        obscureText: false,
+                        controller: toolsVM.newListNameController,
                         style: TextStyle(fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                          hintText: "List name",
+                          hintStyle:
+                              Theme.of(context).primaryTextTheme.bodyText2,
+                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 1,
+                                  color: Theme.of(context).primaryColorDark)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 1,
+                                  color: Theme.of(context).accentColor)),
+                        ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ],
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text("Importance:"),
+                    DropdownButton<Importance>(
+                      value: toolsVM.newListImportance,
+                      dropdownColor: Theme.of(context).backgroundColor,
+                      focusColor: Theme.of(context).disabledColor,
+                      icon:
+                          Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                      iconSize: 24,
+                      elevation: 16,
+                      underline: Container(
+                        height: 2,
+                        color: Colors.white,
+                      ),
+                      onChanged: (Importance imp) {
+                        toolsVM.newListImportance = imp;
+                      },
+                      items: <Importance>[
+                        Importance.low,
+                        Importance.normal,
+                        Importance.important,
+                        Importance.urgent
+                      ].map<DropdownMenuItem<Importance>>((Importance value) {
+                        return DropdownMenuItem<Importance>(
+                          value: value,
+                          child: Text(
+                            toolsVM.getImportanceLabel(value),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: _onPressedDelete != null
+                      ? MainAxisAlignment.spaceEvenly
+                      : MainAxisAlignment.center,
+                  children: [
+                    FlatButton(
+                        color: Theme.of(context).buttonColor,
+                        onPressed: () {
+                          _onPressedSave(context);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Save',
+                            style:
+                                Theme.of(context).primaryTextTheme.bodyText1)),
+                    _onPressedDelete != null
+                        ? FlatButton(
+                            color: Theme.of(context).buttonColor,
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return YesNoDialog(_onPressedDelete,
+                                        _deleteNotificationTitle);
+                                  });
+                            },
+                            child: Text('Remove',
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .bodyText1))
+                        : SizedBox(),
+                  ],
+                )
               ],
             ),
-            Row(
-              mainAxisAlignment: _onPressedDelete != null
-                  ? MainAxisAlignment.spaceEvenly
-                  : MainAxisAlignment.center,
-              children: [
-                FlatButton(
-                    color: Color.fromRGBO(0, 0, 0, 0.2),
-                    onPressed: () {
-                      _onPressedSave(context);
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Save',
-                    )),
-                _onPressedDelete != null
-                    ? FlatButton(
-                        color: Color.fromRGBO(0, 0, 0, 0.2),
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return YesNoDialog(
-                                    _onPressedDelete, _deleteNotificationTitle);
-                              });
-                        },
-                        child: Text(
-                          'Remove',
-                        ))
-                    : SizedBox(),
-              ],
-            )
-          ],
-        ),
-      ),
-    ]);
+          ),
+        ]);
   }
 }
 
@@ -192,6 +185,7 @@ class ChooseUser extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     var size = MediaQuery.of(context).size;
     return AlertDialog(
+      backgroundColor: Theme.of(context).backgroundColor,
       scrollable: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,

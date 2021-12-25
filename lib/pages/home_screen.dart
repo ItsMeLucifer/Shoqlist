@@ -34,6 +34,7 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void fetchData() {
+    print('init fetch data');
     context.read(shoppingListsProvider).clearDisplayedData();
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
@@ -83,12 +84,15 @@ class _HomeScreen extends State<HomeScreen> {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: SpeedDial(
+            foregroundColor:
+                Theme.of(context).floatingActionButtonTheme.foregroundColor,
             overlayOpacity: 0,
             animatedIcon: AnimatedIcons.menu_close,
             backgroundColor:
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,
             children: [
               SpeedDialChild(
+                  labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     context.read(toolsProvider).resetNewListData();
                     showDialog(
@@ -99,35 +103,58 @@ class _HomeScreen extends State<HomeScreen> {
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  child: Icon(Icons.add),
+                  child: Icon(
+                    Icons.add,
+                    color: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .foregroundColor,
+                  ),
                   label: 'Create new list'),
               SpeedDialChild(
+                  labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToLoyaltyCardsHandler(context);
                   },
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  child: Icon(Icons.card_membership),
+                  child: Icon(
+                    Icons.card_membership,
+                    color: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .foregroundColor,
+                  ),
                   label: 'Loyalty cards'),
 
               SpeedDialChild(
+                  labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToFriendsDisplay(context);
                   },
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  child: Icon(Icons.people),
+                  child: Icon(
+                    Icons.people,
+                    color: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .foregroundColor,
+                  ),
                   label: 'Friends'),
               SpeedDialChild(
+                  labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToSettings(context);
                   },
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  child: Icon(Icons.settings),
+                  child: Icon(
+                    Icons.settings,
+                    color: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .foregroundColor,
+                  ),
                   label: 'Settings'),
               // SpeedDialChild(
               // onTap: () {

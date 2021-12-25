@@ -69,7 +69,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                       builder: (context) => AddNewLoyaltyCard());
                 },
                 child: Card(
-                  color: Colors.grey[400],
+                  color: Theme.of(context).disabledColor.withOpacity(0.5),
                   child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Center(

@@ -90,14 +90,13 @@ class BasicButton extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Center(
-              child: _iconData == null
-                  ? Text(
-                      _buttonName,
-                      style: Theme.of(context).primaryTextTheme.button,
-                      textAlign: TextAlign.center,
-                    )
-                  : Icon(_iconData),
-            ),
+                child: _iconData == null
+                    ? Text(
+                        _buttonName,
+                        style: Theme.of(context).primaryTextTheme.button,
+                        textAlign: TextAlign.center,
+                      )
+                    : Icon(_iconData, color: Theme.of(context).accentColor)),
           )),
     );
   }
@@ -110,6 +109,8 @@ class WarningButton extends ConsumerWidget {
   WarningButton(this._onTap, this._buttonName, this._percentageOfScreenWidth);
   Widget build(BuildContext context, ScopedReader watch) {
     final screenSize = MediaQuery.of(context).size;
+    final darkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         showDialog(
