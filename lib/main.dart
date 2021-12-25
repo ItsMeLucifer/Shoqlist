@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
 import 'package:shoqlist/viewmodels/firebase_view_model.dart';
 import 'package:shoqlist/viewmodels/friends_service_view_model.dart';
@@ -46,6 +47,9 @@ void main() async {
   Hive.registerAdapter(ShoppingListItemAdapter());
   await Hive.openBox<ShoppingList>('shopping_lists');
   await Hive.openBox<int>('data_variables');
+
+  //Admob
+  MobileAds.instance.initialize();
 
   runApp(ProviderScope(child: MyApp()));
 }

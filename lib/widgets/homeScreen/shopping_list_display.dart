@@ -272,7 +272,7 @@ class ShoppingListDisplay extends ConsumerWidget {
               padding: EdgeInsets.only(
                   bottom: shoppingList.list.length - 1 == index ? 70 : 0),
               child: Card(
-                color: Theme.of(context).primaryColor.withOpacity(0.5),
+                color: Theme.of(context).primaryColor,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(

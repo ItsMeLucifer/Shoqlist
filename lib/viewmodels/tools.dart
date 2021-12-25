@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
