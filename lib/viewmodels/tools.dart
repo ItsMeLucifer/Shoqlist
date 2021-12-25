@@ -149,8 +149,7 @@ class Tools extends ChangeNotifier {
   }
 
   //Settings
-  bool _darkMode =
-      SchedulerBinding.instance.window.platformBrightness == Brightness.dark;
+  bool _darkMode = false;
   bool get darkMode => _darkMode;
   void triggerDarkMode() {
     _darkMode = !_darkMode;

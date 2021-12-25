@@ -89,7 +89,9 @@ class ShoppingListDisplay extends ConsumerWidget {
                   firebaseAuthVM.currentUser.userId
               ? [
                   SpeedDialChild(
-                      labelBackgroundColor: Theme.of(context).primaryColor,
+                      labelBackgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
                       labelStyle: Theme.of(context).textTheme.bodyText2,
                       child: Icon(Icons.share,
                           color: Theme.of(context)
@@ -106,7 +108,9 @@ class ShoppingListDisplay extends ConsumerWidget {
                           .backgroundColor,
                       label: "Share"),
                   SpeedDialChild(
-                      labelBackgroundColor: Theme.of(context).primaryColor,
+                      labelBackgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
                       labelStyle: Theme.of(context).textTheme.bodyText2,
                       child: Icon(Icons.add_moderator,
                           color: Theme.of(context)
@@ -130,7 +134,9 @@ class ShoppingListDisplay extends ConsumerWidget {
                 ]
               : [
                   SpeedDialChild(
-                      labelBackgroundColor: Theme.of(context).primaryColor,
+                      labelBackgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
                       labelStyle: Theme.of(context).textTheme.bodyText2,
                       child: Icon(Icons.share,
                           color: Theme.of(context)

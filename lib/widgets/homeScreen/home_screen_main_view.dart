@@ -247,10 +247,14 @@ class HomeScreenMainView extends ConsumerWidget {
                                                 .bodyText1))
                                   ],
                                 ))
-                      : Container(
-                          height: 30,
-                          width: 30,
-                          child: CircularProgressIndicator()))
+                      : Column(
+                          children: [
+                            Container(
+                                height: 30,
+                                width: 30,
+                                child: CircularProgressIndicator()),
+                          ],
+                        ))
             ],
           ),
         ],

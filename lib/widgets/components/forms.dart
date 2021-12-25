@@ -36,10 +36,12 @@ class BasicForm extends ConsumerWidget {
           decoration: InputDecoration(
               hintText: _hintText,
               hintStyle: Theme.of(context).primaryTextTheme.bodyText2,
-              prefixIcon: Icon(
-                _prefixIcon,
-                color: Theme.of(context).disabledColor,
-              ),
+              prefixIcon: _prefixIcon != null
+                  ? Icon(
+                      _prefixIcon,
+                      color: Theme.of(context).disabledColor,
+                    )
+                  : null,
               suffixIcon: _suffixIcon,
               focusColor: Theme.of(context).accentColor,
               enabledBorder: OutlineInputBorder(

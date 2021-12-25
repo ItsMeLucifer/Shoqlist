@@ -84,7 +84,9 @@ class _HomeScreen extends State<HomeScreen> {
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,
             children: [
               SpeedDialChild(
-                  labelBackgroundColor: Theme.of(context).primaryColor,
+                  labelBackgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     context.read(toolsProvider).resetNewListData();
@@ -104,7 +106,9 @@ class _HomeScreen extends State<HomeScreen> {
                   ),
                   label: 'Create new list'),
               SpeedDialChild(
-                  labelBackgroundColor: Theme.of(context).primaryColor,
+                  labelBackgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToLoyaltyCardsHandler(context);
@@ -121,7 +125,9 @@ class _HomeScreen extends State<HomeScreen> {
                   label: 'Loyalty cards'),
 
               SpeedDialChild(
-                  labelBackgroundColor: Theme.of(context).primaryColor,
+                  labelBackgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToFriendsDisplay(context);
@@ -137,7 +143,9 @@ class _HomeScreen extends State<HomeScreen> {
                   ),
                   label: 'Friends'),
               SpeedDialChild(
-                  labelBackgroundColor: Theme.of(context).primaryColor,
+                  labelBackgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToSettings(context);

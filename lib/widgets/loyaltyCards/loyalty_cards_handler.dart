@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
-import 'package:shoqlist/widgets/loyaltyCards/add_new_loyalty_card.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_card_info.dart';
 
 import '../../main.dart';
@@ -66,7 +65,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                   toolsVM.clearLoyaltyCardTextEditingControllers();
                   showDialog(
                       context: context,
-                      builder: (context) => AddNewLoyaltyCard());
+                      builder: (context) => AddNewLoyaltyCardDialog());
                 },
                 child: Card(
                   color: Theme.of(context).disabledColor.withOpacity(0.5),

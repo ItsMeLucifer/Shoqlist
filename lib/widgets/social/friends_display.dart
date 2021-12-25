@@ -45,7 +45,9 @@ class FriendsDisplay extends ConsumerWidget {
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,
             children: [
               SpeedDialChild(
-                  labelBackgroundColor: Theme.of(context).primaryColor,
+                  labelBackgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToFriendsSearchList(context);
@@ -62,7 +64,9 @@ class FriendsDisplay extends ConsumerWidget {
                         .foregroundColor,
                   )),
               SpeedDialChild(
-                  labelBackgroundColor: Theme.of(context).primaryColor,
+                  labelBackgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
                     _navigateToFriendRequestsList(context);
