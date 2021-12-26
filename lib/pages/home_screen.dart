@@ -134,7 +134,6 @@ class _HomeScreen extends State<HomeScreen> {
                           .foregroundColor,
                     ),
                     label: 'Loyalty cards'),
-
                 SpeedDialChild(
                     labelBackgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
@@ -171,27 +170,18 @@ class _HomeScreen extends State<HomeScreen> {
                           .foregroundColor,
                     ),
                     label: 'Settings'),
-                // SpeedDialChild(
-                // onTap: () {
-                //   //SCAN
-                // },
-                // backgroundColor: Theme.of(context)
-                //     .floatingActionButtonTheme
-                //     .backgroundColor,
-                // child: Icon(Icons.qr_code_scanner_rounded),
-                // label: 'Scan your list'),
               ]),
         ),
         body: Stack(
           children: [
             HomeScreenMainView(),
             Positioned(
-              bottom: 0,
-              child: Container(
-                  height: 50,
-                  width: screenSize.width,
-                  child: AdWidget(ad: adBanner)),
-            )
+                bottom: 0,
+                child: Container(
+                    height: 50,
+                    width: screenSize.width,
+                    child: AdWidget(ad: adBanner))),
+            // child: Container()))
           ],
         ));
   }

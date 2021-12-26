@@ -94,6 +94,12 @@ class Tools extends ChangeNotifier {
 
   TextEditingController loyaltyCardNameController = TextEditingController();
   TextEditingController loyaltyCardBarCodeController = TextEditingController();
+  void setLoyaltyCardControllers(String name, String barCode) {
+    loyaltyCardNameController.text = name;
+    loyaltyCardBarCodeController.text = barCode;
+    notifyListeners();
+  }
+
   void clearLoyaltyCardTextEditingControllers() {
     loyaltyCardNameController.clear();
     loyaltyCardBarCodeController.clear();

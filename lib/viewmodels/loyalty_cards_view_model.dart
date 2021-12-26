@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 
 class LoyaltyCardsViewModel extends ChangeNotifier {
@@ -22,6 +21,17 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
   void overrideLoyaltyCardsListLocally(List<LoyaltyCard> newLoyaltyCardsList) {
     _loyaltyCardsList = newLoyaltyCardsList;
     sortLoyaltyCardsListLocally();
+    notifyListeners();
+  }
+
+  void updateLoyaltyCard(String name, String barCode, int colorValue) {
+    LoyaltyCard updatedCard = LoyaltyCard(
+        name,
+        barCode,
+        _loyaltyCardsList[_currentLoyaltyCardsListIndex].isFavorite,
+        _loyaltyCardsList[_currentLoyaltyCardsListIndex].documentId,
+        Color(colorValue));
+    _loyaltyCardsList[_currentLoyaltyCardsListIndex] = updatedCard;
     notifyListeners();
   }
 

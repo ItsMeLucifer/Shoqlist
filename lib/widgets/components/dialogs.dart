@@ -8,7 +8,6 @@ import 'package:shoqlist/widgets/social/users_list.dart';
 import '../../main.dart';
 import '../color_picker.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:nanoid/nanoid.dart';
 
 class YesNoDialog extends ConsumerWidget {
   final Function _onAccepted;
@@ -259,11 +258,15 @@ class ChangeName extends ConsumerWidget {
   }
 }
 
-class AddNewLoyaltyCardDialog extends ConsumerWidget {
+class PutLoyaltyCardsData extends ConsumerWidget {
+  final Function _onPressed;
+  final String _title;
+  final Function _onDestroy;
+  final String _removeTitle;
+  PutLoyaltyCardsData(this._onPressed, this._title,
+      [this._onDestroy, this._removeTitle]);
   Widget build(BuildContext context, ScopedReader watch) {
-    final loyaltyCardsVM = watch(loyaltyCardsProvider);
     final toolsVM = watch(toolsProvider);
-    final firebaseVM = watch(firebaseProvider);
     const double _alertDialogWidth = 250;
     const double _dividerHeight = 10;
     Widget _suffixIcon = GestureDetector(
@@ -288,7 +291,7 @@ class AddNewLoyaltyCardDialog extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Add new Loyalty Card",
+                      _title,
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
@@ -313,31 +316,42 @@ class AddNewLoyaltyCardDialog extends ConsumerWidget {
                         false,
                         _suffixIcon),
                     SizedBox(height: _dividerHeight),
-                    FlatButton(
-                        color: Theme.of(context).buttonColor,
-                        onPressed: () {
-                          if (toolsVM.loyaltyCardNameController.text != "" &&
-                              toolsVM.loyaltyCardBarCodeController.text != "") {
-                            String id = nanoid();
-                            //ADD LOYALTY CARD TO FIREBASE
-                            firebaseVM.addNewLoyaltyCardToFirebase(
-                                toolsVM.loyaltyCardNameController.text,
-                                toolsVM.loyaltyCardBarCodeController.text,
-                                id,
-                                toolsVM.newLoyaltyCardColor.value);
-                            //ADD LOYALTY CARD LOCALLY
-                            loyaltyCardsVM.addNewLoyaltyCardLocally(
-                                toolsVM.loyaltyCardNameController.text,
-                                toolsVM.loyaltyCardBarCodeController.text,
-                                id,
-                                toolsVM.newLoyaltyCardColor.value);
-                          }
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          'Add',
-                          style: Theme.of(context).primaryTextTheme.bodyText1,
-                        )),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _onDestroy != null
+                            ? Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: FlatButton(
+                                    color: Theme.of(context).buttonColor,
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return YesNoDialog(
+                                                _onDestroy, _removeTitle);
+                                          });
+                                    },
+                                    child: Text(
+                                      'Remove',
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .bodyText1,
+                                    )),
+                              )
+                            : Container(),
+                        FlatButton(
+                            color: Theme.of(context).buttonColor,
+                            onPressed: () {
+                              _onPressed(context);
+                            },
+                            child: Text(
+                              _onDestroy != null ? 'Save' : 'Add',
+                              style:
+                                  Theme.of(context).primaryTextTheme.bodyText1,
+                            )),
+                      ],
+                    ),
                   ],
                 )),
           ),

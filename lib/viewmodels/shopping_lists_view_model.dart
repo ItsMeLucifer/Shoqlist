@@ -36,6 +36,12 @@ class ShoppingListsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateCurrentShoppingList(ShoppingList newList) {
+    shoppingLists[_currentListIndex] = newList;
+    sortShoppingListItemsDisplay();
+    notifyListeners();
+  }
+
   void filterDisplayedShoppingLists() {
     _sharedShoppingLists = _shoppingLists.where((shoppingList) {
       return shoppingList.ownerId != currentUserId;

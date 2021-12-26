@@ -77,17 +77,15 @@ class FirebaseViewModel extends ChangeNotifier {
     //Fetch informations about shared shopping lists
     List<QueryDocumentSnapshot> _infoAboutSharedShoppingLists =
         List<QueryDocumentSnapshot>();
+    _infoAboutSharedShoppingLists.clear();
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('sharedLists')
         .get()
         .then((QuerySnapshot querySnapshot) => {
-              if (querySnapshot.size > 0)
-                {
-                  querySnapshot.docs.forEach((doc) {
-                    _infoAboutSharedShoppingLists.add(doc);
-                  })
-                }
+              querySnapshot.docs.forEach((doc) {
+                _infoAboutSharedShoppingLists.add(doc);
+              })
             })
         .catchError((error) => _toolsVM.printWarning(
             "Failed to fetch informations about shared shopping lists from Firebase: $error"));
@@ -96,8 +94,11 @@ class FirebaseViewModel extends ChangeNotifier {
     if (_toolsVM.refreshStatus == RefreshStatus.duringRefresh) {
       _toolsVM.refreshStatus = RefreshStatus.refreshed;
     }
-    if (shouldCompareCloudDataWithLocalOne)
+    if (shouldCompareCloudDataWithLocalOne) {
       compareDiscrepanciesBetweenCloudAndLocalData();
+    } else {
+      addFetchedShoppingListsDataToLocalList();
+    }
   }
 
   Future<void> getSharedShoppingListsData(
@@ -111,8 +112,43 @@ class FirebaseViewModel extends ChangeNotifier {
           .get()
           .catchError((error) => _toolsVM.printWarning(
               "Failed to fetch shared shopping lists data from Firebase: $error"));
-      _sharedShoppingListsFetchedFromFirebase.add(doc);
+      if (doc != null && doc.exists) {
+        _sharedShoppingListsFetchedFromFirebase.add(doc);
+      }
     }
+  }
+
+  void fetchOneShoppingList(String documentId, String ownerId) async {
+    List<String> usersWithAccess = List<String>();
+    ShoppingList _currentShoppingList;
+    DocumentSnapshot doc = await users
+        .doc(ownerId)
+        .collection('lists')
+        .doc(documentId)
+        .get()
+        .catchError((error) => _toolsVM.printWarning(
+            "Failed to fetch shopping list [$documentId] data from Firebase: $error"));
+    if (doc != null && doc.exists) {
+      doc
+          .get('usersWithAccess')
+          .forEach((userId) => usersWithAccess.add(userId));
+
+      List<ShoppingListItem> items = [];
+      for (int j = 0; j < doc.get('listContent').length; j++) {
+        items.add(
+          ShoppingListItem(doc.get('listContent')[j], doc.get('listState')[j],
+              doc.get('listFavorite')[j]),
+        );
+      }
+      _currentShoppingList = ShoppingList(
+          doc.get('name'),
+          items,
+          _toolsVM.getImportanceValueFromLabel(doc.get('importance')),
+          doc.get('id'),
+          doc.get('ownerId'),
+          usersWithAccess);
+    }
+    _shoppingListsVM.updateCurrentShoppingList(_currentShoppingList);
   }
 
   void putLocalShoppingListsDataToFirebase() {
@@ -187,7 +223,10 @@ class FirebaseViewModel extends ChangeNotifier {
     }
     //Fetched Shared Shopping lists to List<ShoppingList>
     List<ShoppingList> sharedLists = List<ShoppingList>();
-    for (int i = 0; i < _sharedShoppingListsFetchedFromFirebase.length; i++) {
+    for (int i = 0;
+        _sharedShoppingListsFetchedFromFirebase != null &&
+            i < _sharedShoppingListsFetchedFromFirebase.length;
+        i++) {
       List<ShoppingListItem> sharedItems = [];
       for (int j = 0;
           j <
@@ -471,6 +510,19 @@ class FirebaseViewModel extends ChangeNotifier {
             _toolsVM.printWarning("Failed to create Loyalty card: $error"));
   }
 
+  void updateLoyaltyCard(
+      String name, String barCode, String documentId, int colorValue) async {
+    if (_firebaseAuth.auth.currentUser == null) return;
+    users
+        .doc(_firebaseAuth.auth.currentUser.uid)
+        .collection('loyaltyCards')
+        .doc(documentId)
+        .update({'name': name, 'barCode': barCode, 'color': colorValue})
+        .then((value) => print("Created new Loyalty card"))
+        .catchError((error) => _toolsVM.printWarning(
+            "Failed to update [$documentId] Loyalty card: $error"));
+  }
+
   void deleteLoyaltyCardOnFirebase(String documentId) async {
     await users
         .doc(_firebaseAuth.currentUser.userId)
@@ -478,8 +530,8 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(documentId)
         .delete()
         .then((value) => print("Loyalty card Deleted"))
-        .catchError((error) =>
-            _toolsVM.printWarning("Failed to delete loyalty card: $error"));
+        .catchError((error) => _toolsVM.printWarning(
+            "Failed to delete [$documentId] loyalty card: $error"));
   }
 
   void toggleFavoriteOfLoyaltyCardOnFirebase(String documentId) async {
@@ -663,6 +715,7 @@ class FirebaseViewModel extends ChangeNotifier {
 
   void giveFriendAccessToYourShoppingList(
       User friend, String documentId) async {
+    if (friend.userId == _firebaseAuth.auth.currentUser.uid) return;
     //Add shopping list's data to friend's sharedLists
     await users
         .doc(friend.userId)
@@ -682,10 +735,7 @@ class FirebaseViewModel extends ChangeNotifier {
           "Could not get document with friend's list data from Firebase, error: " +
               e.code.toString());
     }
-    List<dynamic> usersWithAccess = List<dynamic>();
-    document
-        .get('usersWithAccess')
-        .forEach((user) => usersWithAccess.add(user));
+    List<dynamic> usersWithAccess = document.get('usersWithAccess');
     usersWithAccess.add(friend.userId);
     await users
         .doc(_firebaseAuth.currentUser.userId)

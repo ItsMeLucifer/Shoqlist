@@ -11,6 +11,7 @@ import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/services.dart';
 
 import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';
@@ -50,6 +51,10 @@ void main() async {
 
   //Admob
   MobileAds.instance.initialize();
+
+  //Orientation
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   runApp(ProviderScope(child: MyApp()));
 }

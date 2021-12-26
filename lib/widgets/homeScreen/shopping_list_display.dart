@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:share/share.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
@@ -60,6 +61,10 @@ class ShoppingListDisplay extends ConsumerWidget {
     shoppingListsVM.addUserIdToUsersWithAccessList(
         friendsWithoutAccess[friendsServiceVM.currentUserIndex].userId);
     Navigator.of(context).popUntil((route) => !Navigator.of(context).canPop());
+  }
+
+  void _onRefresh(BuildContext context, String documentId, String ownerId) {
+    context.read(firebaseProvider).fetchOneShoppingList(documentId, ownerId);
   }
 
   Widget build(BuildContext context, ScopedReader watch) {
@@ -172,10 +177,26 @@ class ShoppingListDisplay extends ConsumerWidget {
                   endIndent: 50,
                 ),
                 Expanded(
-                  child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 8, top: 8, right: 8, bottom: 65),
-                      child: shoppingList(watch)),
+                  child: LiquidPullToRefresh(
+                      backgroundColor: Theme.of(context).accentColor,
+                      color: Theme.of(context).primaryColor,
+                      height: 50,
+                      animSpeedFactor: 5,
+                      showChildOpacityTransition: false,
+                      onRefresh: () async {
+                        _onRefresh(
+                            context,
+                            shoppingListsVM
+                                .shoppingLists[shoppingListsVM.currentListIndex]
+                                .documentId,
+                            shoppingListsVM
+                                .shoppingLists[shoppingListsVM.currentListIndex]
+                                .ownerId);
+                      },
+                      child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8, top: 8, right: 8, bottom: 65),
+                          child: shoppingList(watch))),
                 ),
               ],
             ),
@@ -240,10 +261,11 @@ class ShoppingListDisplay extends ConsumerWidget {
   Widget shoppingList(ScopedReader watch) {
     final shoppingListsVM = watch(shoppingListsProvider);
     final firebaseVM = watch(firebaseProvider);
+    final toolsVM = watch(toolsProvider);
     ShoppingList shoppingList =
         shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
     return ListView.builder(
-        shrinkWrap: true,
+        shrinkWrap: false,
         itemCount: shoppingList.list.length,
         itemBuilder: (context, index) {
           return GestureDetector(
@@ -308,9 +330,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                                   !shoppingList.list[index].isFavorite
                                       ? null
                                       : Icons.star,
-                                  color: MediaQuery.of(context)
-                                              .platformBrightness !=
-                                          Brightness.dark
+                                  color: !toolsVM.darkMode
                                       ? Colors.yellow
                                       : Color.fromRGBO(191, 127, 53, 1)),
                               Icon(
