@@ -66,43 +66,70 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
-      darkTheme: ThemeData(
-          backgroundColor: Colors.grey[900],
-          textTheme: ThemeData.dark().textTheme,
-          primaryTextTheme: TextTheme(
-              bodyText2: TextStyle(
-                  color: Colors.grey[500], fontWeight: FontWeight.bold),
-              headline3: TextStyle(
-                  color: Colors.white,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold)),
-          primaryColor: Colors.black87,
-          accentColor: Colors.white,
-          disabledColor: Colors.grey[400],
-          primarySwatch: Colors.grey,
-          buttonColor: Colors.grey[800],
-          floatingActionButtonTheme: FloatingActionButtonThemeData(
-              backgroundColor: Colors.grey[850],
-              foregroundColor: Colors.white)),
-      theme: ThemeData(
-          primaryTextTheme: TextTheme(
-              bodyText2: TextStyle(
-                  color: Colors.grey[400], fontWeight: FontWeight.bold),
-              headline3: TextStyle(
-                  color: Colors.black,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold)),
-          primarySwatch: Colors.grey,
-          primaryColor: Colors.white,
-          disabledColor: Colors.grey[400],
-          accentColor: Colors.black,
-          primaryColorDark: Colors.black38,
-          textTheme: Typography.blackCupertino,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          scaffoldBackgroundColor: Color.fromRGBO(237, 246, 249, 1),
-          floatingActionButtonTheme: FloatingActionButtonThemeData(
-              backgroundColor: Colors.white, foregroundColor: Colors.black)),
-      themeMode: toolsVM.darkMode ? ThemeMode.dark : ThemeMode.light,
+      // darkTheme: ThemeData(
+      //     backgroundColor: Colors.grey[900],
+      //     textTheme: ThemeData.dark().textTheme,
+      //     primaryTextTheme: TextTheme(
+      //         bodyText2: TextStyle(
+      //             color: Colors.grey[500], fontWeight: FontWeight.bold),
+      //         headline3: TextStyle(
+      //             color: Colors.white,
+      //             fontStyle: FontStyle.italic,
+      //             fontWeight: FontWeight.bold)),
+      //     primaryColor: Colors.black87,
+      //     accentColor: Colors.white,
+      //     disabledColor: Colors.grey[400],
+      //     primarySwatch: Colors.grey,
+      //     buttonColor: Colors.grey[800],
+      //     floatingActionButtonTheme: FloatingActionButtonThemeData(
+      //         backgroundColor: Colors.grey[850],
+      //         foregroundColor: Colors.white)),
+      theme: !toolsVM.darkMode
+          ? ThemeData(
+              primaryTextTheme: !toolsVM.darkMode
+                  ? TextTheme(
+                      bodyText2: TextStyle(
+                          color: Colors.grey[400], fontWeight: FontWeight.bold),
+                      headline3: TextStyle(
+                          color: Colors.black,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold))
+                  : TextTheme(
+                      bodyText2: TextStyle(
+                          color: Colors.grey[500], fontWeight: FontWeight.bold),
+                      headline3: TextStyle(
+                          color: Colors.white,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold)),
+              primarySwatch: Colors.grey,
+              primaryColor: Colors.white,
+              disabledColor: Colors.grey[400],
+              accentColor: Colors.black,
+              primaryColorDark: Colors.grey[300],
+              textTheme: Typography.blackCupertino,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+              scaffoldBackgroundColor: Color.fromRGBO(237, 246, 249, 1),
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                  backgroundColor: Colors.white, foregroundColor: Colors.black))
+          : ThemeData(
+              backgroundColor: Colors.grey[900],
+              textTheme: ThemeData.dark().textTheme,
+              primaryTextTheme: TextTheme(
+                  bodyText2: TextStyle(
+                      color: Colors.grey[500], fontWeight: FontWeight.bold),
+                  headline3: TextStyle(
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold)),
+              primaryColor: Colors.grey[900],
+              accentColor: Colors.white,
+              disabledColor: Colors.grey[400],
+              primarySwatch: Colors.grey,
+              buttonColor: Colors.grey[800],
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                  backgroundColor: Colors.grey[850],
+                  foregroundColor: Colors.white)),
+      themeMode: ThemeMode.light,
       home: Wrapper(),
     );
   }

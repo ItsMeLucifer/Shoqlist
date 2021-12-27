@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shoqlist/models/shopping_list.dart';
+import '../utilities/boxes.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
 enum RefreshStatus { duringRefresh, refreshed }
@@ -154,10 +155,17 @@ class Tools extends ChangeNotifier {
   }
 
   //Settings
+  final _boxData = Boxes.getDataVariables();
   bool _darkMode = false;
   bool get darkMode => _darkMode;
   void triggerDarkMode() {
     _darkMode = !_darkMode;
+    _boxData.put('darkMode', _darkMode ? 1 : -1);
+    notifyListeners();
+  }
+
+  void getThemeInfo() {
+    _darkMode = _boxData.get('darkMode') == 1;
     notifyListeners();
   }
 }
