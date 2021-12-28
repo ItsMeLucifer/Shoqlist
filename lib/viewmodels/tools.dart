@@ -164,6 +164,43 @@ class Tools extends ChangeNotifier {
     notifyListeners();
   }
 
+  final ThemeData _darkTheme = ThemeData(
+      backgroundColor: Colors.grey[900],
+      textTheme: ThemeData.dark().textTheme,
+      primaryTextTheme: TextTheme(
+          bodyText2:
+              TextStyle(color: Colors.grey[500], fontWeight: FontWeight.bold),
+          headline3: TextStyle(
+              color: Colors.white,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold)),
+      primaryColor: Colors.grey[900],
+      accentColor: Colors.white,
+      disabledColor: Colors.grey[400],
+      primarySwatch: Colors.grey,
+      buttonColor: Colors.grey[800],
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.grey[850], foregroundColor: Colors.white));
+  final ThemeData _lightTheme = ThemeData(
+      primaryTextTheme: TextTheme(
+          bodyText2:
+              TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold),
+          headline3: TextStyle(
+              color: Colors.black,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold)),
+      primarySwatch: Colors.grey,
+      primaryColor: Colors.white,
+      disabledColor: Colors.grey[400],
+      accentColor: Colors.black,
+      primaryColorDark: Colors.grey[300],
+      textTheme: Typography.blackCupertino,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+      scaffoldBackgroundColor: Color.fromRGBO(237, 246, 249, 1),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.white, foregroundColor: Colors.black));
+
+  ThemeData get theme => _darkMode ? _darkTheme : _lightTheme;
   void getThemeInfo() {
     _darkMode = _boxData.get('darkMode') == 1;
     notifyListeners();

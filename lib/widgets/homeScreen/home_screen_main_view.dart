@@ -144,16 +144,14 @@ class HomeScreenMainView extends ConsumerWidget {
                                                       .ownerId ==
                                                   firebaseAuthVM
                                                       .currentUser.userId) {
+                                                String title = "Remove the '" +
+                                                    shoppingListsVM
+                                                        .shoppingLists[index]
+                                                        .name +
+                                                    "' list?";
                                                 showDialog(
                                                     context: context,
                                                     builder: (context) {
-                                                      String title =
-                                                          "Remove the '" +
-                                                              shoppingListsVM
-                                                                  .shoppingLists[
-                                                                      index]
-                                                                  .name +
-                                                              "' list?";
                                                       return PutShoppingListData(
                                                         _updateShoppingList,
                                                         context,
