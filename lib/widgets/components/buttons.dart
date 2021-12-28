@@ -11,9 +11,7 @@ class LoyaltyCardButton extends ConsumerWidget {
   LoyaltyCardButton(this.cardName, this.isFavorite, this.color);
   Widget build(BuildContext context, ScopedReader watch) {
     return Card(
-      color: !context.read(toolsProvider).darkMode
-          ? color
-          : Color.lerp(color, Colors.black, 0.4),
+      color: color,
       child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(

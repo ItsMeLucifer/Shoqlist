@@ -8,6 +8,7 @@ class LoyaltyCardInfo extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final loyaltyCardsVM = watch(loyaltyCardsProvider);
     return AlertDialog(
+      backgroundColor: Colors.white,
       contentPadding: EdgeInsets.fromLTRB(6, 6, 6, 6),
       content: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -27,10 +28,12 @@ class LoyaltyCardInfo extends ConsumerWidget {
                             .isFavorite
                         ? Icons.star
                         : Icons.star_border_outlined,
+                    color: Colors.black,
                     size: 15,
                   ),
                   SizedBox(width: 5),
-                  Text("Favorite", style: TextStyle(fontSize: 15)),
+                  Text("Favorite",
+                      style: TextStyle(fontSize: 15, color: Colors.black)),
                 ],
               ),
               onPressed: () {
@@ -62,6 +65,9 @@ class LoyaltyCardInfo extends ConsumerWidget {
             height: 150,
             width: 300,
             child: SfBarcodeGenerator(
+              textStyle: TextStyle(color: Colors.black),
+              backgroundColor: Colors.white,
+              barColor: Colors.black,
               value: loyaltyCardsVM
                   .loyaltyCardsList[loyaltyCardsVM.currentLoyaltyCardsListIndex]
                   .barCode,

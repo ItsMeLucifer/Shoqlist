@@ -73,11 +73,7 @@ class ShoppingListDisplay extends ConsumerWidget {
     final firebaseAuthVM = watch(firebaseAuthProvider);
     final friendsServiceVM = watch(friendsServiceProvider);
     return Scaffold(
-      backgroundColor: Color.lerp(
-          toolsVM.getImportanceColor(shoppingListsVM
-              .shoppingLists[shoppingListsVM.currentListIndex].importance),
-          Colors.black,
-          0.15),
+      backgroundColor: Theme.of(context).backgroundColor,
       //backgroundColor: Theme.of(context).backgroundColor,
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 60.0),
@@ -220,6 +216,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                           controller: toolsVM.newItemNameController,
                           style: TextStyle(fontWeight: FontWeight.bold),
                           decoration: InputDecoration(
+                            fillColor: Colors.grey[600],
                             hintText: "New Item name",
                             hintStyle:
                                 Theme.of(context).primaryTextTheme.bodyText2,
@@ -330,9 +327,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                                   !shoppingList.list[index].isFavorite
                                       ? null
                                       : Icons.star,
-                                  color: !toolsVM.darkMode
-                                      ? Colors.yellow
-                                      : Color.fromRGBO(191, 127, 53, 1)),
+                                  color: Theme.of(context).accentColor),
                               Icon(
                                 Icons.star_border_outlined,
                                 color: Theme.of(context).accentColor,

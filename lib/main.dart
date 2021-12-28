@@ -59,16 +59,33 @@ void main() async {
   runApp(ProviderScope(child: MyApp()));
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
-    final theme = toolsVM.theme;
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
-      theme: theme,
-      themeMode: ThemeMode.light,
+      darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.grey[900],
+          textTheme: ThemeData.dark().textTheme,
+          primaryTextTheme: TextTheme(
+              bodyText2: TextStyle(
+                  color: Colors.grey[500], fontWeight: FontWeight.bold),
+              headline3: TextStyle(
+                  color: Colors.white,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.bold)),
+          primaryColor: Colors.black,
+          accentColor: Colors.white,
+          disabledColor: Colors.grey[400],
+          primaryColorDark: Colors.grey[600],
+          primarySwatch: Colors.grey,
+          buttonColor: Colors.grey[800],
+          floatingActionButtonTheme: FloatingActionButtonThemeData(
+              backgroundColor: Colors.grey[850],
+              foregroundColor: Colors.white)),
+      themeMode: ThemeMode.dark,
       home: Wrapper(),
     );
   }

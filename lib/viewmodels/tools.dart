@@ -9,13 +9,13 @@ class Tools extends ChangeNotifier {
   Color getImportanceColor(Importance importance) {
     switch (importance) {
       case Importance.important:
-        return !darkMode ? Colors.orange[200] : Color.fromRGBO(94, 79, 58, 1);
+        return Colors.orange[200];
       case Importance.urgent:
-        return !darkMode ? Colors.red[300] : Color.fromRGBO(108, 49, 51, 1);
+        return Colors.red[300];
       case Importance.low:
-        return !darkMode ? Colors.blue[200] : Color.fromRGBO(67, 111, 122, 1);
+        return Colors.blue[200];
       default: //Importance.normal
-        return !darkMode ? Colors.green[200] : Color.fromRGBO(55, 70, 53, 1);
+        return Colors.green[200];
     }
   }
 
@@ -151,58 +151,6 @@ class Tools extends ChangeNotifier {
   RefreshStatus get refreshStatus => _refreshStatus;
   set refreshStatus(RefreshStatus newStatus) {
     _refreshStatus = newStatus;
-    notifyListeners();
-  }
-
-  //Settings
-  final _boxData = Boxes.getDataVariables();
-  bool _darkMode = false;
-  bool get darkMode => _darkMode;
-  void triggerDarkMode() {
-    _darkMode = !_darkMode;
-    _boxData.put('darkMode', _darkMode ? 1 : -1);
-    notifyListeners();
-  }
-
-  final ThemeData _darkTheme = ThemeData(
-      backgroundColor: Colors.grey[900],
-      textTheme: ThemeData.dark().textTheme,
-      primaryTextTheme: TextTheme(
-          bodyText2:
-              TextStyle(color: Colors.grey[500], fontWeight: FontWeight.bold),
-          headline3: TextStyle(
-              color: Colors.white,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.bold)),
-      primaryColor: Colors.grey[900],
-      accentColor: Colors.white,
-      disabledColor: Colors.grey[400],
-      primarySwatch: Colors.grey,
-      buttonColor: Colors.grey[800],
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.grey[850], foregroundColor: Colors.white));
-  final ThemeData _lightTheme = ThemeData(
-      primaryTextTheme: TextTheme(
-          bodyText2:
-              TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold),
-          headline3: TextStyle(
-              color: Colors.black,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.bold)),
-      primarySwatch: Colors.grey,
-      primaryColor: Colors.white,
-      disabledColor: Colors.grey[400],
-      accentColor: Colors.black,
-      primaryColorDark: Colors.grey[300],
-      textTheme: Typography.blackCupertino,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-      scaffoldBackgroundColor: Color.fromRGBO(237, 246, 249, 1),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.white, foregroundColor: Colors.black));
-
-  ThemeData get theme => _darkMode ? _darkTheme : _lightTheme;
-  void getThemeInfo() {
-    _darkMode = _boxData.get('darkMode') == 1;
     notifyListeners();
   }
 }

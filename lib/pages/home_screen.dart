@@ -41,7 +41,6 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void fetchData() {
-    context.read(toolsProvider).getThemeInfo();
     context.read(firebaseProvider).getShoppingListsFromFirebase(true);
     context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
     context.read(firebaseProvider).fetchFriendsList();

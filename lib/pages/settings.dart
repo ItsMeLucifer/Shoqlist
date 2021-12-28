@@ -115,42 +115,9 @@ class Settings extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenSize.height * 0.1),
-                      GestureDetector(
-                        onTap: () {
-                          toolsVM.triggerDarkMode();
-                        },
-                        child: Container(
-                          width: screenSize.width * 0.6,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).buttonColor,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  toolsVM.darkMode
-                                      ? Icon(Icons.check,
-                                          color: Theme.of(context).accentColor)
-                                      : Container(),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Dark Mode',
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .button,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              )),
-                        ),
-                      ),
-                      SizedBox(height: screenSize.height * 0.1),
+                      SizedBox(height: screenSize.height * 0.2),
                       BasicButton(_signOut, 'Sign-out', 0.6),
-                      SizedBox(height: screenSize.height * 0.1),
+                      SizedBox(height: screenSize.height * 0.2),
                       WarningButton(_deleteAccount, 'Delete Account', 0.6)
                     ],
                   ),

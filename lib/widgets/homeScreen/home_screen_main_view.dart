@@ -192,6 +192,7 @@ class HomeScreenMainView extends ConsumerWidget {
                                                                 index]
                                                             .name,
                                                         style: TextStyle(
+                                                            color: Colors.black,
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             fontSize: 20),
@@ -217,6 +218,8 @@ class HomeScreenMainView extends ConsumerWidget {
                                                                             .ellipsis,
                                                                     maxLines: 1,
                                                                     style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
                                                                         fontWeight:
                                                                             FontWeight
                                                                                 .normal,
@@ -238,6 +241,8 @@ class HomeScreenMainView extends ConsumerWidget {
                                                                     .toString() +
                                                                 "]",
                                                             style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
