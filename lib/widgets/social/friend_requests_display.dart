@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../main.dart';
 
@@ -37,7 +38,7 @@ class FriendRequestsDisplay extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 5),
-                  Text("Friend Requests",
+                  Text(AppLocalizations.of(context).friendRequests,
                       style: Theme.of(context).primaryTextTheme.headline4),
                   Divider(
                     color: Theme.of(context).accentColor,
@@ -60,7 +61,8 @@ class FriendRequestsDisplay extends ConsumerWidget {
                                     SizedBox(height: 10),
                                     Center(
                                       child: Text(
-                                          "You don't have any friend requests",
+                                          AppLocalizations.of(context)
+                                              .noFriendRequestsMsg,
                                           style: Theme.of(context)
                                               .primaryTextTheme
                                               .bodyText1),
@@ -70,7 +72,8 @@ class FriendRequestsDisplay extends ConsumerWidget {
                               : UsersList(
                                   _acceptFriendRequestAfterTap,
                                   friendsServiceVM.friendRequestsList,
-                                  'Accept friend request?',
+                                  AppLocalizations.of(context)
+                                      .acceptFriendRequestTitle,
                                   _declineFriendRequestAfterTap)))
                 ],
               ),

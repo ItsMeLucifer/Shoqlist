@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
@@ -12,9 +13,10 @@ import 'package:shoqlist/widgets/wrapper.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/services.dart';
-
+import 'package:shoqlist/l10n/l10n.dart';
 import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 final ChangeNotifierProvider<ShoppingListsViewModel> shoppingListsProvider =
     ChangeNotifierProvider((_) => ShoppingListsViewModel());
@@ -86,6 +88,13 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.grey[850],
               foregroundColor: Colors.white)),
       themeMode: ThemeMode.dark,
+      supportedLocales: L10n.all,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate
+      ],
       home: Wrapper(),
     );
   }

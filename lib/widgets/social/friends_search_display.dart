@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/widgets/components/forms.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../main.dart';
 import '../../viewmodels/tools.dart';
 
@@ -36,7 +38,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 5),
-                  Text("Search for Friends",
+                  Text(AppLocalizations.of(context).searchFriends,
                       style: Theme.of(context).primaryTextTheme.headline4),
                   Divider(
                     color: Theme.of(context).accentColor,
@@ -46,7 +48,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
                   BasicForm(
                       TextInputType.emailAddress,
                       friendsServiceVM.searchFriendTextController,
-                      'Type in email',
+                      AppLocalizations.of(context).email,
                       _onChanged,
                       Icons.email,
                       false,
@@ -61,7 +63,8 @@ class FriendsSearchDisplay extends ConsumerWidget {
                               children: [
                                 Center(
                                     child: Text(
-                                        "Can't find that user, try again",
+                                        AppLocalizations.of(context)
+                                            .cantFindUserMsg,
                                         style: Theme.of(context)
                                             .primaryTextTheme
                                             .bodyText1)),
@@ -70,7 +73,8 @@ class FriendsSearchDisplay extends ConsumerWidget {
                           : UsersList(
                               _sendFriendRequestAfterTap,
                               friendsServiceVM.usersList,
-                              'Send friend request?'))
+                              AppLocalizations.of(context)
+                                  .sendFriendRequestTitle))
                 ],
               ),
             ],

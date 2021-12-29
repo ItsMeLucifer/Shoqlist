@@ -8,6 +8,7 @@ import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
   void _onLongPressShoppingListItem(BuildContext context) {
@@ -102,12 +103,13 @@ class ShoppingListDisplay extends ConsumerWidget {
                         Share.share(
                             shoppingListsVM
                                 .getCurrentShoppingListDataInString(),
-                            subject: 'A shared list for you');
+                            subject:
+                                AppLocalizations.of(context).shareListSubject);
                       },
                       backgroundColor: Theme.of(context)
                           .floatingActionButtonTheme
                           .backgroundColor,
-                      label: "Share"),
+                      label: AppLocalizations.of(context).share),
                   SpeedDialChild(
                       labelBackgroundColor: Theme.of(context)
                           .floatingActionButtonTheme
@@ -126,12 +128,12 @@ class ShoppingListDisplay extends ConsumerWidget {
                                     .getFriendsWithoutAccessToCurrentShoppingList(
                                         shoppingListsVM
                                             .getUsersWithAccessToCurrentList()),
-                                "Give access to that Friend?"));
+                                AppLocalizations.of(context).giveAccessTitle));
                       },
                       backgroundColor: Theme.of(context)
                           .floatingActionButtonTheme
                           .backgroundColor,
-                      label: "Give access"),
+                      label: AppLocalizations.of(context).giveAccess),
                 ]
               : [
                   SpeedDialChild(
@@ -147,12 +149,13 @@ class ShoppingListDisplay extends ConsumerWidget {
                         Share.share(
                             shoppingListsVM
                                 .getCurrentShoppingListDataInString(),
-                            subject: 'A shared list for you');
+                            subject:
+                                AppLocalizations.of(context).shareListSubject);
                       },
                       backgroundColor: Theme.of(context)
                           .floatingActionButtonTheme
                           .backgroundColor,
-                      label: "Share"),
+                      label: AppLocalizations.of(context).share),
                 ],
         ),
       ),
@@ -217,7 +220,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                           style: TextStyle(fontWeight: FontWeight.bold),
                           decoration: InputDecoration(
                             fillColor: Colors.grey[600],
-                            hintText: "New Item name",
+                            hintText: AppLocalizations.of(context).itemNameHint,
                             hintStyle:
                                 Theme.of(context).primaryTextTheme.bodyText2,
                             contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -241,6 +244,8 @@ class ShoppingListDisplay extends ConsumerWidget {
                     GestureDetector(
                         onTap: () {
                           _addNewItemToCurrentShoppingList(context);
+                          toolsVM.clearNewItemTextEditingController();
+                          toolsVM.newItemFocusNode.requestFocus();
                         },
                         child: Icon(Icons.add,
                             color: Theme.of(context).accentColor)),
@@ -284,7 +289,9 @@ class ShoppingListDisplay extends ConsumerWidget {
                   context: context,
                   builder: (context) {
                     return YesNoDialog(
-                        _onLongPressShoppingListItem, "Remove this item?");
+                        _onLongPressShoppingListItem,
+                        AppLocalizations.of(context)
+                            .removeItemMsg(shoppingList.list[index].itemName));
                   });
             },
             child: Padding(

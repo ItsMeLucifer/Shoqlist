@@ -11,6 +11,7 @@ import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/widgets/social/friends_display.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -115,7 +116,7 @@ class _HomeScreen extends State<HomeScreen> {
                           .floatingActionButtonTheme
                           .foregroundColor,
                     ),
-                    label: 'Create new list'),
+                    label: AppLocalizations.of(context).newList),
                 SpeedDialChild(
                     labelBackgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
@@ -133,7 +134,7 @@ class _HomeScreen extends State<HomeScreen> {
                           .floatingActionButtonTheme
                           .foregroundColor,
                     ),
-                    label: 'Loyalty cards'),
+                    label: AppLocalizations.of(context).loyaltyCards),
                 SpeedDialChild(
                     labelBackgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
@@ -151,7 +152,7 @@ class _HomeScreen extends State<HomeScreen> {
                           .floatingActionButtonTheme
                           .foregroundColor,
                     ),
-                    label: 'Friends'),
+                    label: AppLocalizations.of(context).friends),
                 SpeedDialChild(
                     labelBackgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
@@ -169,7 +170,7 @@ class _HomeScreen extends State<HomeScreen> {
                           .floatingActionButtonTheme
                           .foregroundColor,
                     ),
-                    label: 'Settings'),
+                    label: AppLocalizations.of(context).settings),
               ]),
         ),
         body: Stack(

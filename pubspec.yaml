@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.1.6+11
+version: 1.1.8+13
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -26,6 +26,8 @@ dependencies:
   firebase_auth: ^0.20.0+1
   firebase_core: ^0.7.0
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
   flutter_barcode_scanner: ^1.0.2
   flutter_password_strength: ^0.1.5
@@ -63,6 +65,7 @@ flutter_icons:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter.
 flutter:
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

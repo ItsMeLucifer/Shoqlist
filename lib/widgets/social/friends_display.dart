@@ -7,6 +7,7 @@ import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/widgets/social/friend_requests_display.dart';
 import 'package:shoqlist/widgets/social/friends_search_display.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FriendsDisplay extends ConsumerWidget {
   void _removeUserFromFriendsListAfterTap(BuildContext context) {
@@ -53,7 +54,7 @@ class FriendsDisplay extends ConsumerWidget {
                     _navigateToFriendsSearchList(context);
                     friendsServiceVM.clearSearchFriendTextController();
                   },
-                  label: 'Search Friends',
+                  label: AppLocalizations.of(context).searchFriends,
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
@@ -71,7 +72,7 @@ class FriendsDisplay extends ConsumerWidget {
                   onTap: () {
                     _navigateToFriendRequestsList(context);
                   },
-                  label: 'Friend Requests',
+                  label: AppLocalizations.of(context).friendRequests,
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
@@ -89,7 +90,7 @@ class FriendsDisplay extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 5),
-                  Text("Friends",
+                  Text(AppLocalizations.of(context).friends,
                       style: Theme.of(context).primaryTextTheme.headline4),
                   Divider(
                     color: Theme.of(context).accentColor,
@@ -111,7 +112,9 @@ class FriendsDisplay extends ConsumerWidget {
                                 children: [
                                   SizedBox(height: 10),
                                   Center(
-                                    child: Text("You have no friends",
+                                    child: Text(
+                                        AppLocalizations.of(context)
+                                            .noFriendsMsg,
                                         style: Theme.of(context)
                                             .primaryTextTheme
                                             .bodyText1),
@@ -121,7 +124,8 @@ class FriendsDisplay extends ConsumerWidget {
                             : UsersList(
                                 _removeUserFromFriendsListAfterTap,
                                 friendsServiceVM.friendsList,
-                                "Remove from friends list?")),
+                                AppLocalizations.of(context)
+                                    .removeFriendTitle)),
                   )
                 ],
               ),

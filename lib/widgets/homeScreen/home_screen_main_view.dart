@@ -8,6 +8,7 @@ import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/shopping_list_display.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreenMainView extends ConsumerWidget {
   void _navigateToShoppingList(BuildContext context) {
@@ -62,7 +63,7 @@ class HomeScreenMainView extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(height: 5),
-              Text("Shoqlist",
+              Text(AppLocalizations.of(context).appName,
                   style: Theme.of(context).primaryTextTheme.headline3),
               Divider(
                 color: Theme.of(context).accentColor,
@@ -75,14 +76,16 @@ class HomeScreenMainView extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ShoppingListTypeChangeButton(
-                        'Your lists', ShoppingListType.ownShoppingLists),
+                        AppLocalizations.of(context).myLists,
+                        ShoppingListType.ownShoppingLists),
                     VerticalDivider(
                       color: Theme.of(context).accentColor,
                       indent: screenSize.height * 0.01,
                       endIndent: screenSize.height * 0.01,
                     ),
                     ShoppingListTypeChangeButton(
-                        'Shared lists', ShoppingListType.sharedShoppingLists),
+                        AppLocalizations.of(context).sharedLists,
+                        ShoppingListType.sharedShoppingLists),
                   ],
                 ),
               ),
@@ -134,6 +137,8 @@ class HomeScreenMainView extends ConsumerWidget {
                                             onTap: () {
                                               shoppingListsVM.currentListIndex =
                                                   index;
+                                              shoppingListsVM
+                                                  .sortShoppingListItemsDisplay();
                                               _navigateToShoppingList(context);
                                             },
                                             onLongPress: () {
@@ -144,11 +149,13 @@ class HomeScreenMainView extends ConsumerWidget {
                                                       .ownerId ==
                                                   firebaseAuthVM
                                                       .currentUser.userId) {
-                                                String title = "Remove the '" +
-                                                    shoppingListsVM
-                                                        .shoppingLists[index]
-                                                        .name +
-                                                    "' list?";
+                                                String title =
+                                                    AppLocalizations.of(context)
+                                                        .removeListTitle(
+                                                            shoppingListsVM
+                                                                .shoppingLists[
+                                                                    index]
+                                                                .name);
                                                 showDialog(
                                                     context: context,
                                                     builder: (context) {
@@ -266,8 +273,10 @@ class HomeScreenMainView extends ConsumerWidget {
                                                           .currentlyDisplayedListType ==
                                                       ShoppingListType
                                                           .ownShoppingLists
-                                                  ? 'You have no shopping lists'
-                                                  : 'You have no shared lists',
+                                                  ? AppLocalizations.of(context)
+                                                      .noListsMsg
+                                                  : AppLocalizations.of(context)
+                                                      .noSharedListsMsg,
                                               style: Theme.of(context)
                                                   .primaryTextTheme
                                                   .bodyText1))

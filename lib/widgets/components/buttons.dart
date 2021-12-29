@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoyaltyCardButton extends ConsumerWidget {
   final String cardName;
@@ -18,7 +19,7 @@ class LoyaltyCardButton extends ConsumerWidget {
               child: Stack(
             children: <Widget>[
               Text(cardName,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.fade,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 17,
@@ -117,8 +118,8 @@ class WarningButton extends ConsumerWidget {
         showDialog(
             context: context,
             builder: (context) {
-              return YesNoDialog(_onTap,
-                  'Are you sure you want to delete your account?\n\nThis change will be irreversible.');
+              return YesNoDialog(
+                  _onTap, AppLocalizations.of(context).deleteAccountMsg);
             });
       },
       child: Container(

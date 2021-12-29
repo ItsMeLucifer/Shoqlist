@@ -41,6 +41,23 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<String> _exceptionMessages = [
+    "An undefined Error happened",
+    "No user found for that email",
+    "Wrong password provided for that user",
+    "Invalid email",
+    "User disabled",
+    "At least one of the fields is empty",
+    "The password provided is too weak",
+    "The account already exists for that email",
+    "Error with Google sign-in",
+    "Error with anonymously sign-in"
+  ];
+  set exceptionMessages(List<String> newExceptionMessages) {
+    _exceptionMessages = newExceptionMessages;
+    notifyListeners();
+  }
+
   Future<void> signIn(String email, String password) async {
     status = Status.DuringAuthorization;
     try {
@@ -48,21 +65,21 @@ class FirebaseAuthViewModel extends ChangeNotifier {
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = "An undefined Error happened.";
+      _exceptionMessage = _exceptionMessages[0];
       if (e.code == 'user-not-found') {
-        _exceptionMessage = "No user found for that email.";
+        _exceptionMessage = _exceptionMessages[1];
       } else if (e.code == 'wrong-password') {
-        _exceptionMessage = "Wrong password provided for that user.";
+        _exceptionMessage = _exceptionMessages[2];
       } else if (e.code == 'invalid-email') {
-        _exceptionMessage = "Invalid email";
+        _exceptionMessage = _exceptionMessages[3];
       } else if (e.code == 'user-disabled') {
-        _exceptionMessage = "User disabled";
+        _exceptionMessage = _exceptionMessages[4];
       }
     } catch (e) {
       print(e);
     }
     if (email == "" || password == "") {
-      _exceptionMessage = "At least one of the fields is empty.";
+      _exceptionMessage = _exceptionMessages[5];
     }
   }
 
@@ -80,17 +97,17 @@ class FirebaseAuthViewModel extends ChangeNotifier {
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = "An undefined Error happened.";
+      _exceptionMessage = _exceptionMessages[0];
       if (e.code == 'weak-password') {
-        _exceptionMessage = "The password provided is too weak.";
+        _exceptionMessage = _exceptionMessages[6];
       } else if (e.code == 'email-already-in-use') {
-        _exceptionMessage = "The account already exists for that email.";
+        _exceptionMessage = _exceptionMessages[7];
       }
     } catch (e) {
       print(e);
     }
     if (email == "" || password == "") {
-      _exceptionMessage = "At least one of the fields is empty.";
+      _exceptionMessage = _exceptionMessages[5];
     }
     checkIfUserDocumentWasCreated();
   }
@@ -106,7 +123,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
       userCredential = await _auth.signInWithCredential(credential);
     } catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = "Error with Google sign-in";
+      _exceptionMessage = _exceptionMessages[8];
       print(e);
     }
     checkIfUserDocumentWasCreated();
@@ -118,7 +135,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
       userCredential = await _auth.signInAnonymously();
     } catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = "Error with anonymously sign-in";
+      _exceptionMessage = _exceptionMessages[9];
       print(e);
     }
     checkIfUserDocumentWasCreated();
@@ -146,7 +163,6 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   Future<void> signOut() async {
     status = Status.Unauthenticated;
     _exceptionMessage = "";
-    print('SIGN OUT');
     notifyListeners();
     await _auth.signOut();
   }
@@ -154,7 +170,6 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   Future<void> deleteAccount() async {
     status = Status.Unauthenticated;
     _exceptionMessage = "";
-    print('SIGN OUT');
     notifyListeners();
     await _auth.currentUser.delete();
   }

@@ -1,0 +1,96 @@
+{
+    "language": "日本語",
+    "appName": "ショクリスト",
+    
+    
+
+    "signIn": "サインイン",
+    "register": "サインアップ",
+    "email": "メール",
+    "password": "パスワード",
+    
+    
+
+    "myLists": "マイリスト",
+    "sharedLists": "共有リスト",
+    "settings": "セットアップ",
+    "friends": "友達",
+    "loyaltyCards": "ポイントカード",
+    "newList": "新しいリストを作る",
+    
+    
+
+    "changeNicknameTitle": "ニックネームを変更する",
+    "signOut": "サインアウト",
+    "deleteAccount": "アカウント削除",
+
+
+
+    "nickname": "ニックネーム",
+    "save": "セーブ",
+    "cancel": "キャンセル",
+    "cardName": "カード名",
+    "cardCode": "カードコード",
+    "remove": "取り除く",
+    "add": "追加する",
+    "chooseUser": "セレクトユーザー",
+    "chooseUserEmptyMessage": "友達がいない、または友達が全員すでにアクセスしている",
+    "importance": "重要性",
+    "listName": "リスト名",
+    "newListTitle": "新しいリストを追加する",
+    "editListTitle": "編集リスト",
+    "decline": "キャンセル",
+    "yes": "はい",
+    "no": "いいえ",
+    "accept": "受入れる",
+
+
+
+    "removeListTitle": "'{listName}'リストを削除しますか",
+    "noListsMsg": "リストが無い",
+    "noSharedListsMsg": "共有リストが無い",
+
+
+
+    "giveAccess": "Daj dostęp",
+    "share": "分け合う",
+    "shareListSubject": "リストが公開されました!",
+    "giveAccessTitle": "その友達に分け合うか",
+    "itemNameHint": "新しいアイテムの名前",
+    "removeItemMsg": "'{itemName}'アイテムを削除しますか",
+
+
+
+    "newCardTitle": "新しいポイントカードを追加する",
+    "removeCardTitle": "'{cardName}'カードを取り除きますか",
+    "editCardTitle": "'{cardName}'カードをエディトします",
+
+
+
+    "deleteAccountMsg": "本当にアカウントを削除しますか\n\nこの決定は不可逆的である",
+
+
+
+    "undefinedExc": "未定義のエラーが発生しました",
+    "noUserExc": "このメールアドレスに該当するユーザーはいません",
+    "passwordExc": "パスワードが正しくない",
+    "emailExc": "電子メールアドレスが正しくない",
+    "userDisabledExc": "お客様のアカウントはブロックされています",
+    "emptyFieldExc": "少なくとも1つのフィールドが空である",
+    "weakPasswordExc": "入力されたパスワードが弱すぎる",
+    "emailInUseExc": "このメールアドレスには、すでにアカウントが存在します",
+    "googleSignInExc": "Googleからサインインしようとするとエラーが発生した",
+    "anonymousSignInExc": "匿名でログインしようとしたときにエラーが発生しました",
+
+
+
+    "friends": "友達",
+    "friendRequests": "友達申請",
+    "searchFriends": "友達を探します",
+    "noFriendsMsg": "あなたには友達がいない",
+    "removeFriendTitle": "友達リストから削除するか",
+    "noFriendRequestsMsg": "友達申請がありません",
+    "acceptFriendRequestTitle": "友達申請を承認しますか",
+    "cantFindUserMsg": "そのユーザーが見つかりません、もう一度試してください",
+    "sendFriendRequestTitle": "友達申請を確認しますか"
+}

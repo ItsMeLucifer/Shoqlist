@@ -6,6 +6,7 @@ import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_card_info.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../main.dart';
 
@@ -80,7 +81,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
             Column(
               children: [
                 SizedBox(height: 5),
-                Text("Loyalty Cards",
+                Text(AppLocalizations.of(context).loyaltyCards,
                     style: Theme.of(context).primaryTextTheme.headline4),
                 Divider(
                   color: Theme.of(context).accentColor,
@@ -125,7 +126,8 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                   showDialog(
                       context: context,
                       builder: (context) => PutLoyaltyCardsData(
-                          _addNewLoyaltyCard, 'Add new Loyalty Card'));
+                          _addNewLoyaltyCard,
+                          AppLocalizations.of(context).newCardTitle));
                 },
                 child: Card(
                   color: Theme.of(context).disabledColor.withOpacity(0.5),
@@ -148,12 +150,11 @@ class LoyaltyCardsHandler extends ConsumerWidget {
               },
               onLongPress: () {
                 loyaltyCardsVM.currentLoyaltyCardsListIndex = fixedIndex;
-                String removeTitle = "Remove the '" +
-                    loyaltyCardsVM.loyaltyCardsList[fixedIndex].name +
-                    "' card?";
-                String title = "Edit " +
-                    loyaltyCardsVM.loyaltyCardsList[fixedIndex].name +
-                    " card";
+                String removeTitle = AppLocalizations.of(context)
+                    .removeCardTitle(
+                        loyaltyCardsVM.loyaltyCardsList[fixedIndex].name);
+                String title = AppLocalizations.of(context).editCardTitle(
+                    loyaltyCardsVM.loyaltyCardsList[fixedIndex].name);
                 toolsVM.setLoyaltyCardControllers(
                     loyaltyCardsVM.loyaltyCardsList[fixedIndex].name,
                     loyaltyCardsVM.loyaltyCardsList[fixedIndex].barCode);

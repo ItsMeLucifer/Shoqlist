@@ -1,0 +1,95 @@
+{
+    "language": "Polski",
+    "appName": "Shoqlist",
+    
+    
+
+    "signIn": "Zaloguj się",
+    "register": "Zarejestruj się",
+    "email": "E-mail",
+    "password": "Hasło",
+    
+    
+
+    "myLists": "Moje listy",
+    "sharedLists": "Udostępnione listy",
+    "settings": "Ustawienia",
+    "friends": "Przyjaciele",
+    "loyaltyCards": "Karty lojalnościowe",
+    "newList": "Stwórz nową listę",
+    
+    
+
+    "changeNicknameTitle": "Zmień pseudonim",
+    "signOut": "Wyloguj się",
+    "deleteAccount": "Usuń konto",
+
+
+
+    "nickname": "Pseudonim",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "cardName": "Nazwa karty",
+    "cardCode": "Kod karty",
+    "remove": "Usuń",
+    "add": "Dodaj",
+    "chooseUser": "Wybierz użytkownika",
+    "chooseUserEmptyMessage": "Nie masz przyjaciół, lub każdy z przyjaciół posiada już dostęp",
+    "importance": "Ważność",
+    "listName": "Nazwa listy",
+    "newListTitle": "Dodaj nową listę",
+    "editListTitle": "Edytuj listę",
+    "decline": "Odrzuć",
+    "yes": "Tak",
+    "no": "Nie",
+    "accept": "Akceptuj",
+
+
+
+    "removeListTitle": "Usunąć listę '{listName}'?",
+    "noListsMsg": "Nie masz żadnych list",
+    "noSharedListsMsg": "Nie udostępniono ci żadnych list",
+
+
+
+    "giveAccess": "Daj dostęp",
+    "share": "Udostępnij",
+    "shareListSubject": "Udostępniono ci listę!",
+    "giveAccessTitle": "Dać dostęp temu przyjacielowi?",
+    "itemNameHint": "Nazwa nowego elementu",
+    "removeItemMsg": "Czy usunąć element '{itemName}'?",
+
+
+
+    "newCardTitle": "Dodaj nową kartę lojalnościową",
+    "removeCardTitle": "Usunąć kartę '{cardName}'?",
+    "editCardTitle": "Edycja karty '{cardName}'",
+
+
+
+    "deleteAccountMsg": "Jesteś pewien/na, że chcesz usunąć konto?\n\nTa decyzja jest nieodwracalna",
+
+
+
+    "undefinedExc": "Wystąpił niezdefiniowany błąd",
+    "noUserExc": "Nie znaleziono użytkownika dla tego adresu e-mail",
+    "passwordExc": "Nieprawidłowe hasło",
+    "emailExc": "Nieprawidłowy adres e-mail",
+    "userDisabledExc": "Twoje konto zostało zablokowane",
+    "emptyFieldExc": "Przynajmniej jedno z pól jest puste",
+    "weakPasswordExc": "Podane hasło jest za słabe",
+    "emailInUseExc": "Dla tego adresu e-mail konto już istnieje",
+    "googleSignInExc": "Wystąpił błąd przy próbie zalogowania przez platformę Google",
+    "anonymousSignInExc": "Wystąpił błąd przy próbie anonimowego zalogowania",
+
+
+    "friends": "Znajomi",
+    "friendRequests": "Zaproszenia do znajomych",
+    "searchFriends": "Szukaj znajomych",
+    "noFriendsMsg": "Nie masz żadnych znajomych",
+    "removeFriendTitle": "Usunąć z listy znajomych?",
+    "noFriendRequestsMsg": "Nie masz żadnych zaproszeń do znajomych",
+    "acceptFriendRequestTitle": "Zaakceptować zaproszenie do znajomych?",
+    "cantFindUserMsg": "Nie znaleziono użytkownika z podanym adresem e-mail, spróbuj ponownie",
+    "sendFriendRequestTitle": "Wysłać zaproszenie do znajomych?"
+}

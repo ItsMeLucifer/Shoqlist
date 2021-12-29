@@ -8,6 +8,7 @@ import 'package:shoqlist/widgets/social/users_list.dart';
 import '../../main.dart';
 import '../color_picker.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class YesNoDialog extends ConsumerWidget {
   final Function _onAccepted;
@@ -30,7 +31,9 @@ class YesNoDialog extends ConsumerWidget {
           onPressed: () {
             _onAccepted(context);
           },
-          child: Text(_onDeclined == null ? 'Yes' : 'Accept'),
+          child: Text(_onDeclined == null
+              ? AppLocalizations.of(context).yes
+              : AppLocalizations.of(context).accept),
         ),
         FlatButton(
           onPressed: () {
@@ -40,7 +43,9 @@ class YesNoDialog extends ConsumerWidget {
               _onDeclined(context);
             }
           },
-          child: Text(_onDeclined == null ? 'No' : 'Decline'),
+          child: Text(_onDeclined == null
+              ? AppLocalizations.of(context).no
+              : AppLocalizations.of(context).decline),
         )
       ],
     );
@@ -67,8 +72,8 @@ class PutShoppingListData extends ConsumerWidget {
               children: [
                 Text(
                   _onPressedDelete == null
-                      ? "Add new List"
-                      : "Edit List's data",
+                      ? AppLocalizations.of(context).newListTitle
+                      : AppLocalizations.of(context).editListTitle,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
@@ -86,7 +91,7 @@ class PutShoppingListData extends ConsumerWidget {
                         controller: toolsVM.newListNameController,
                         style: TextStyle(fontWeight: FontWeight.bold),
                         decoration: InputDecoration(
-                          hintText: "List name",
+                          hintText: AppLocalizations.of(context).listName,
                           hintStyle:
                               Theme.of(context).primaryTextTheme.bodyText2,
                           contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -106,7 +111,7 @@ class PutShoppingListData extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text("Importance:"),
+                    Text(AppLocalizations.of(context).importance + ":"),
                     DropdownButton<Importance>(
                       value: toolsVM.newListImportance,
                       dropdownColor: Theme.of(context).backgroundColor,
@@ -150,7 +155,7 @@ class PutShoppingListData extends ConsumerWidget {
                           _onPressedSave(context);
                           Navigator.of(context).pop();
                         },
-                        child: Text('Save',
+                        child: Text(AppLocalizations.of(context).save,
                             style:
                                 Theme.of(context).primaryTextTheme.bodyText1)),
                     _onPressedDelete != null
@@ -164,7 +169,7 @@ class PutShoppingListData extends ConsumerWidget {
                                         _deleteNotificationTitle);
                                   });
                             },
-                            child: Text('Remove',
+                            child: Text(AppLocalizations.of(context).remove,
                                 style: Theme.of(context)
                                     .primaryTextTheme
                                     .bodyText1))
@@ -192,7 +197,7 @@ class ChooseUser extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("Choose User",
+          Text(AppLocalizations.of(context).chooseUser,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center),
           SizedBox(height: 10),
@@ -202,8 +207,7 @@ class ChooseUser extends ConsumerWidget {
                   width: size.width * 0.9,
                   child: UsersList(_actionAfterTapUser, _usersList,
                       _titleToDisplay, null, 0.4))
-              : Text(
-                  "You have no friends or every one of your friends already has access.",
+              : Text(AppLocalizations.of(context).chooseUserEmptyMessage,
                   style: Theme.of(context).primaryTextTheme.bodyText1,
                   textAlign: TextAlign.center),
         ],
@@ -233,8 +237,13 @@ class ChangeName extends ConsumerWidget {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center)),
-              BasicForm(TextInputType.name, toolsVM.newNicknameController,
-                  'Nickname', () => {}, Icons.person, false)
+              BasicForm(
+                  TextInputType.name,
+                  toolsVM.newNicknameController,
+                  AppLocalizations.of(context).nickname,
+                  () => {},
+                  Icons.person,
+                  false)
             ],
           ),
         ),
@@ -249,7 +258,7 @@ class ChangeName extends ConsumerWidget {
                 _onAccepted(context);
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: Text(AppLocalizations.of(context).save),
             ),
           ),
         ),
@@ -272,8 +281,8 @@ class PutLoyaltyCardsData extends ConsumerWidget {
     Widget _suffixIcon = GestureDetector(
       onTap: () async {
         toolsVM.loyaltyCardBarCodeController.text =
-            await FlutterBarcodeScanner.scanBarcode(
-                "#ff6666", "Cancel", true, ScanMode.DEFAULT);
+            await FlutterBarcodeScanner.scanBarcode("#ff6666",
+                AppLocalizations.of(context).cancel, true, ScanMode.DEFAULT);
         if (toolsVM.loyaltyCardBarCodeController.text == '-1')
           toolsVM.loyaltyCardBarCodeController.text = '';
       },
@@ -300,7 +309,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                     BasicForm(
                         TextInputType.name,
                         toolsVM.loyaltyCardNameController,
-                        'Card name',
+                        AppLocalizations.of(context).cardName,
                         (value) => {},
                         null,
                         false),
@@ -310,7 +319,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                     BasicForm(
                         TextInputType.text,
                         toolsVM.loyaltyCardBarCodeController,
-                        'Card code',
+                        AppLocalizations.of(context).cardCode,
                         (value) => {},
                         null,
                         false,
@@ -333,7 +342,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                                           });
                                     },
                                     child: Text(
-                                      'Remove',
+                                      AppLocalizations.of(context).remove,
                                       style: Theme.of(context)
                                           .primaryTextTheme
                                           .bodyText1,
@@ -346,7 +355,9 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                               _onPressed(context);
                             },
                             child: Text(
-                              _onDestroy != null ? 'Save' : 'Add',
+                              _onDestroy != null
+                                  ? AppLocalizations.of(context).save
+                                  : AppLocalizations.of(context).add,
                               style:
                                   Theme.of(context).primaryTextTheme.bodyText1,
                             )),

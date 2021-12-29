@@ -1,0 +1,308 @@
+{
+    "language": "English",
+    "@language":{
+        "description": "The current language"
+    },
+    "appName": "Shoqlist",
+    "@appName":{
+        "description": "The name od application"
+    },
+    
+    
+
+    "signIn": "Sign-in",
+    "@signIn":{
+        "description": "'Sign-in' phrase"
+    },
+    "register": "Register",
+    "@register":{
+        "description": "'Register' word"
+    },
+    "email": "E-mail",
+    "@email":{
+        "description": "'Email' word"
+    },
+    "password": "Password",
+    "@password":{
+        "description": "'Password' word"
+    },
+    
+    
+
+    "myLists": "My lists",
+    "@myLists":{
+        "description": "'My lists' phrase"
+    },
+    "sharedLists": "Shared lists",
+    "@sharedLists":{
+        "description": "'Shared lists' phrase"
+    },
+    "settings": "Settings",
+    "@settings":{
+        "description": "'Settings' word"
+    },
+    "friends": "Friends",
+    "@friends":{
+        "description": "'Friends' word"
+    },
+    "loyaltyCards": "Loyalty cards",
+    "@loyaltyCards":{
+        "description": "'Loyalty cards' phrase"
+    },
+    "newList": "Create new list",
+    "@newList":{
+        "description": "'Create new list' phrase"
+    },
+    
+
+
+    "changeNicknameTitle": "Change nickname",
+    "@changeNicknameTitle":{
+        "description": "'Change nickname' phrase"
+    },
+    "signOut": "Sign-out",
+    "@signOut":{
+        "description": "'Sign-out' phrase"
+    },
+    "deleteAccount": "Delete account",
+    "@deleteAccount":{
+        "description": "'Delete account' phrase"
+    },
+
+
+
+    "nickname": "Nickname",
+    "@nickname":{
+        "description": "'Nickname' word"
+    },
+    "save": "Save",
+    "@save":{
+        "description": "'Save' word"
+    },
+    "cancel": "Cancel",
+    "@cancel":{
+        "description": "'Cancel' word"
+    },
+    "cardName": "Card name",
+    "@cardName":{
+        "description": "'Card name' phrase"
+    },
+    "cardCode": "Card code",
+    "@cardCode":{
+        "description": "'Card code' phrase"
+    },
+    "remove": "Remove",
+    "@remove":{
+        "description": "'Remove' word"
+    },
+    "add": "Add",
+    "@add":{
+        "description": "'Add' word"
+    },
+    "chooseUser": "Choose user",
+    "@chooseUser":{
+        "description": "'Choose user' phrase"
+    },
+    "chooseUserEmptyMessage": "You have no friends or every one of your friends already has access",
+    "@chooseUserEmptyMessage":{
+        "description": "The message that displays when there are no friends to display"
+    },
+    "importance": "Importance",
+    "@importance":{
+        "description": "'Importance' word"
+    },
+    "listName": "List name",
+    "@listName":{
+        "description": "'List name' phrase"
+    },
+    "newListTitle": "Add new list",
+    "@newListTitle":{
+        "description": "Title of dialog, when creating a new shopping list"
+    },
+    "editListTitle": "Edit list's data",
+    "@editListTitle":{
+        "description": "Title of dialog, when editing an existing shopping list"
+    },
+    "decline": "Decline",
+    "@decline":{
+        "description": "'Decline' word"
+    },
+    "yes": "Yes",
+    "@yes":{
+        "description": "'Yes' word"
+    },
+    "no": "No",
+    "@no":{
+        "description": "'No' word"
+    },
+    "accept": "Accept",
+    "@accept":{
+        "description": "'Accept' word"
+    },
+
+
+
+    "removeListTitle": "Remove the '{listName}' list?",
+    "@removeListTitle":{
+        "description": "The title of the message that displays when you try to delete a shopping list",
+        "placeholders":{
+            "listName":{
+                "type": "String"
+            }
+        }
+    },
+    "noListsMsg": "You have no shopping lists",
+    "@noListsMsg":{
+        "description": "A message displated when user has no shopping lists"
+    },
+    "noSharedListsMsg": "You have no shared lists",
+    "@noSharedListsMsg":{
+        "description": "A message displated when user has no shared lists"
+    },
+
+
+
+    "giveAccess": "Give access",
+    "@giveAccess":{
+        "description": "'Give access' phrase'"
+    },
+    "share": "Share",
+    "@share":{
+        "description": "'Share' word'"
+    },
+    "shareListSubject": "A list has been made available to you!",
+    "@shareListSubject":{
+        "description": "Message title when sharing a shopping list"
+    },
+    "giveAccessTitle": "Give access to that friend?",
+    "@giveAccessTitle":{
+        "description": "The message that pops up when you give access to a friend"
+    },
+    "itemNameHint": "New item name",
+    "@itemNameHint":{
+        "description": "HintText displayed during adding new item to the list"
+    },
+    "removeItemMsg": "Remove the '{itemName}' item?",
+    "@removeItemMsg":{
+        "description": "The message that pops up when you want to remove an item",
+        "placeholders":{
+            "itemName":{
+                "type": "String"
+            }
+        }
+    },
+
+
+
+    "newCardTitle": "Add new loyalty card",
+    "@newCardTitle":{
+        "description": "The message that pops up when you want to add new loyalty card"
+    },
+    "removeCardTitle": "Remove the '{cardName}' card?",
+    "@removeCardTitle":{
+        "description": "The message that pops up when you want to add new loyalty card",
+        "placeholders":{
+            "cardName":{
+                "type": "String"
+            }
+        }
+    },
+    "editCardTitle": "Edit the '{cardName}' card",
+    "@editCardTitle":{
+        "description": "The message that pops up when you want to edit existing loyalty card",
+        "placeholders":{
+            "cardName":{
+                "type": "String"
+            }
+        }
+    },
+
+
+
+    "deleteAccountMsg": "Are you sure you want to delete your account?\n\nThis change will be irreversible",
+    "@deleteAccountMsg":{
+        "description": "The message that pops up when you want to delete account"
+    },
+
+
+
+    "undefinedExc": "An undefined Error happened",
+    "@undefinedExc":{
+        "description": "Exception throwed when undefined error happened"
+    },
+    "noUserExc": "No user found for that email",
+    "@noUserExc":{
+        "description": "Exception throwed when no user found for that email"
+    },
+    "passwordExc": "Wrong password provided for that user",
+    "@passwordExc":{
+        "description": "Exception throwed when wrong password has been provided"
+    },
+    "emailExc": "Invalid email",
+    "@emailExc":{
+        "description": "Exception throwed when wrong email has been provided"
+    },
+    "userDisabledExc": "Your account has been disabled",
+    "@userDisabledExc":{
+        "description": "Exception throwed when account has been disabled"
+    },
+    "emptyFieldExc": "At least one of the fields is empty",
+    "@emptyFieldExc":{
+        "description": "Exception throwed when at least one of the fields in register/login form is empty"
+    },
+    "weakPasswordExc": "The password provided is too weak",
+    "@weakPasswordExc":{
+        "description": "Exception throwed when provided password is too weak"
+    },
+    "emailInUseExc": "The account already exists for that email",
+    "@emailInUseExc":{
+        "description": "Exception throwed when email is already in use"
+    },
+    "googleSignInExc": "Error with Google sign-in",
+    "@googleSignInExc":{
+        "description": "Exception throwed when there was an error with Google sign-in"
+    },
+    "anonymousSignInExc": "Error with anonymously sign-in",
+    "@anonymousSignInExc":{
+        "description": "Exception throwed when there was an error with anonymous sign-in"
+    },
+
+
+
+    "friends": "Friends",
+    "@friends":{
+        "description": "'Friends' word"
+    },
+    "friendRequests": "Friend requests",
+    "@friendRequests":{
+        "description": "'Friend requests' phrase"
+    },
+    "searchFriends": "Search friends",
+    "@searchFriends":{
+        "description": "'Search friends' phrase"
+    },
+    "noFriendsMsg": "You have no friends",
+    "@noFriendsMsg":{
+        "description": "Message displayed when you have no friends"
+    },
+    "removeFriendTitle": "Remove from friends list?",
+    "@removeFriendTitle":{
+        "description": "Message displayed when you want to remove an user from friends list"
+    },
+    "noFriendRequestsMsg": "You don't have any friend requests",
+    "@noFriendRequestsMsg":{
+        "description": "Message displayed when you have no friend requests"
+    },
+    "acceptFriendRequestTitle": "Accept friend request?",
+    "@acceptFriendRequestTitle":{
+        "description": "Message displayed when you want to accept friend request"
+    },
+    "cantFindUserMsg": "Can't find that user, try again",
+    "@cantFindUserMsg":{
+        "description": "Message displayed when there is no user with provided email"
+    },
+    "sendFriendRequestTitle": "Send friend request?",
+    "@sendFriendRequestTitle":{
+        "description": "Message displayed when you want to send a friend request"
+    }
+}

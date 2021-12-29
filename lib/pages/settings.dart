@@ -6,6 +6,7 @@ import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Settings extends ConsumerWidget {
   void _signOut(BuildContext context) {
@@ -52,7 +53,7 @@ class Settings extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: 5),
-                Text("Settings",
+                Text(AppLocalizations.of(context).settings,
                     style: Theme.of(context).primaryTextTheme.headline3),
                 Divider(
                   color: Theme.of(context).accentColor,
@@ -109,16 +110,22 @@ class Settings extends ConsumerWidget {
                                 ],
                               ),
                               SizedBox(width: screenSize.width * 0.1),
-                              BasicButton(_showDialogWithChangeNickname,
-                                  'Change Nickname', 0.1, Icons.edit)
+                              BasicButton(
+                                  _showDialogWithChangeNickname,
+                                  AppLocalizations.of(context)
+                                      .changeNicknameTitle,
+                                  0.1,
+                                  Icons.edit)
                             ],
                           ),
                         ),
                       ),
                       SizedBox(height: screenSize.height * 0.2),
-                      BasicButton(_signOut, 'Sign-out', 0.6),
+                      BasicButton(
+                          _signOut, AppLocalizations.of(context).signOut, 0.6),
                       SizedBox(height: screenSize.height * 0.2),
-                      WarningButton(_deleteAccount, 'Delete Account', 0.6)
+                      WarningButton(_deleteAccount,
+                          AppLocalizations.of(context).deleteAccount, 0.6)
                     ],
                   ),
                 ),
