@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/user.dart';
+import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/forms.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
 import '../../main.dart';
@@ -28,7 +29,7 @@ class YesNoDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () {
-            _onAccepted(context);
+            _onAccepted(context, ref);
           },
           child: Text(_onDeclined == null
               ? AppLocalizations.of(context).yes
@@ -39,7 +40,7 @@ class YesNoDialog extends ConsumerWidget {
             if (_onDeclined == null) {
               Navigator.of(context).pop();
             } else {
-              _onDeclined(context);
+              _onDeclined(context, ref);
             }
           },
           child: Text(_onDeclined == null
@@ -136,9 +137,12 @@ class PutShoppingListData extends ConsumerWidget {
                         return DropdownMenuItem<Importance>(
                           value: value,
                           child: Text(
-                            toolsVM.getImportanceLabel(value),
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                              toolsVM.getTranslatedImportanceLabel(
+                                  context, value),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center),
                         );
                       }).toList(),
                     ),
@@ -149,19 +153,6 @@ class PutShoppingListData extends ConsumerWidget {
                       ? MainAxisAlignment.spaceEvenly
                       : MainAxisAlignment.center,
                   children: [
-                    Card(
-                      color:
-                          Theme.of(context).buttonTheme.colorScheme.background,
-                      child: TextButton(
-                          onPressed: () {
-                            _onPressedSave(context);
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(AppLocalizations.of(context).save,
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .bodyText1)),
-                    ),
                     _onPressedDelete != null
                         ? Card(
                             color: Theme.of(context)
@@ -182,6 +173,19 @@ class PutShoppingListData extends ConsumerWidget {
                                         .primaryTextTheme
                                         .bodyText1)))
                         : SizedBox(),
+                    Card(
+                      color:
+                          Theme.of(context).buttonTheme.colorScheme.background,
+                      child: TextButton(
+                          onPressed: () {
+                            _onPressedSave(context, ref);
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(AppLocalizations.of(context).save,
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .bodyText1)),
+                    ),
                   ],
                 )
               ],
@@ -249,7 +253,7 @@ class ChangeName extends ConsumerWidget {
                   TextInputType.name,
                   toolsVM.newNicknameController,
                   AppLocalizations.of(context).nickname,
-                  () => {},
+                  (BuildContext context, WidgetRef ref) => {},
                   Icons.person,
                   false)
             ],
@@ -258,18 +262,11 @@ class ChangeName extends ConsumerWidget {
       ),
       actions: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Container(
-            height: screenSize.height * 0.02,
-            child: TextButton(
-              onPressed: () {
-                _onAccepted(context);
-                Navigator.of(context).pop();
-              },
-              child: Text(AppLocalizations.of(context).save),
-            ),
-          ),
-        ),
+            padding: const EdgeInsets.only(bottom: 8.0, right: 8),
+            child: BasicButton(() {
+              _onAccepted(context, ref);
+              Navigator.of(context).pop();
+            }, AppLocalizations.of(context).save, .2)),
       ],
     );
   }
@@ -370,7 +367,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                               .background,
                           child: TextButton(
                               onPressed: () {
-                                _onPressed(context);
+                                _onPressed(context, ref);
                               },
                               child: Text(
                                 _onDestroy != null

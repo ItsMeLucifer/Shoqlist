@@ -92,5 +92,12 @@
     "noFriendRequestsMsg": "友達申請がありません",
     "acceptFriendRequestTitle": "友達申請を承認しますか",
     "cantFindUserMsg": "そのユーザーが見つかりません、もう一度試してください",
-    "sendFriendRequestTitle": "友達申請を確認しますか"
+    "sendFriendRequestTitle": "友達申請を確認しますか",
+
+
+
+    "low": "微々たる",
+    "normal": "正常",
+    "important": "重要",
+    "urgent": "アージャント"
 }

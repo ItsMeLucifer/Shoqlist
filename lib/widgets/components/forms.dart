@@ -24,11 +24,11 @@ class BasicForm extends ConsumerWidget {
           obscureText: _obsureText,
           controller: _controller,
           onChanged: (value) {
-            _onChanged(context);
+            _onChanged(context, ref);
           },
           onFieldSubmitted: (value) {
             if (_onSubmitted != null) {
-              _onSubmitted(context, value);
+              _onSubmitted(ref, value);
             }
           },
           style: Theme.of(context).primaryTextTheme.bodyText1,

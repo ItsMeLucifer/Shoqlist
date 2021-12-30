@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shoqlist/models/shopping_list.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
 enum RefreshStatus { duringRefresh, refreshed }
@@ -23,6 +24,17 @@ class Tools extends ChangeNotifier {
     return temp[0].toUpperCase() + temp.substring(1);
   }
 
+  String getTranslatedImportanceLabel(
+      BuildContext context, Importance importance) {
+    List<String> _importances = [
+      AppLocalizations.of(context).low,
+      AppLocalizations.of(context).normal,
+      AppLocalizations.of(context).important,
+      AppLocalizations.of(context).urgent
+    ];
+    return _importances[importance.index];
+  }
+
   Importance getImportanceValueFromLabel(String label) {
     for (int i = 0; i < Importance.values.length; i++) {
       if (getImportanceLabel(Importance.values[i]) == label)
@@ -44,7 +56,7 @@ class Tools extends ChangeNotifier {
   }
 
   //Home Page
-  FetchStatus _fetchStatus = FetchStatus.unfetched;
+  FetchStatus _fetchStatus = FetchStatus.duringFetching;
   FetchStatus get fetchStatus => _fetchStatus;
   set fetchStatus(FetchStatus status) {
     _fetchStatus = status;

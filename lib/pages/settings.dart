@@ -3,29 +3,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/models/shopping_list.dart';
+import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Settings extends ConsumerWidget {
-  void _signOut(BuildContext context, Ref ref) {
+  void _signOut(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.read(toolsProvider);
     final firebaseAuthVM = ref.read(firebaseAuthProvider);
     ref.read(shoppingListsProvider).clearDisplayedData();
     Hive.box<ShoppingList>('shopping_lists').clear();
     Hive.box<int>('data_variables').clear();
     toolsVM.clearAuthenticationTextEditingControllers();
-    Navigator.pop(context);
     firebaseAuthVM.signOut();
+    firebaseAuthVM.status = Status.Unauthenticated;
+    Navigator.pop(context);
   }
 
-  void _changeNickname(BuildContext context, Ref ref) {
+  void _changeNickname(BuildContext context, WidgetRef ref) {
     final firebaseAuthVM = ref.read(firebaseAuthProvider);
     final toolsVM = ref.read(toolsProvider);
     firebaseAuthVM.changeNickname(toolsVM.newNicknameController.text);
   }
 
-  void _showDialogWithChangeNickname(BuildContext context, Ref ref) {
+  void _showDialogWithChangeNickname(BuildContext context, WidgetRef ref) {
     ref.read(toolsProvider).clearNewNicknameController();
     showDialog(
         context: context,
@@ -34,7 +36,7 @@ class Settings extends ConsumerWidget {
         });
   }
 
-  void _deleteAccount(BuildContext context, Ref ref) {
+  void _deleteAccount(BuildContext context, WidgetRef ref) {
     ref.read(firebaseProvider).deleteEveryDataRelatedToCurrentUser();
     Navigator.of(context).pop();
   }

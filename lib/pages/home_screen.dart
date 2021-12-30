@@ -1,10 +1,12 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
+import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
@@ -33,7 +35,7 @@ class _HomeScreen extends State<HomeScreen> {
     if (ref.read(firebaseAuthProvider).auth.currentUser != null) {
       fetchData(ref);
     }
-    adBanner.load();
+    if (!kDebugMode) adBanner.load();
   }
 
   void _whenInternetConnectionIsRestoredCompareDatabasesAgain(WidgetRef ref) {
@@ -183,7 +185,7 @@ class _HomeScreen extends State<HomeScreen> {
                 child: Container(
                     height: 50,
                     width: screenSize.width,
-                    child: AdWidget(ad: adBanner))),
+                    child: !kDebugMode ? AdWidget(ad: adBanner) : Container())),
             // child: Container()))
           ],
         ));

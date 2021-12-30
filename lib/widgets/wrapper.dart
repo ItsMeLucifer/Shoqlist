@@ -10,7 +10,6 @@ class Wrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     firebaseAuthVM.addListenerToFirebaseAuth();
-    firebaseAuthVM.setExceptionMessagesTranslations(context);
     switch (firebaseAuthVM.status) {
       case Status.Authenticated:
         return HomeScreen(ref);

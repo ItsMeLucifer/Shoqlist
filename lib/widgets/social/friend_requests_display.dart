@@ -38,8 +38,11 @@ class FriendRequestsDisplay extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 5),
-                  Text(AppLocalizations.of(context).friendRequests,
-                      style: Theme.of(context).primaryTextTheme.headline4),
+                  Text(
+                    AppLocalizations.of(context).friendRequests,
+                    style: Theme.of(context).primaryTextTheme.headline4,
+                    textAlign: TextAlign.center,
+                  ),
                   Divider(
                     color: Theme.of(context).colorScheme.secondary,
                     indent: 50,

@@ -25,6 +25,8 @@ final loyaltyCardsProvider =
 final toolsProvider = ChangeNotifierProvider((_) => Tools());
 final firebaseAuthProvider =
     ChangeNotifierProvider((_) => FirebaseAuthViewModel());
+// final firebaseAuthDataProvider =
+//     ChangeNotifierProvider((_) => FirebaseAuthViewModel.instance());
 final friendsServiceProvider =
     ChangeNotifierProvider((_) => FriendsServiceViewModel());
 final ChangeNotifierProvider<FirebaseViewModel> firebaseProvider =
@@ -40,7 +42,7 @@ final ChangeNotifierProvider<FirebaseViewModel> firebaseProvider =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //Firebase - NoSQL databese in the cloud
+  //Firebase - NoSQL cloud database
   await Firebase.initializeApp();
 
   //HIVE - Local NoSQL database

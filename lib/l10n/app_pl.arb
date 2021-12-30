@@ -91,5 +91,12 @@
     "noFriendRequestsMsg": "Nie masz żadnych zaproszeń do znajomych",
     "acceptFriendRequestTitle": "Zaakceptować zaproszenie do znajomych?",
     "cantFindUserMsg": "Nie znaleziono użytkownika z podanym adresem e-mail, spróbuj ponownie",
-    "sendFriendRequestTitle": "Wysłać zaproszenie do znajomych?"
+    "sendFriendRequestTitle": "Wysłać zaproszenie do znajomych?",
+
+
+
+    "low": "Mało ważne",
+    "normal": "Normalne",
+    "important": "Ważne",
+    "urgent": "Pilne"
 }

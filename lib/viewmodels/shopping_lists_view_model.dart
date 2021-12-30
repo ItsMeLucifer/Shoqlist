@@ -55,6 +55,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
 
   void overrideShoppingListsLocally(
       List<ShoppingList> lists, int timestamp, String userId) async {
+    clearDisplayedData();
     _shoppingLists = lists;
     currentUserId = userId;
     filterDisplayedShoppingLists();
@@ -73,7 +74,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void displayLocalShoppingLists(String userId) {
-    _shoppingLists.clear();
+    clearDisplayedData();
     currentUserId = userId;
     _box.toMap().forEach((key, value) {
       _shoppingLists.add(value);

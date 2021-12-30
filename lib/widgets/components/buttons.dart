@@ -82,7 +82,7 @@ class BasicButton extends ConsumerWidget {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
-        _onTap(context);
+        _onTap(context, ref);
       },
       child: Container(
           width: screenSize.width * _percentageOfScreenWidth,

@@ -8,6 +8,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 enum Status { Authenticated, Unauthenticated, DuringAuthorization }
 
 class FirebaseAuthViewModel extends ChangeNotifier {
+  // FirebaseAuthViewModel.instance() : _auth = FirebaseAuth.instance {
+  //   _auth.authStateChanges().listen(_onAuthStateChanged);
+  // }
+  FirebaseAuthViewModel();
   //AUTHENTICATION
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseAuth get auth => _auth;
@@ -19,10 +23,10 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  String _exceptionMessage = "";
-  String get exceptionMessage => _exceptionMessage;
+  int _exceptionMessageIndex = 10;
+  int get exceptionMessageIndex => _exceptionMessageIndex;
   void resetExceptionMessage() {
-    _exceptionMessage = "";
+    _exceptionMessageIndex = 10;
     notifyListeners();
   }
 
@@ -32,6 +36,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
 
   model.User currentUser = model.User('Nickname', 'Email', 'UserId');
   void _setCurrentUserCredentials() async {
+    if (_auth.currentUser == null || status == Status.Unauthenticated) return;
     DocumentSnapshot document = await FirebaseFirestore.instance
         .collection('users')
         .doc(auth.currentUser.uid)
@@ -42,37 +47,20 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setExceptionMessagesTranslations(BuildContext context) {
-    _exceptionMessages = [
-      AppLocalizations.of(context).undefinedExc,
-      AppLocalizations.of(context).noUserExc,
-      AppLocalizations.of(context).passwordExc,
-      AppLocalizations.of(context).emailExc,
-      AppLocalizations.of(context).userDisabledExc,
-      AppLocalizations.of(context).emptyFieldExc,
-      AppLocalizations.of(context).weakPasswordExc,
-      AppLocalizations.of(context).emailInUseExc,
-      AppLocalizations.of(context).googleSignInExc,
-      AppLocalizations.of(context).anonymousSignInExc
-    ];
-  }
+  void setExceptionMessagesTranslations(BuildContext context) {}
 
-  List<String> _exceptionMessages = [
-    "An undefined Error happened",
-    "No user found for that email",
-    "Wrong password provided for that user",
-    "Invalid email",
-    "User disabled",
-    "At least one of the fields is empty",
-    "The password provided is too weak",
-    "The account already exists for that email",
-    "Error with Google sign-in",
-    "Error with anonymously sign-in"
-  ];
-  set exceptionMessages(List<String> newExceptionMessages) {
-    _exceptionMessages = newExceptionMessages;
-    notifyListeners();
-  }
+  // List<String> _exceptionMessages = [
+  //   "An undefined Error happened",
+  //   "No user found for that email",
+  //   "Wrong password provided for that user",
+  //   "Invalid email",
+  //   "User disabled",
+  //   "At least one of the fields is empty",
+  //   "The password provided is too weak",
+  //   "The account already exists for that email",
+  //   "Error with Google sign-in",
+  //   "Error with anonymously sign-in"
+  // ];
 
   Future<void> signIn(String email, String password) async {
     status = Status.DuringAuthorization;
@@ -81,21 +69,21 @@ class FirebaseAuthViewModel extends ChangeNotifier {
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = _exceptionMessages[0];
+      _exceptionMessageIndex = 0;
       if (e.code == 'user-not-found') {
-        _exceptionMessage = _exceptionMessages[1];
+        _exceptionMessageIndex = 1;
       } else if (e.code == 'wrong-password') {
-        _exceptionMessage = _exceptionMessages[2];
+        _exceptionMessageIndex = 2;
       } else if (e.code == 'invalid-email') {
-        _exceptionMessage = _exceptionMessages[3];
+        _exceptionMessageIndex = 3;
       } else if (e.code == 'user-disabled') {
-        _exceptionMessage = _exceptionMessages[4];
+        _exceptionMessageIndex = 4;
       }
     } catch (e) {
       print(e);
     }
     if (email == "" || password == "") {
-      _exceptionMessage = _exceptionMessages[5];
+      _exceptionMessageIndex = 5;
     }
   }
 
@@ -113,17 +101,17 @@ class FirebaseAuthViewModel extends ChangeNotifier {
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = _exceptionMessages[0];
+      _exceptionMessageIndex = 0;
       if (e.code == 'weak-password') {
-        _exceptionMessage = _exceptionMessages[6];
+        _exceptionMessageIndex = 6;
       } else if (e.code == 'email-already-in-use') {
-        _exceptionMessage = _exceptionMessages[7];
+        _exceptionMessageIndex = 7;
       }
     } catch (e) {
       print(e);
     }
     if (email == "" || password == "") {
-      _exceptionMessage = _exceptionMessages[5];
+      _exceptionMessageIndex = 5;
     }
     checkIfUserDocumentWasCreated();
   }
@@ -139,7 +127,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
       userCredential = await _auth.signInWithCredential(credential);
     } catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = _exceptionMessages[8];
+      _exceptionMessageIndex = 8;
       print(e);
     }
     checkIfUserDocumentWasCreated();
@@ -151,7 +139,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
       userCredential = await _auth.signInAnonymously();
     } catch (e) {
       status = Status.Unauthenticated;
-      _exceptionMessage = _exceptionMessages[9];
+      _exceptionMessageIndex = 9;
       print(e);
     }
     checkIfUserDocumentWasCreated();
@@ -178,14 +166,14 @@ class FirebaseAuthViewModel extends ChangeNotifier {
 
   Future<void> signOut() async {
     status = Status.Unauthenticated;
-    _exceptionMessage = "";
+    _exceptionMessageIndex = 10;
     notifyListeners();
     await _auth.signOut();
   }
 
   Future<void> deleteAccount() async {
     status = Status.Unauthenticated;
-    _exceptionMessage = "";
+    _exceptionMessageIndex = 10;
     notifyListeners();
     await _auth.currentUser.delete();
   }

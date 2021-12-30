@@ -7,20 +7,20 @@ import 'package:shoqlist/widgets/components/forms.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Authentication extends ConsumerWidget {
-  void _registerUserFirebase(BuildContext context, Ref ref) {
+  void _registerUserFirebase(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.read(toolsProvider);
     ref.read(firebaseAuthProvider).register(
         toolsVM.emailController.text, toolsVM.passwordController.text);
   }
 
-  void _signInUserFirebase(BuildContext context, Ref ref) {
+  void _signInUserFirebase(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.read(toolsProvider);
     ref
         .read(firebaseAuthProvider)
         .signIn(toolsVM.emailController.text, toolsVM.passwordController.text);
   }
 
-  void _resetExceptionMessage(BuildContext context, Ref ref) {
+  void _resetExceptionMessage(BuildContext context, WidgetRef ref) {
     ref.read(firebaseAuthProvider).resetExceptionMessage();
   }
 
@@ -28,6 +28,19 @@ class Authentication extends ConsumerWidget {
     final toolsVM = ref.watch(toolsProvider);
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
+    List<String> _exceptionMessages = [
+      AppLocalizations.of(context).undefinedExc,
+      AppLocalizations.of(context).noUserExc,
+      AppLocalizations.of(context).passwordExc,
+      AppLocalizations.of(context).emailExc,
+      AppLocalizations.of(context).userDisabledExc,
+      AppLocalizations.of(context).emptyFieldExc,
+      AppLocalizations.of(context).weakPasswordExc,
+      AppLocalizations.of(context).emailInUseExc,
+      AppLocalizations.of(context).googleSignInExc,
+      AppLocalizations.of(context).anonymousSignInExc,
+      ''
+    ];
     Widget _passwordVisibilityWidget = GestureDetector(
       onTap: () {
         ref.read(toolsProvider).showPassword =
@@ -68,7 +81,7 @@ class Authentication extends ConsumerWidget {
                           ? CircularProgressIndicator()
                           : Container()),
                   Text(
-                    firebaseAuthVM.exceptionMessage,
+                    _exceptionMessages[firebaseAuthVM.exceptionMessageIndex],
                     style: TextStyle(color: Colors.red, fontSize: 12),
                     textAlign: TextAlign.center,
                   ),

@@ -304,5 +304,24 @@
     "sendFriendRequestTitle": "Send friend request?",
     "@sendFriendRequestTitle":{
         "description": "Message displayed when you want to send a friend request"
+    },
+
+
+
+    "low": "Low",
+    "@low":{
+        "description": "The lowest importance word"
+    },
+    "normal": "Normal",
+    "@normal":{
+        "description": "The normal importance word"
+    },
+    "important": "Important",
+    "@important":{
+        "description": "The important importance word"
+    },
+    "urgent": "Urgent",
+    "@urgent":{
+        "description": "The urgent importance word"
     }
 }

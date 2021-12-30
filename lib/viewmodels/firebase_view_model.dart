@@ -41,8 +41,6 @@ class FirebaseViewModel extends ChangeNotifier {
       bool shouldCompareCloudDataWithLocalOne) async {
     if (_firebaseAuth.auth.currentUser == null) return;
     //Fetch shopping lists
-    _toolsVM.fetchStatus = FetchStatus.duringFetching;
-    _shoppingListsFetchedFromFirebase.clear();
     _sharedShoppingListsFetchedFromFirebase.clear();
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
@@ -54,62 +52,61 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('lists')
         .get()
-        .then((QuerySnapshot querySnapshot) => {
-              if (querySnapshot.size > 0)
-                {
-                  querySnapshot.docs.forEach((doc) {
-                    _shoppingListsFetchedFromFirebase.add(doc);
-                  })
-                }
-            })
-        .catchError((error) {
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.size > 0) {
+        _shoppingListsFetchedFromFirebase.clear();
+        querySnapshot.docs.forEach((doc) {
+          _shoppingListsFetchedFromFirebase.add(doc);
+        });
+      }
+    }).catchError((error) {
       _toolsVM.printWarning(
           "Failed to fetch shopping lists data from Firebase: $error");
     });
     //Fetch informations about shared shopping lists
-    List<QueryDocumentSnapshot> _infoAboutSharedShoppingLists = [];
-    _infoAboutSharedShoppingLists.clear();
+    List<DocumentSnapshot> _sharedListsReferences = [];
     await users
         .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('sharedLists')
         .get()
-        .then((QuerySnapshot querySnapshot) => {
-              querySnapshot.docs.forEach((doc) {
-                _infoAboutSharedShoppingLists.add(doc);
-              })
-            })
-        .catchError((error) {
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.size > 0) {
+        querySnapshot.docs.forEach((doc) {
+          _sharedListsReferences.add(doc);
+        });
+      }
+    }).catchError((error) {
       _toolsVM.printWarning(
           "Failed to fetch informations about shared shopping lists from Firebase: $error");
     });
-    await getSharedShoppingListsData(_infoAboutSharedShoppingLists);
-    _toolsVM.fetchStatus = FetchStatus.fetched;
-    if (_toolsVM.refreshStatus == RefreshStatus.duringRefresh) {
-      _toolsVM.refreshStatus = RefreshStatus.refreshed;
-    }
+    await getDocumentsFromReferences(_sharedListsReferences);
     if (shouldCompareCloudDataWithLocalOne) {
       compareDiscrepanciesBetweenCloudAndLocalData();
     } else {
       addFetchedShoppingListsDataToLocalList();
     }
+    _toolsVM.fetchStatus = FetchStatus.fetched;
+    if (_toolsVM.refreshStatus == RefreshStatus.duringRefresh) {
+      _toolsVM.refreshStatus = RefreshStatus.refreshed;
+    }
   }
 
-  Future<void> getSharedShoppingListsData(
-      List<QueryDocumentSnapshot> _infoAboutSharedShoppingLists) async {
-    for (int i = 0; i < _infoAboutSharedShoppingLists.length; i++) {
-      //Fetching data from the owner of shared shopping list
-      DocumentSnapshot doc = await users
-          .doc(_infoAboutSharedShoppingLists[i].get('ownerId'))
+  Future<void> getDocumentsFromReferences(List<DocumentSnapshot> _list) async {
+    _sharedShoppingListsFetchedFromFirebase.clear();
+    for (DocumentSnapshot doc in _list) {
+      await users
+          .doc(doc.get('ownerId'))
           .collection('lists')
-          .doc(_infoAboutSharedShoppingLists[i].get('documentId'))
+          .doc(doc.get('documentId'))
           .get()
+          .then((DocumentSnapshot document) => {
+                if (document.exists)
+                  {_sharedShoppingListsFetchedFromFirebase.add(document)}
+              })
           .catchError((error) {
         _toolsVM.printWarning(
             "Failed to fetch shared shopping lists data from Firebase: $error");
       });
-      if (doc != null && doc.exists) {
-        _sharedShoppingListsFetchedFromFirebase.add(doc);
-      }
     }
   }
 
@@ -252,9 +249,9 @@ class FirebaseViewModel extends ChangeNotifier {
           _sharedShoppingListsFetchedFromFirebase[i].get('ownerId'),
           usersWithAccess));
     }
-    result = new List.from(shoppingLists)..addAll(sharedLists);
+    result = [...shoppingLists, ...sharedLists];
     _shoppingListsVM.overrideShoppingListsLocally(
-        result, _cloudTimestamp, _firebaseAuth.currentUser.userId);
+        result, _cloudTimestamp, _firebaseAuth.auth.currentUser.uid);
   }
 
   void putShoppingListToFirebase(
