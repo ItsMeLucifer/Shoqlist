@@ -11,24 +11,24 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../main.dart';
 
 class LoyaltyCardsHandler extends ConsumerWidget {
-  void _removeLoyaltyCard(BuildContext context) {
+  void _removeLoyaltyCard(BuildContext context, WidgetRef ref) {
     //DELETE LIST ON FIREBASE
-    context.read(firebaseProvider).deleteLoyaltyCardOnFirebase(context
+    ref.read(firebaseProvider).deleteLoyaltyCardOnFirebase(ref
         .read(loyaltyCardsProvider)
         .loyaltyCardsList[
-            context.read(loyaltyCardsProvider).currentLoyaltyCardsListIndex]
+            ref.read(loyaltyCardsProvider).currentLoyaltyCardsListIndex]
         .documentId);
     //DELETE LIST LOCALLY
-    context.read(loyaltyCardsProvider).deleteLoyaltyCardLocally(
-        context.read(loyaltyCardsProvider).currentLoyaltyCardsListIndex);
+    ref.read(loyaltyCardsProvider).deleteLoyaltyCardLocally(
+        ref.read(loyaltyCardsProvider).currentLoyaltyCardsListIndex);
     Navigator.of(context).pop();
     Navigator.of(context).pop();
   }
 
-  void _addNewLoyaltyCard(BuildContext context) {
-    final toolsVM = context.read(toolsProvider);
-    final firebaseVM = context.read(firebaseProvider);
-    final loyaltyCardsVM = context.read(loyaltyCardsProvider);
+  void _addNewLoyaltyCard(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.read(toolsProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final loyaltyCardsVM = ref.read(loyaltyCardsProvider);
     if (toolsVM.loyaltyCardNameController.text != "" &&
         toolsVM.loyaltyCardBarCodeController.text != "") {
       String id = nanoid();
@@ -48,10 +48,10 @@ class LoyaltyCardsHandler extends ConsumerWidget {
     Navigator.of(context).pop();
   }
 
-  void _updateLoyaltyCardData(BuildContext context) {
-    final firebaseVM = context.read(firebaseProvider);
-    final toolsVM = context.read(toolsProvider);
-    final loyaltyCardsVM = context.read(loyaltyCardsProvider);
+  void _updateLoyaltyCardData(BuildContext context, WidgetRef ref) {
+    final firebaseVM = ref.read(firebaseProvider);
+    final toolsVM = ref.read(toolsProvider);
+    final loyaltyCardsVM = ref.read(loyaltyCardsProvider);
     //Firebase
     firebaseVM.updateLoyaltyCard(
         toolsVM.loyaltyCardNameController.text,
@@ -68,11 +68,11 @@ class LoyaltyCardsHandler extends ConsumerWidget {
     Navigator.of(context).pop();
   }
 
-  void _onRefresh(BuildContext context) {
-    context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
+  void _onRefresh(WidgetRef ref) {
+    ref.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
   }
 
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: SafeArea(
@@ -84,23 +84,23 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                 Text(AppLocalizations.of(context).loyaltyCards,
                     style: Theme.of(context).primaryTextTheme.headline4),
                 Divider(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                   indent: 50,
                   endIndent: 50,
                 ),
                 Expanded(
                   child: LiquidPullToRefresh(
-                      backgroundColor: Theme.of(context).accentColor,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
                       color: Theme.of(context).primaryColor,
                       height: 50,
                       animSpeedFactor: 5,
                       showChildOpacityTransition: false,
                       onRefresh: () async {
-                        _onRefresh(context);
+                        _onRefresh(ref);
                       },
                       child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: loyaltyCardsList(watch))),
+                          child: loyaltyCardsList(ref))),
                 ),
               ],
             ),
@@ -110,9 +110,9 @@ class LoyaltyCardsHandler extends ConsumerWidget {
     );
   }
 
-  Widget loyaltyCardsList(ScopedReader watch) {
-    final loyaltyCardsVM = watch(loyaltyCardsProvider);
-    final toolsVM = watch(toolsProvider);
+  Widget loyaltyCardsList(WidgetRef ref) {
+    final loyaltyCardsVM = ref.watch(loyaltyCardsProvider);
+    final toolsVM = ref.watch(toolsProvider);
     return GridView.builder(
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),

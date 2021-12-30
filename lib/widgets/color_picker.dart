@@ -8,9 +8,9 @@ class ColorPicker extends ConsumerWidget {
   final double _colorPickerHeight;
   ColorPicker(this._colorPickerWidth, this._colorPickerHeight);
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final loyaltyCardsVM = watch(loyaltyCardsProvider);
-    final toolsVM = watch(toolsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loyaltyCardsVM = ref.watch(loyaltyCardsProvider);
+    final toolsVM = ref.watch(toolsProvider);
     return Container(
       height: _colorPickerHeight,
       width: _colorPickerWidth,

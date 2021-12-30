@@ -10,7 +10,7 @@ class LoyaltyCardButton extends ConsumerWidget {
   final bool isFavorite;
   final Color color;
   LoyaltyCardButton(this.cardName, this.isFavorite, this.color);
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       color: color,
       child: Padding(
@@ -44,8 +44,8 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
   final String _buttonName;
   final ShoppingListType _shoppingListType;
   ShoppingListTypeChangeButton(this._buttonName, this._shoppingListType);
-  Widget build(BuildContext context, ScopedReader watch) {
-    final shoppingListsVM = watch(shoppingListsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
@@ -55,7 +55,7 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
           decoration: BoxDecoration(
               color: shoppingListsVM.currentlyDisplayedListType ==
                       _shoppingListType
-                  ? Theme.of(context).accentColor.withOpacity(0.1)
+                  ? Theme.of(context).colorScheme.secondary.withOpacity(0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(5)),
           width: screenSize.width * 0.45,
@@ -78,7 +78,7 @@ class BasicButton extends ConsumerWidget {
   final IconData _iconData;
   BasicButton(this._onTap, this._buttonName, this._percentageOfScreenWidth,
       [this._iconData]);
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
@@ -88,7 +88,7 @@ class BasicButton extends ConsumerWidget {
           width: screenSize.width * _percentageOfScreenWidth,
           height: 40,
           decoration: BoxDecoration(
-            color: Theme.of(context).buttonColor,
+            color: Theme.of(context).buttonTheme.colorScheme.background,
             borderRadius: BorderRadius.circular(5),
           ),
           child: Padding(
@@ -100,7 +100,8 @@ class BasicButton extends ConsumerWidget {
                         style: Theme.of(context).primaryTextTheme.button,
                         textAlign: TextAlign.center,
                       )
-                    : Icon(_iconData, color: Theme.of(context).accentColor)),
+                    : Icon(_iconData,
+                        color: Theme.of(context).colorScheme.secondary)),
           )),
     );
   }
@@ -111,7 +112,7 @@ class WarningButton extends ConsumerWidget {
   final String _buttonName;
   final double _percentageOfScreenWidth;
   WarningButton(this._onTap, this._buttonName, this._percentageOfScreenWidth);
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
@@ -126,7 +127,7 @@ class WarningButton extends ConsumerWidget {
           width: screenSize.width * _percentageOfScreenWidth,
           height: 40,
           decoration: BoxDecoration(
-              color: Theme.of(context).buttonColor,
+              color: Theme.of(context).buttonTheme.colorScheme.background,
               borderRadius: BorderRadius.circular(5),
               border: Border.all(color: Colors.red, width: 2)),
           child: Padding(

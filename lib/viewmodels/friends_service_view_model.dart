@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:shoqlist/models/user.dart';
 
 class FriendsServiceViewModel extends ChangeNotifier {
-  List<User> _friendsList = List<User>();
+  List<User> _friendsList = [];
   List<User> get friendsList => _friendsList;
 
-  List<User> _friendRequestsList = List<User>();
+  List<User> _friendRequestsList = [];
   List<User> get friendRequestsList => _friendRequestsList;
 
-  List<User> _usersList = List<User>();
+  List<User> _usersList = [];
   List<User> get usersList => _usersList;
 
   void clearUsersList() {

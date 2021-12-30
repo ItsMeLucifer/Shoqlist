@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
@@ -8,34 +7,34 @@ import 'package:shoqlist/widgets/components/forms.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Authentication extends ConsumerWidget {
-  void _registerUserFirebase(BuildContext context) {
-    final toolsVM = context.read(toolsProvider);
-    context.read(firebaseAuthProvider).register(
+  void _registerUserFirebase(BuildContext context, Ref ref) {
+    final toolsVM = ref.read(toolsProvider);
+    ref.read(firebaseAuthProvider).register(
         toolsVM.emailController.text, toolsVM.passwordController.text);
   }
 
-  void _signInUserFirebase(BuildContext context) {
-    final toolsVM = context.read(toolsProvider);
-    context
+  void _signInUserFirebase(BuildContext context, Ref ref) {
+    final toolsVM = ref.read(toolsProvider);
+    ref
         .read(firebaseAuthProvider)
         .signIn(toolsVM.emailController.text, toolsVM.passwordController.text);
   }
 
-  void _resetExceptionMessage(BuildContext context) {
-    context.read(firebaseAuthProvider).resetExceptionMessage();
+  void _resetExceptionMessage(BuildContext context, Ref ref) {
+    ref.read(firebaseAuthProvider).resetExceptionMessage();
   }
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
-    final firebaseAuthVM = watch(firebaseAuthProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.watch(toolsProvider);
+    final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
     Widget _passwordVisibilityWidget = GestureDetector(
       onTap: () {
-        context.read(toolsProvider).showPassword =
-            !context.read(toolsProvider).showPassword;
+        ref.read(toolsProvider).showPassword =
+            !ref.read(toolsProvider).showPassword;
       },
       child: Icon(
-          !context.read(toolsProvider).showPassword
+          !ref.read(toolsProvider).showPassword
               ? Icons.visibility_off
               : Icons.visibility,
           color: Colors.grey),

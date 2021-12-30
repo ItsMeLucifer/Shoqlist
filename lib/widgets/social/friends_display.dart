@@ -10,16 +10,16 @@ import 'package:shoqlist/widgets/social/users_list.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FriendsDisplay extends ConsumerWidget {
-  void _removeUserFromFriendsListAfterTap(BuildContext context) {
-    final firebaseVM = context.read(firebaseProvider);
-    final friendsServiceVM = context.read(friendsServiceProvider);
+  void _removeUserFromFriendsListAfterTap(BuildContext context, WidgetRef ref) {
+    final firebaseVM = ref.read(firebaseProvider);
+    final friendsServiceVM = ref.read(friendsServiceProvider);
     User user = friendsServiceVM.friendsList[friendsServiceVM.currentUserIndex];
     firebaseVM.removeFriendFromFriendsList(user);
     Navigator.of(context).pop();
   }
 
-  void _navigateToFriendsSearchList(BuildContext context) {
-    context.read(friendsServiceProvider).clearUsersList();
+  void _navigateToFriendsSearchList(BuildContext context, WidgetRef ref) {
+    ref.read(friendsServiceProvider).clearUsersList();
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => FriendsSearchDisplay()));
   }
@@ -29,12 +29,12 @@ class FriendsDisplay extends ConsumerWidget {
         MaterialPageRoute(builder: (context) => FriendRequestsDisplay()));
   }
 
-  void _onRefresh(BuildContext context) {
-    context.read(firebaseProvider).fetchFriendsList();
+  void _onRefresh(WidgetRef ref) {
+    ref.read(firebaseProvider).fetchFriendsList();
   }
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final friendsServiceVM = watch(friendsServiceProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final friendsServiceVM = ref.watch(friendsServiceProvider);
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: SpeedDial(
@@ -51,7 +51,7 @@ class FriendsDisplay extends ConsumerWidget {
                       .backgroundColor,
                   labelStyle: Theme.of(context).textTheme.bodyText2,
                   onTap: () {
-                    _navigateToFriendsSearchList(context);
+                    _navigateToFriendsSearchList(context, ref);
                     friendsServiceVM.clearSearchFriendTextController();
                   },
                   label: AppLocalizations.of(context).searchFriends,
@@ -93,19 +93,20 @@ class FriendsDisplay extends ConsumerWidget {
                   Text(AppLocalizations.of(context).friends,
                       style: Theme.of(context).primaryTextTheme.headline4),
                   Divider(
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                     indent: 50,
                     endIndent: 50,
                   ),
                   Expanded(
                     child: LiquidPullToRefresh(
-                        backgroundColor: Theme.of(context).accentColor,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
                         color: Theme.of(context).primaryColor,
                         height: 50,
                         animSpeedFactor: 5,
                         showChildOpacityTransition: false,
                         onRefresh: () async {
-                          _onRefresh(context);
+                          _onRefresh(ref);
                         },
                         child: friendsServiceVM.friendsList.isEmpty
                             ? ListView(

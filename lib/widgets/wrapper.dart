@@ -7,12 +7,12 @@ import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
 
 class Wrapper extends ConsumerWidget {
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final firebaseAuthVM = watch(firebaseAuthProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     firebaseAuthVM.addListenerToFirebaseAuth();
     switch (firebaseAuthVM.status) {
       case Status.Authenticated:
-        return HomeScreen();
+        return HomeScreen(ref);
         break;
       case Status.Unauthenticated:
         return Authentication();

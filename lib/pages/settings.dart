@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -9,10 +8,10 @@ import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Settings extends ConsumerWidget {
-  void _signOut(BuildContext context) {
-    final toolsVM = context.read(toolsProvider);
-    final firebaseAuthVM = context.read(firebaseAuthProvider);
-    context.read(shoppingListsProvider).clearDisplayedData();
+  void _signOut(BuildContext context, Ref ref) {
+    final toolsVM = ref.read(toolsProvider);
+    final firebaseAuthVM = ref.read(firebaseAuthProvider);
+    ref.read(shoppingListsProvider).clearDisplayedData();
     Hive.box<ShoppingList>('shopping_lists').clear();
     Hive.box<int>('data_variables').clear();
     toolsVM.clearAuthenticationTextEditingControllers();
@@ -20,14 +19,14 @@ class Settings extends ConsumerWidget {
     firebaseAuthVM.signOut();
   }
 
-  void _changeNickname(BuildContext context) {
-    final firebaseAuthVM = context.read(firebaseAuthProvider);
-    final toolsVM = context.read(toolsProvider);
+  void _changeNickname(BuildContext context, Ref ref) {
+    final firebaseAuthVM = ref.read(firebaseAuthProvider);
+    final toolsVM = ref.read(toolsProvider);
     firebaseAuthVM.changeNickname(toolsVM.newNicknameController.text);
   }
 
-  void _showDialogWithChangeNickname(BuildContext context) {
-    context.read(toolsProvider).clearNewNicknameController();
+  void _showDialogWithChangeNickname(BuildContext context, Ref ref) {
+    ref.read(toolsProvider).clearNewNicknameController();
     showDialog(
         context: context,
         builder: (context) {
@@ -35,15 +34,15 @@ class Settings extends ConsumerWidget {
         });
   }
 
-  void _deleteAccount(BuildContext context) {
-    context.read(firebaseProvider).deleteEveryDataRelatedToCurrentUser();
+  void _deleteAccount(BuildContext context, Ref ref) {
+    ref.read(firebaseProvider).deleteEveryDataRelatedToCurrentUser();
     Navigator.of(context).pop();
   }
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final firebaseAuthVM = watch(firebaseAuthProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
-    final toolsVM = watch(toolsProvider);
+    final toolsVM = ref.watch(toolsProvider);
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: SingleChildScrollView(
@@ -56,7 +55,7 @@ class Settings extends ConsumerWidget {
                 Text(AppLocalizations.of(context).settings,
                     style: Theme.of(context).primaryTextTheme.headline3),
                 Divider(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                   indent: 50,
                   endIndent: 50,
                 ),
@@ -81,7 +80,7 @@ class Settings extends ConsumerWidget {
                               ),
                               SizedBox(width: screenSize.width * 0.02),
                               VerticalDivider(
-                                color: Theme.of(context).accentColor,
+                                color: Theme.of(context).colorScheme.secondary,
                                 indent: screenSize.height * 0.01,
                                 endIndent: screenSize.height * 0.01,
                               ),

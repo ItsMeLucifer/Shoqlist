@@ -65,7 +65,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   List<ShoppingList> getLocalShoppingList() {
-    List<ShoppingList> lists = List<ShoppingList>();
+    List<ShoppingList> lists = [];
     _box.toMap().forEach((key, value) {
       lists.add(value);
     });

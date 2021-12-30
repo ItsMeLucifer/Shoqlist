@@ -5,8 +5,8 @@ import 'package:shoqlist/main.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class LoyaltyCardInfo extends ConsumerWidget {
-  Widget build(BuildContext context, ScopedReader watch) {
-    final loyaltyCardsVM = watch(loyaltyCardsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loyaltyCardsVM = ref.watch(loyaltyCardsProvider);
     return AlertDialog(
       backgroundColor: Colors.white,
       contentPadding: EdgeInsets.fromLTRB(6, 6, 6, 6),
@@ -43,7 +43,7 @@ class LoyaltyCardInfo extends ConsumerWidget {
                     .documentId;
                 Navigator.of(context).pop();
                 //FIREBASE
-                context
+                ref
                     .read(firebaseProvider)
                     .toggleFavoriteOfLoyaltyCardOnFirebase(documentId);
                 //LOCALLY

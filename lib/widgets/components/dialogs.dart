@@ -16,7 +16,7 @@ class YesNoDialog extends ConsumerWidget {
   final Function _onDeclined;
   YesNoDialog(this._onAccepted, this._titleToDisplay, [this._onDeclined]);
 
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
       backgroundColor: Theme.of(context).backgroundColor,
       content: Padding(
@@ -60,8 +60,8 @@ class PutShoppingListData extends ConsumerWidget {
   PutShoppingListData(this._onPressedSave, this.context,
       [this._deleteNotificationTitle = '', this._onPressedDelete]);
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.watch(toolsProvider);
     return SimpleDialog(
         backgroundColor: Theme.of(context).backgroundColor,
         children: [
@@ -102,7 +102,8 @@ class PutShoppingListData extends ConsumerWidget {
                           focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                   width: 1,
-                                  color: Theme.of(context).accentColor)),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary)),
                         ),
                       ),
                     ),
@@ -150,7 +151,10 @@ class PutShoppingListData extends ConsumerWidget {
                       : MainAxisAlignment.center,
                   children: [
                     FlatButton(
-                        color: Theme.of(context).buttonColor,
+                        color: Theme.of(context)
+                            .buttonTheme
+                            .colorScheme
+                            .background,
                         onPressed: () {
                           _onPressedSave(context);
                           Navigator.of(context).pop();
@@ -160,7 +164,10 @@ class PutShoppingListData extends ConsumerWidget {
                                 Theme.of(context).primaryTextTheme.bodyText1)),
                     _onPressedDelete != null
                         ? FlatButton(
-                            color: Theme.of(context).buttonColor,
+                            color: Theme.of(context)
+                                .buttonTheme
+                                .colorScheme
+                                .background,
                             onPressed: () {
                               showDialog(
                                   context: context,
@@ -189,7 +196,7 @@ class ChooseUser extends ConsumerWidget {
   final String _titleToDisplay;
   ChooseUser(this._actionAfterTapUser, this._usersList, this._titleToDisplay);
 
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     return AlertDialog(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -220,8 +227,8 @@ class ChangeName extends ConsumerWidget {
   final Function _onAccepted;
   final String _titleToDisplay;
   ChangeName(this._onAccepted, this._titleToDisplay);
-  Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
     return AlertDialog(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -274,8 +281,8 @@ class PutLoyaltyCardsData extends ConsumerWidget {
   final String _removeTitle;
   PutLoyaltyCardsData(this._onPressed, this._title,
       [this._onDestroy, this._removeTitle]);
-  Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.watch(toolsProvider);
     const double _alertDialogWidth = 250;
     const double _dividerHeight = 10;
     Widget _suffixIcon = GestureDetector(
@@ -286,7 +293,8 @@ class PutLoyaltyCardsData extends ConsumerWidget {
         if (toolsVM.loyaltyCardBarCodeController.text == '-1')
           toolsVM.loyaltyCardBarCodeController.text = '';
       },
-      child: Icon(Icons.qr_code, color: Theme.of(context).accentColor),
+      child:
+          Icon(Icons.qr_code, color: Theme.of(context).colorScheme.secondary),
     );
     return SimpleDialog(
         backgroundColor: Theme.of(context).backgroundColor,
@@ -332,7 +340,10 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                             ? Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
                                 child: FlatButton(
-                                    color: Theme.of(context).buttonColor,
+                                    color: Theme.of(context)
+                                        .buttonTheme
+                                        .colorScheme
+                                        .background,
                                     onPressed: () {
                                       showDialog(
                                           context: context,
@@ -350,7 +361,10 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                               )
                             : Container(),
                         FlatButton(
-                            color: Theme.of(context).buttonColor,
+                            color: Theme.of(context)
+                                .buttonTheme
+                                .colorScheme
+                                .background,
                             onPressed: () {
                               _onPressed(context);
                             },

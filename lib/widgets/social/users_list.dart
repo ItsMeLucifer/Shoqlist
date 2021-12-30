@@ -14,8 +14,8 @@ class UsersList extends ConsumerWidget {
   final double _elementWidth;
   UsersList(this._acceptAction, this._usersList,
       [this._dialogTitle, this._declineAction, this._elementWidth = 0.7]);
-  Widget build(BuildContext context, ScopedReader watch) {
-    final friendsServiceVM = watch(friendsServiceProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
     return ListView.builder(
         shrinkWrap: false,
@@ -45,7 +45,7 @@ class UsersList extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.person,
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.secondary,
                       ),
                       SizedBox(width: screenSize.width * 0.05 * _elementWidth),
                       Column(

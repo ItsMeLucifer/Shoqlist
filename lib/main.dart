@@ -10,7 +10,6 @@ import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:shoqlist/l10n/l10n.dart';
@@ -79,11 +78,15 @@ class MyApp extends StatelessWidget {
                   fontStyle: FontStyle.italic,
                   fontWeight: FontWeight.bold)),
           primaryColor: Colors.black,
-          accentColor: Colors.white,
+          colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: Colors.grey, accentColor: Colors.white),
+          buttonTheme: ButtonThemeData(
+              colorScheme: ColorScheme.fromSwatch(
+                  primarySwatch: Colors.grey,
+                  backgroundColor: Colors.grey[800])),
           disabledColor: Colors.grey[400],
           primaryColorDark: Colors.grey[600],
           primarySwatch: Colors.grey,
-          buttonColor: Colors.grey[800],
           floatingActionButtonTheme: FloatingActionButtonThemeData(
               backgroundColor: Colors.grey[850],
               foregroundColor: Colors.white)),

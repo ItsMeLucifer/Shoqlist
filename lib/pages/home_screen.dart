@@ -1,5 +1,4 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -14,39 +13,44 @@ import 'package:shoqlist/widgets/social/friends_display.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreen createState() => _HomeScreen();
+  final WidgetRef ref;
+  HomeScreen(this.ref);
+  State<HomeScreen> createState() => _HomeScreen(ref);
 }
 
 class _HomeScreen extends State<HomeScreen> {
+  final WidgetRef ref;
+  _HomeScreen(this.ref);
   final BannerAd adBanner = BannerAd(
       adUnitId: 'ca-app-pub-6556175768591042/6145501750',
       size: AdSize.banner,
       request: AdRequest(),
-      listener: AdListener());
+      listener: BannerAdListener());
 
   @override
   initState() {
     super.initState();
-    fetchData();
+    if (ref.read(firebaseAuthProvider).auth.currentUser != null) {
+      fetchData(ref);
+    }
     adBanner.load();
   }
 
-  void _whenInternetConnectionIsRestoredCompareDatabasesAgain() {
+  void _whenInternetConnectionIsRestoredCompareDatabasesAgain(WidgetRef ref) {
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile ||
           result == ConnectivityResult.wifi) {
-        context.read(firebaseProvider).getShoppingListsFromFirebase(true);
+        ref.read(firebaseProvider).getShoppingListsFromFirebase(true);
       }
     });
   }
 
-  void fetchData() {
-    context.read(firebaseProvider).getShoppingListsFromFirebase(true);
-    context.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
-    context.read(firebaseProvider).fetchFriendsList();
-    context.read(firebaseProvider).fetchFriendRequestsList();
-    _whenInternetConnectionIsRestoredCompareDatabasesAgain();
+  void fetchData(WidgetRef ref) {
+    ref.read(firebaseProvider).getShoppingListsFromFirebase(true);
+    ref.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
+    ref.read(firebaseProvider).fetchFriendsList();
+    ref.read(firebaseProvider).fetchFriendRequestsList();
+    _whenInternetConnectionIsRestoredCompareDatabasesAgain(ref);
   }
 
   void _navigateToLoyaltyCardsHandler(BuildContext context) {
@@ -64,12 +68,10 @@ class _HomeScreen extends State<HomeScreen> {
         context, MaterialPageRoute(builder: (context) => FriendsDisplay()));
   }
 
-  void _createNewShoppingList(
-    BuildContext context,
-  ) {
-    final toolsVM = context.read(toolsProvider);
-    final firebaseVM = context.read(firebaseProvider);
-    final shopingListsProviderVM = context.read(shoppingListsProvider);
+  void _createNewShoppingList(WidgetRef ref) {
+    final toolsVM = ref.read(toolsProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final shopingListsProviderVM = ref.read(shoppingListsProvider);
     if (toolsVM.newListNameController.text != "") {
       String id = nanoid();
       //CREATE LIST ON SERVER
@@ -101,7 +103,7 @@ class _HomeScreen extends State<HomeScreen> {
                         .backgroundColor,
                     labelStyle: Theme.of(context).textTheme.bodyText2,
                     onTap: () {
-                      context.read(toolsProvider).resetNewListData();
+                      ref.read(toolsProvider).resetNewListData();
                       showDialog(
                           context: context,
                           builder: (context) => PutShoppingListData(

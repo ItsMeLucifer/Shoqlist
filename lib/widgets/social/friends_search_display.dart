@@ -10,25 +10,25 @@ import '../../main.dart';
 import '../../viewmodels/tools.dart';
 
 class FriendsSearchDisplay extends ConsumerWidget {
-  void _sendFriendRequestAfterTap(BuildContext context) {
-    final firebaseVM = context.read(firebaseProvider);
-    final friendsServiceVM = context.read(friendsServiceProvider);
+  void _sendFriendRequestAfterTap(BuildContext context, WidgetRef ref) {
+    final firebaseVM = ref.read(firebaseProvider);
+    final friendsServiceVM = ref.read(friendsServiceProvider);
     User user = friendsServiceVM.usersList[friendsServiceVM.currentUserIndex];
     firebaseVM.sendFriendRequest(user);
     Navigator.of(context).pop();
   }
 
-  void _searchForFriend(BuildContext context, String value) {
-    context.read(firebaseProvider).searchForUser(value);
+  void _searchForFriend(WidgetRef ref, String value) {
+    ref.read(firebaseProvider).searchForUser(value);
   }
 
-  void _onChanged(BuildContext context) {
-    context.read(toolsProvider).friendsFetchStatus = FetchStatus.unfetched;
+  void _onChanged(WidgetRef ref) {
+    ref.read(toolsProvider).friendsFetchStatus = FetchStatus.unfetched;
   }
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final toolsVM = watch(toolsProvider);
-    final friendsServiceVM = watch(friendsServiceProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.watch(toolsProvider);
+    final friendsServiceVM = ref.watch(friendsServiceProvider);
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: SafeArea(
@@ -41,7 +41,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
                   Text(AppLocalizations.of(context).searchFriends,
                       style: Theme.of(context).primaryTextTheme.headline4),
                   Divider(
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                     indent: 50,
                     endIndent: 50,
                   ),

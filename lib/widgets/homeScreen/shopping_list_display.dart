@@ -11,9 +11,9 @@ import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
-  void _onLongPressShoppingListItem(BuildContext context) {
-    final firebaseVM = context.read(firebaseProvider);
-    final shoppingListsVM = context.read(shoppingListsProvider);
+  void _onLongPressShoppingListItem(BuildContext context, WidgetRef ref) {
+    final firebaseVM = ref.read(firebaseProvider);
+    final shoppingListsVM = ref.read(shoppingListsProvider);
     //DELETE ITEM ON FIREBASE
     firebaseVM.deleteShoppingListItemOnFirebase(
         shoppingListsVM.currentListIndex,
@@ -27,10 +27,10 @@ class ShoppingListDisplay extends ConsumerWidget {
     Navigator.of(context).pop();
   }
 
-  void _addNewItemToCurrentShoppingList(BuildContext context) {
-    final toolsVM = context.read(toolsProvider);
-    final firebaseVM = context.read(firebaseProvider);
-    final shoppingListsVM = context.read(shoppingListsProvider);
+  void _addNewItemToCurrentShoppingList(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.read(toolsProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final shoppingListsVM = ref.read(shoppingListsProvider);
     if (toolsVM.newItemNameController.text != "") {
       //ADD ITEM TO FIREBASE
       firebaseVM.addNewItemToShoppingListOnFirebase(
@@ -47,10 +47,10 @@ class ShoppingListDisplay extends ConsumerWidget {
     FocusManager.instance.primaryFocus.unfocus();
   }
 
-  void _giveAccessToTheFriendAfterTap(BuildContext context) {
-    final friendsServiceVM = context.read(friendsServiceProvider);
-    final firebaseVM = context.read(firebaseProvider);
-    final shoppingListsVM = context.read(shoppingListsProvider);
+  void _giveAccessToTheFriendAfterTap(BuildContext context, WidgetRef ref) {
+    final friendsServiceVM = ref.read(friendsServiceProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final shoppingListsVM = ref.read(shoppingListsProvider);
     List<User> friendsWithoutAccess =
         friendsServiceVM.getFriendsWithoutAccessToCurrentShoppingList(
             shoppingListsVM.getUsersWithAccessToCurrentList());
@@ -64,15 +64,15 @@ class ShoppingListDisplay extends ConsumerWidget {
     Navigator.of(context).popUntil((route) => !Navigator.of(context).canPop());
   }
 
-  void _onRefresh(BuildContext context, String documentId, String ownerId) {
-    context.read(firebaseProvider).fetchOneShoppingList(documentId, ownerId);
+  void _onRefresh(WidgetRef ref, String documentId, String ownerId) {
+    ref.read(firebaseProvider).fetchOneShoppingList(documentId, ownerId);
   }
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final shoppingListsVM = watch(shoppingListsProvider);
-    final toolsVM = watch(toolsProvider);
-    final firebaseAuthVM = watch(firebaseAuthProvider);
-    final friendsServiceVM = watch(friendsServiceProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
+    final toolsVM = ref.watch(toolsProvider);
+    final firebaseAuthVM = ref.watch(firebaseAuthProvider);
+    final friendsServiceVM = ref.watch(friendsServiceProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       //backgroundColor: Theme.of(context).backgroundColor,
@@ -171,20 +171,20 @@ class ShoppingListDisplay extends ConsumerWidget {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
                 Divider(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                   indent: 50,
                   endIndent: 50,
                 ),
                 Expanded(
                   child: LiquidPullToRefresh(
-                      backgroundColor: Theme.of(context).accentColor,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
                       color: Theme.of(context).primaryColor,
                       height: 50,
                       animSpeedFactor: 5,
                       showChildOpacityTransition: false,
                       onRefresh: () async {
                         _onRefresh(
-                            context,
+                            ref,
                             shoppingListsVM
                                 .shoppingLists[shoppingListsVM.currentListIndex]
                                 .documentId,
@@ -195,7 +195,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                       child: Padding(
                           padding: const EdgeInsets.only(
                               left: 8, top: 8, right: 8, bottom: 65),
-                          child: shoppingList(watch))),
+                          child: shoppingList(ref))),
                 ),
               ],
             ),
@@ -231,10 +231,12 @@ class ShoppingListDisplay extends ConsumerWidget {
                             focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                     width: 1,
-                                    color: Theme.of(context).accentColor)),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary)),
                           ),
                           onFieldSubmitted: (value) {
-                            _addNewItemToCurrentShoppingList(context);
+                            _addNewItemToCurrentShoppingList(context, ref);
                             toolsVM.clearNewItemTextEditingController();
                             toolsVM.newItemFocusNode.requestFocus();
                           },
@@ -243,12 +245,12 @@ class ShoppingListDisplay extends ConsumerWidget {
                     ),
                     GestureDetector(
                         onTap: () {
-                          _addNewItemToCurrentShoppingList(context);
+                          _addNewItemToCurrentShoppingList(context, ref);
                           toolsVM.clearNewItemTextEditingController();
                           toolsVM.newItemFocusNode.requestFocus();
                         },
                         child: Icon(Icons.add,
-                            color: Theme.of(context).accentColor)),
+                            color: Theme.of(context).colorScheme.secondary)),
                     SizedBox(width: 10)
                   ],
                 ),
@@ -260,10 +262,10 @@ class ShoppingListDisplay extends ConsumerWidget {
     );
   }
 
-  Widget shoppingList(ScopedReader watch) {
-    final shoppingListsVM = watch(shoppingListsProvider);
-    final firebaseVM = watch(firebaseProvider);
-    final toolsVM = watch(toolsProvider);
+  Widget shoppingList(WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
+    final firebaseVM = ref.watch(firebaseProvider);
+    final toolsVM = ref.watch(toolsProvider);
     ShoppingList shoppingList =
         shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
     return ListView.builder(
@@ -307,7 +309,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                           shoppingList.list[index].gotItem
                               ? Icons.radio_button_checked
                               : Icons.radio_button_off,
-                          color: Theme.of(context).accentColor),
+                          color: Theme.of(context).colorScheme.secondary),
                       SizedBox(width: 5),
                       Expanded(
                         child: Text(shoppingList.list[index].itemName,
@@ -334,10 +336,11 @@ class ShoppingListDisplay extends ConsumerWidget {
                                   !shoppingList.list[index].isFavorite
                                       ? null
                                       : Icons.star,
-                                  color: Theme.of(context).accentColor),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
                               Icon(
                                 Icons.star_border_outlined,
-                                color: Theme.of(context).accentColor,
+                                color: Theme.of(context).colorScheme.secondary,
                               )
                             ],
                           )),

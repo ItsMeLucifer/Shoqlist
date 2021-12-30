@@ -16,14 +16,14 @@ class HomeScreenMainView extends ConsumerWidget {
         MaterialPageRoute(builder: (context) => ShoppingListDisplay()));
   }
 
-  void _onRefresh(BuildContext context) {
-    context.read(toolsProvider).refreshStatus = RefreshStatus.duringRefresh;
-    context.read(firebaseProvider).getShoppingListsFromFirebase(true);
+  void _onRefresh(BuildContext context, WidgetRef ref) {
+    ref.read(toolsProvider).refreshStatus = RefreshStatus.duringRefresh;
+    ref.read(firebaseProvider).getShoppingListsFromFirebase(true);
   }
 
-  void _deleteShoppingList(BuildContext context) {
-    final firebaseVM = context.read(firebaseProvider);
-    final shoppingListsVM = context.read(shoppingListsProvider);
+  void _deleteShoppingList(BuildContext context, WidgetRef ref) {
+    final firebaseVM = ref.read(firebaseProvider);
+    final shoppingListsVM = ref.read(shoppingListsProvider);
     //DELETE LIST ON FIREBASE
     firebaseVM.deleteShoppingListOnFirebase(shoppingListsVM
         .shoppingLists[shoppingListsVM.currentListIndex].documentId);
@@ -32,11 +32,11 @@ class HomeScreenMainView extends ConsumerWidget {
     Navigator.of(context).popUntil((route) => !route.navigator.canPop());
   }
 
-  void _updateShoppingList(BuildContext context) {
-    if (context.read(toolsProvider).newListNameController.text != "") {
-      final firebaseVM = context.read(firebaseProvider);
-      final toolsVM = context.read(toolsProvider);
-      final shoppingListsVM = context.read(shoppingListsProvider);
+  void _updateShoppingList(BuildContext context, WidgetRef ref) {
+    if (ref.read(toolsProvider).newListNameController.text != "") {
+      final firebaseVM = ref.read(firebaseProvider);
+      final toolsVM = ref.read(toolsProvider);
+      final shoppingListsVM = ref.read(shoppingListsProvider);
       //UPDATE LIST ON SERVER
       firebaseVM.updateShoppingListToFirebase(
           toolsVM.newListNameController.text,
@@ -51,10 +51,10 @@ class HomeScreenMainView extends ConsumerWidget {
     }
   }
 
-  Widget build(BuildContext context, ScopedReader watch) {
-    final shoppingListsVM = watch(shoppingListsProvider);
-    final toolsVM = watch(toolsProvider);
-    final firebaseAuthVM = watch(firebaseAuthProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
+    final toolsVM = ref.watch(toolsProvider);
+    final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Stack(
@@ -66,7 +66,7 @@ class HomeScreenMainView extends ConsumerWidget {
               Text(AppLocalizations.of(context).appName,
                   style: Theme.of(context).primaryTextTheme.headline3),
               Divider(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
                 indent: 50,
                 endIndent: 50,
               ),
@@ -79,7 +79,7 @@ class HomeScreenMainView extends ConsumerWidget {
                         AppLocalizations.of(context).myLists,
                         ShoppingListType.ownShoppingLists),
                     VerticalDivider(
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).colorScheme.secondary,
                       indent: screenSize.height * 0.01,
                       endIndent: screenSize.height * 0.01,
                     ),
@@ -107,13 +107,14 @@ class HomeScreenMainView extends ConsumerWidget {
                     child: toolsVM.fetchStatus == FetchStatus.fetched ||
                             toolsVM.refreshStatus == RefreshStatus.duringRefresh
                         ? LiquidPullToRefresh(
-                            backgroundColor: Theme.of(context).accentColor,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
                             color: Theme.of(context).primaryColor,
                             height: 50,
                             animSpeedFactor: 5,
                             showChildOpacityTransition: false,
                             onRefresh: () async {
-                              _onRefresh(context);
+                              _onRefresh(context, ref);
                             },
                             child: shoppingListsVM.shoppingLists.isNotEmpty
                                 ? ListView.builder(
