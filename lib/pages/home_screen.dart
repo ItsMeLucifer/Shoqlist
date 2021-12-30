@@ -25,7 +25,7 @@ class _HomeScreen extends State<HomeScreen> {
       adUnitId: 'ca-app-pub-6556175768591042/6145501750',
       size: AdSize.banner,
       request: AdRequest(),
-      listener: BannerAdListener());
+      listener: AdListener());
 
   @override
   initState() {

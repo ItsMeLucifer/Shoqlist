@@ -39,18 +39,6 @@ class Authentication extends ConsumerWidget {
               : Icons.visibility,
           color: Colors.grey),
     );
-    firebaseAuthVM.exceptionMessages = [
-      AppLocalizations.of(context).undefinedExc,
-      AppLocalizations.of(context).noUserExc,
-      AppLocalizations.of(context).passwordExc,
-      AppLocalizations.of(context).emailExc,
-      AppLocalizations.of(context).userDisabledExc,
-      AppLocalizations.of(context).emptyFieldExc,
-      AppLocalizations.of(context).weakPasswordExc,
-      AppLocalizations.of(context).emailInUseExc,
-      AppLocalizations.of(context).googleSignInExc,
-      AppLocalizations.of(context).anonymousSignInExc
-    ];
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: Center(

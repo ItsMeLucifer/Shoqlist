@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -265,7 +264,6 @@ class ShoppingListDisplay extends ConsumerWidget {
   Widget shoppingList(WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final firebaseVM = ref.watch(firebaseProvider);
-    final toolsVM = ref.watch(toolsProvider);
     ShoppingList shoppingList =
         shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
     return ListView.builder(

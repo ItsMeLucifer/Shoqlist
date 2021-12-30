@@ -10,6 +10,7 @@ import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
+import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:shoqlist/l10n/l10n.dart';
@@ -67,7 +68,6 @@ class MyApp extends StatelessWidget {
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
-          brightness: Brightness.dark,
           backgroundColor: Colors.grey[900],
           textTheme: ThemeData.dark().textTheme,
           primaryTextTheme: TextTheme(

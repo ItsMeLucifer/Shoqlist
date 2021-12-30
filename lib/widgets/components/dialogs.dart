@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/models/shopping_list.dart';
@@ -27,7 +26,7 @@ class YesNoDialog extends ConsumerWidget {
                 textAlign: TextAlign.center)),
       ),
       actions: [
-        FlatButton(
+        TextButton(
           onPressed: () {
             _onAccepted(context);
           },
@@ -35,7 +34,7 @@ class YesNoDialog extends ConsumerWidget {
               ? AppLocalizations.of(context).yes
               : AppLocalizations.of(context).accept),
         ),
-        FlatButton(
+        TextButton(
           onPressed: () {
             if (_onDeclined == null) {
               Navigator.of(context).pop();
@@ -150,36 +149,38 @@ class PutShoppingListData extends ConsumerWidget {
                       ? MainAxisAlignment.spaceEvenly
                       : MainAxisAlignment.center,
                   children: [
-                    FlatButton(
-                        color: Theme.of(context)
-                            .buttonTheme
-                            .colorScheme
-                            .background,
-                        onPressed: () {
-                          _onPressedSave(context);
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(AppLocalizations.of(context).save,
-                            style:
-                                Theme.of(context).primaryTextTheme.bodyText1)),
+                    Card(
+                      color:
+                          Theme.of(context).buttonTheme.colorScheme.background,
+                      child: TextButton(
+                          onPressed: () {
+                            _onPressedSave(context);
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(AppLocalizations.of(context).save,
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .bodyText1)),
+                    ),
                     _onPressedDelete != null
-                        ? FlatButton(
+                        ? Card(
                             color: Theme.of(context)
                                 .buttonTheme
                                 .colorScheme
                                 .background,
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return YesNoDialog(_onPressedDelete,
-                                        _deleteNotificationTitle);
-                                  });
-                            },
-                            child: Text(AppLocalizations.of(context).remove,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .bodyText1))
+                            child: TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return YesNoDialog(_onPressedDelete,
+                                            _deleteNotificationTitle);
+                                      });
+                                },
+                                child: Text(AppLocalizations.of(context).remove,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .bodyText1)))
                         : SizedBox(),
                   ],
                 )
@@ -260,7 +261,7 @@ class ChangeName extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 8.0),
           child: Container(
             height: screenSize.height * 0.02,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {
                 _onAccepted(context);
                 Navigator.of(context).pop();
@@ -339,42 +340,47 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                         _onDestroy != null
                             ? Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
-                                child: FlatButton(
-                                    color: Theme.of(context)
-                                        .buttonTheme
-                                        .colorScheme
-                                        .background,
-                                    onPressed: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return YesNoDialog(
-                                                _onDestroy, _removeTitle);
-                                          });
-                                    },
-                                    child: Text(
-                                      AppLocalizations.of(context).remove,
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .bodyText1,
-                                    )),
+                                child: Card(
+                                  color: Theme.of(context)
+                                      .buttonTheme
+                                      .colorScheme
+                                      .background,
+                                  child: TextButton(
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return YesNoDialog(
+                                                  _onDestroy, _removeTitle);
+                                            });
+                                      },
+                                      child: Text(
+                                        AppLocalizations.of(context).remove,
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .bodyText1,
+                                      )),
+                                ),
                               )
                             : Container(),
-                        FlatButton(
-                            color: Theme.of(context)
-                                .buttonTheme
-                                .colorScheme
-                                .background,
-                            onPressed: () {
-                              _onPressed(context);
-                            },
-                            child: Text(
-                              _onDestroy != null
-                                  ? AppLocalizations.of(context).save
-                                  : AppLocalizations.of(context).add,
-                              style:
-                                  Theme.of(context).primaryTextTheme.bodyText1,
-                            )),
+                        Card(
+                          color: Theme.of(context)
+                              .buttonTheme
+                              .colorScheme
+                              .background,
+                          child: TextButton(
+                              onPressed: () {
+                                _onPressed(context);
+                              },
+                              child: Text(
+                                _onDestroy != null
+                                    ? AppLocalizations.of(context).save
+                                    : AppLocalizations.of(context).add,
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .bodyText1,
+                              )),
+                        ),
                       ],
                     ),
                   ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shoqlist/models/shopping_list.dart';
-import '../utilities/boxes.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
 enum RefreshStatus { duringRefresh, refreshed }

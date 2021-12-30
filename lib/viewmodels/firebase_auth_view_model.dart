@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shoqlist/models/user.dart' as model;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum Status { Authenticated, Unauthenticated, DuringAuthorization }
 
@@ -39,6 +40,21 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     currentUser = model.User(document.get('nickname'), document.get('email'),
         document.get('userId'));
     notifyListeners();
+  }
+
+  void setExceptionMessagesTranslations(BuildContext context) {
+    _exceptionMessages = [
+      AppLocalizations.of(context).undefinedExc,
+      AppLocalizations.of(context).noUserExc,
+      AppLocalizations.of(context).passwordExc,
+      AppLocalizations.of(context).emailExc,
+      AppLocalizations.of(context).userDisabledExc,
+      AppLocalizations.of(context).emptyFieldExc,
+      AppLocalizations.of(context).weakPasswordExc,
+      AppLocalizations.of(context).emailInUseExc,
+      AppLocalizations.of(context).googleSignInExc,
+      AppLocalizations.of(context).anonymousSignInExc
+    ];
   }
 
   List<String> _exceptionMessages = [

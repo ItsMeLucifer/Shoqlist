@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
@@ -16,7 +15,7 @@ class LoyaltyCardInfo extends ConsumerWidget {
         children: [
           Align(
             alignment: Alignment.centerRight,
-            child: FlatButton(
+            child: TextButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 mainAxisSize: MainAxisSize.min,
