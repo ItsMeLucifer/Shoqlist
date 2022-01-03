@@ -6,7 +6,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
-import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
@@ -70,7 +69,7 @@ class _HomeScreen extends State<HomeScreen> {
         context, MaterialPageRoute(builder: (context) => FriendsDisplay()));
   }
 
-  void _createNewShoppingList(WidgetRef ref) {
+  void _createNewShoppingList(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.read(toolsProvider);
     final firebaseVM = ref.read(firebaseProvider);
     final shopingListsProviderVM = ref.read(shoppingListsProvider);
@@ -186,7 +185,6 @@ class _HomeScreen extends State<HomeScreen> {
                     height: 50,
                     width: screenSize.width,
                     child: !kDebugMode ? AdWidget(ad: adBanner) : Container())),
-            // child: Container()))
           ],
         ));
   }

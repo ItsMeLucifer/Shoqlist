@@ -200,7 +200,6 @@ class ChooseUser extends ConsumerWidget {
   final List<User> _usersList;
   final String _titleToDisplay;
   ChooseUser(this._actionAfterTapUser, this._usersList, this._titleToDisplay);
-
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     return AlertDialog(
@@ -263,10 +262,8 @@ class ChangeName extends ConsumerWidget {
       actions: [
         Padding(
             padding: const EdgeInsets.only(bottom: 8.0, right: 8),
-            child: BasicButton(() {
-              _onAccepted(context, ref);
-              Navigator.of(context).pop();
-            }, AppLocalizations.of(context).save, .2)),
+            child: BasicButton(
+                _onAccepted, AppLocalizations.of(context).save, .2)),
       ],
     );
   }
@@ -316,7 +313,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                         TextInputType.name,
                         toolsVM.loyaltyCardNameController,
                         AppLocalizations.of(context).cardName,
-                        (value) => {},
+                        null,
                         null,
                         false),
                     SizedBox(height: _dividerHeight),
@@ -326,7 +323,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                         TextInputType.text,
                         toolsVM.loyaltyCardBarCodeController,
                         AppLocalizations.of(context).cardCode,
-                        (value) => {},
+                        null,
                         null,
                         false,
                         _suffixIcon),

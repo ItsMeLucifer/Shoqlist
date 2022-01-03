@@ -53,7 +53,6 @@ class HomeScreenMainView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
-    final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Stack(
@@ -116,170 +115,28 @@ class HomeScreenMainView extends ConsumerWidget {
                               _onRefresh(context, ref);
                             },
                             child: shoppingListsVM.shoppingLists.isNotEmpty
-                                ? ListView.builder(
-                                    itemCount:
-                                        shoppingListsVM.shoppingLists.length,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 8.0,
-                                            right: 8.0,
-                                            bottom: index ==
-                                                    shoppingListsVM
-                                                            .shoppingLists
-                                                            .length -
-                                                        1
-                                                ? 50
-                                                : 0),
-                                        child: Container(
-                                          height: 60,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              shoppingListsVM.currentListIndex =
-                                                  index;
-                                              shoppingListsVM
-                                                  .sortShoppingListItemsDisplay();
-                                              _navigateToShoppingList(context);
-                                            },
-                                            onLongPress: () {
-                                              shoppingListsVM.currentListIndex =
-                                                  index;
-                                              if (shoppingListsVM
-                                                      .shoppingLists[index]
-                                                      .ownerId ==
-                                                  firebaseAuthVM
-                                                      .currentUser.userId) {
-                                                String title =
-                                                    AppLocalizations.of(context)
-                                                        .removeListTitle(
-                                                            shoppingListsVM
-                                                                .shoppingLists[
-                                                                    index]
-                                                                .name);
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return PutShoppingListData(
-                                                        _updateShoppingList,
-                                                        context,
-                                                        title,
-                                                        _deleteShoppingList,
-                                                      );
-                                                    });
-                                                toolsVM.newListImportance =
-                                                    shoppingListsVM
-                                                        .shoppingLists[index]
-                                                        .importance;
-                                                toolsVM
-                                                    .setNewListNameControllerText(
-                                                        shoppingListsVM
-                                                            .shoppingLists[
-                                                                index]
-                                                            .name);
-                                              }
-                                            },
-                                            child: Card(
-                                                color:
-                                                    toolsVM.getImportanceColor(
-                                                        shoppingListsVM
-                                                            .shoppingLists[
-                                                                index]
-                                                            .importance),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        shoppingListsVM
-                                                            .shoppingLists[
-                                                                index]
-                                                            .name,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 20),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          shoppingListsVM
-                                                                      .shoppingLists[
-                                                                          index]
-                                                                      .list
-                                                                      .length !=
-                                                                  0
-                                                              ? Container(
-                                                                  width: 100,
-                                                                  child: Text(
-                                                                    shoppingListsVM
-                                                                            .shoppingLists[index]
-                                                                            .list[0]
-                                                                            .itemName +
-                                                                        "${shoppingListsVM.shoppingLists[index].list.length > 1 ? ', ...' : ''}",
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    maxLines: 1,
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .normal,
-                                                                        fontSize:
-                                                                            15),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .end,
-                                                                  ),
-                                                                )
-                                                              : Container(),
-                                                          Text(
-                                                            "   [" +
-                                                                shoppingListsVM
-                                                                    .shoppingLists[
-                                                                        index]
-                                                                    .list
-                                                                    .length
-                                                                    .toString() +
-                                                                "]",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 15),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )),
-                                          ),
-                                        ),
-                                      );
-                                    })
+                                ? shoppingLists(context, ref)
                                 : ListView(
                                     children: [
                                       SizedBox(height: 10),
-                                      Center(
-                                          child: Text(
-                                              shoppingListsVM
-                                                          .currentlyDisplayedListType ==
-                                                      ShoppingListType
-                                                          .ownShoppingLists
-                                                  ? AppLocalizations.of(context)
-                                                      .noListsMsg
-                                                  : AppLocalizations.of(context)
-                                                      .noSharedListsMsg,
-                                              style: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .bodyText1))
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Center(
+                                            child: Text(
+                                                shoppingListsVM
+                                                            .currentlyDisplayedListType ==
+                                                        ShoppingListType
+                                                            .ownShoppingLists
+                                                    ? AppLocalizations.of(
+                                                            context)
+                                                        .noListsMsg
+                                                    : AppLocalizations.of(
+                                                            context)
+                                                        .noSharedListsMsg,
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .bodyText1)),
+                                      )
                                     ],
                                   ))
                         : Column(
@@ -297,5 +154,57 @@ class HomeScreenMainView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _onLongPressShoppingListButton(
+      BuildContext context, int index, WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
+    final firebaseAuthVM = ref.watch(firebaseAuthProvider);
+    final toolsVM = ref.watch(toolsProvider);
+    shoppingListsVM.currentListIndex = index;
+    if (shoppingListsVM.shoppingLists[index].ownerId ==
+        firebaseAuthVM.currentUser.userId) {
+      String title = AppLocalizations.of(context)
+          .removeListTitle(shoppingListsVM.shoppingLists[index].name);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return PutShoppingListData(
+              _updateShoppingList,
+              context,
+              title,
+              _deleteShoppingList,
+            );
+          });
+      toolsVM.newListImportance =
+          shoppingListsVM.shoppingLists[index].importance;
+      toolsVM.setNewListNameControllerText(
+          shoppingListsVM.shoppingLists[index].name);
+    }
+  }
+
+  void _onTapShoppingListButton(
+      BuildContext context, int index, WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
+    shoppingListsVM.currentListIndex = index;
+    shoppingListsVM.sortShoppingListItemsDisplay();
+    _navigateToShoppingList(context);
+  }
+
+  Widget shoppingLists(BuildContext context, WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
+    return ListView.builder(
+        itemCount: shoppingListsVM.shoppingLists.length,
+        itemBuilder: (context, index) {
+          return Padding(
+              padding: EdgeInsets.only(
+                  left: 8.0,
+                  right: 8.0,
+                  bottom: index == shoppingListsVM.shoppingLists.length - 1
+                      ? 50
+                      : 0),
+              child: ShoppingListButton(_onTapShoppingListButton,
+                  _onLongPressShoppingListButton, index));
+        });
   }
 }

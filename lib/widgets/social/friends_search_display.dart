@@ -21,7 +21,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
     ref.read(firebaseProvider).searchForUser(value);
   }
 
-  void _onChanged(WidgetRef ref) {
+  void _onChanged(BuildContext context, WidgetRef ref) {
     ref.read(toolsProvider).friendsFetchStatus = FetchStatus.unfetched;
   }
 
@@ -61,12 +61,17 @@ class FriendsSearchDisplay extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)
-                                            .cantFindUserMsg,
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .bodyText1)),
+                                    child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .cantFindUserMsg,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .bodyText1,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
                               ],
                             )
                           : UsersList(

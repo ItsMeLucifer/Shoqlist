@@ -24,7 +24,9 @@ class BasicForm extends ConsumerWidget {
           obscureText: _obsureText,
           controller: _controller,
           onChanged: (value) {
-            _onChanged(context, ref);
+            if (_onChanged != null) {
+              _onChanged(context, ref);
+            }
           },
           onFieldSubmitted: (value) {
             if (_onSubmitted != null) {

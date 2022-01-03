@@ -25,6 +25,7 @@ class Settings extends ConsumerWidget {
     final firebaseAuthVM = ref.read(firebaseAuthProvider);
     final toolsVM = ref.read(toolsProvider);
     firebaseAuthVM.changeNickname(toolsVM.newNicknameController.text);
+    Navigator.of(context).pop();
   }
 
   void _showDialogWithChangeNickname(BuildContext context, WidgetRef ref) {

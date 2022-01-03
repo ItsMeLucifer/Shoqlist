@@ -148,3 +148,74 @@ class WarningButton extends ConsumerWidget {
     );
   }
 }
+
+class ShoppingListButton extends ConsumerWidget {
+  final Function _onTap;
+  final Function _onLongPress;
+  final int _index;
+  ShoppingListButton(this._onTap, this._onLongPress, this._index);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shoppingListsVM = ref.watch(shoppingListsProvider);
+    final toolsVM = ref.watch(toolsProvider);
+    return Container(
+      height: 60,
+      child: GestureDetector(
+        onTap: () {
+          _onTap(context, _index, ref);
+        },
+        onLongPress: () {
+          _onLongPress(context, _index, ref);
+        },
+        child: Card(
+            color: toolsVM.getImportanceColor(
+                shoppingListsVM.shoppingLists[_index].importance),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    shoppingListsVM.shoppingLists[_index].name,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  ),
+                  Row(
+                    children: [
+                      shoppingListsVM.shoppingLists[_index].list.length != 0
+                          ? Container(
+                              width: 100,
+                              child: Text(
+                                shoppingListsVM.shoppingLists[_index].list[0]
+                                        .itemName +
+                                    "${shoppingListsVM.shoppingLists[_index].list.length > 1 ? ', ...' : ''}",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 15),
+                                textAlign: TextAlign.end,
+                              ),
+                            )
+                          : Container(),
+                      Text(
+                        "   [" +
+                            shoppingListsVM.shoppingLists[_index].list.length
+                                .toString() +
+                            "]",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )),
+      ),
+    );
+  }
+}
