@@ -17,6 +17,9 @@ import 'package:shoqlist/l10n/l10n.dart';
 import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:device_info/device_info.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io';
 
 final ChangeNotifierProvider<ShoppingListsViewModel> shoppingListsProvider =
     ChangeNotifierProvider((_) => ShoppingListsViewModel());
@@ -56,6 +59,19 @@ void main() async {
   //Admob
   MobileAds.instance.initialize();
 
+  //PlatformViewLink
+  if (Platform.isAndroid) {
+    var androidInfo = await DeviceInfoPlugin().androidInfo;
+    var isAndroidOld = (androidInfo.version.sdkInt ?? 0) < 29; //Android 10
+    // var useHybridComposition = remoteConfig.getBool(
+    //   isAndroidOld
+    //       ? RemoteConfigKey.useHybridCompositionOlderOS
+    //       : RemoteConfigKey.useHybridCompositionNewerOS,
+    // );
+    if (isAndroidOld) {
+      await PlatformViewsService.synchronizeToNativeViewHierarchy(false);
+    }
+  }
   //Orientation
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);

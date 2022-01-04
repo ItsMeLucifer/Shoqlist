@@ -47,10 +47,11 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void fetchData(WidgetRef ref) {
-    ref.read(firebaseProvider).getShoppingListsFromFirebase(true);
-    ref.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
-    ref.read(firebaseProvider).fetchFriendsList();
-    ref.read(firebaseProvider).fetchFriendRequestsList();
+    final firebaseVM = ref.read(firebaseProvider);
+    firebaseVM.getShoppingListsFromFirebase(true);
+    firebaseVM.getLoyaltyCardsFromFirebase(true);
+    firebaseVM.fetchFriendsList();
+    firebaseVM.fetchFriendRequestsList();
     _whenInternetConnectionIsRestoredCompareDatabasesAgain(ref);
   }
 

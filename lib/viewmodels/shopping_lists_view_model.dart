@@ -133,9 +133,15 @@ class ShoppingListsViewModel extends ChangeNotifier {
         .firstWhere((element) => element.gotItem, orElse: () => null);
     int firstDoneItemIndex = firstGotItem != null
         ? shoppingLists[_currentListIndex].list.indexOf(firstGotItem)
-        : shoppingLists[_currentListIndex].list.length;
-    shoppingLists[_currentListIndex].list.insert(
-        firstDoneItemIndex, ShoppingListItem(itemName, itemGot, isFavorited));
+        : null;
+    if (firstDoneItemIndex != null) {
+      shoppingLists[_currentListIndex].list.insert(
+          firstDoneItemIndex, ShoppingListItem(itemName, itemGot, isFavorited));
+    } else {
+      shoppingLists[_currentListIndex]
+          .list
+          .add(ShoppingListItem(itemName, itemGot, isFavorited));
+    }
     //HIVE
     int index = _shoppingLists
         .indexWhere((element) => element == shoppingLists[_currentListIndex]);

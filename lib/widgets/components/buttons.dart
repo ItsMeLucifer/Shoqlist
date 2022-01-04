@@ -157,6 +157,7 @@ class ShoppingListButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
+    final screenSize = MediaQuery.of(context).size;
     return Container(
       height: 60,
       child: GestureDetector(
@@ -174,18 +175,24 @@ class ShoppingListButton extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    shoppingListsVM.shoppingLists[_index].name,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
+                  Container(
+                    width: screenSize.width * 0.5,
+                    child: Text(
+                      shoppingListsVM.shoppingLists[_index].name,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20),
+                    ),
                   ),
                   Row(
                     children: [
                       shoppingListsVM.shoppingLists[_index].list.length != 0
                           ? Container(
-                              width: 100,
+                              width: screenSize.width * 0.28,
                               child: Text(
                                 shoppingListsVM.shoppingLists[_index].list[0]
                                         .itemName +

@@ -15,7 +15,7 @@ class ShoppingListDisplay extends ConsumerWidget {
     final shoppingListsVM = ref.read(shoppingListsProvider);
     //DELETE ITEM ON FIREBASE
     firebaseVM.deleteShoppingListItemOnFirebase(
-        shoppingListsVM.currentListIndex,
+        shoppingListsVM.pickedListItemIndex,
         shoppingListsVM
             .shoppingLists[shoppingListsVM.currentListIndex].documentId,
         shoppingListsVM
