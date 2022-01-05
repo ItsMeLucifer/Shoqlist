@@ -29,14 +29,6 @@ class YesNoDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () {
-            _onAccepted(context, ref);
-          },
-          child: Text(_onDeclined == null
-              ? AppLocalizations.of(context).yes
-              : AppLocalizations.of(context).accept),
-        ),
-        TextButton(
-          onPressed: () {
             if (_onDeclined == null) {
               Navigator.of(context).pop();
             } else {
@@ -46,7 +38,15 @@ class YesNoDialog extends ConsumerWidget {
           child: Text(_onDeclined == null
               ? AppLocalizations.of(context).no
               : AppLocalizations.of(context).decline),
-        )
+        ),
+        TextButton(
+          onPressed: () {
+            _onAccepted(context, ref);
+          },
+          child: Text(_onDeclined == null
+              ? AppLocalizations.of(context).yes
+              : AppLocalizations.of(context).accept),
+        ),
       ],
     );
   }
@@ -279,7 +279,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
     const double _alertDialogWidth = 250;
-    const double _dividerHeight = 10;
+    const double _dividerHeight = 15;
     Widget _suffixIcon = GestureDetector(
       onTap: () async {
         toolsVM.loyaltyCardBarCodeController.text =
@@ -296,89 +296,77 @@ class PutLoyaltyCardsData extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(10.0),
-            child: Container(
-                height: 320,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _title,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: _dividerHeight * 2),
+                BasicForm(TextInputType.name, toolsVM.loyaltyCardNameController,
+                    AppLocalizations.of(context).cardName, null, null, false),
+                SizedBox(height: _dividerHeight),
+                ColorPicker(_alertDialogWidth, 100),
+                SizedBox(height: _dividerHeight),
+                BasicForm(
+                    TextInputType.text,
+                    toolsVM.loyaltyCardBarCodeController,
+                    AppLocalizations.of(context).cardCode,
+                    null,
+                    null,
+                    false,
+                    _suffixIcon),
+                SizedBox(height: _dividerHeight),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      _title,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: _dividerHeight),
-                    BasicForm(
-                        TextInputType.name,
-                        toolsVM.loyaltyCardNameController,
-                        AppLocalizations.of(context).cardName,
-                        null,
-                        null,
-                        false),
-                    SizedBox(height: _dividerHeight),
-                    ColorPicker(_alertDialogWidth, 100),
-                    SizedBox(height: _dividerHeight),
-                    BasicForm(
-                        TextInputType.text,
-                        toolsVM.loyaltyCardBarCodeController,
-                        AppLocalizations.of(context).cardCode,
-                        null,
-                        null,
-                        false,
-                        _suffixIcon),
-                    SizedBox(height: _dividerHeight),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _onDestroy != null
-                            ? Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Card(
-                                  color: Theme.of(context)
-                                      .buttonTheme
-                                      .colorScheme
-                                      .background,
-                                  child: TextButton(
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return YesNoDialog(
-                                                  _onDestroy, _removeTitle);
-                                            });
-                                      },
-                                      child: Text(
-                                        AppLocalizations.of(context).remove,
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .bodyText1,
-                                      )),
-                                ),
-                              )
-                            : Container(),
-                        Card(
-                          color: Theme.of(context)
-                              .buttonTheme
-                              .colorScheme
-                              .background,
-                          child: TextButton(
-                              onPressed: () {
-                                _onPressed(context, ref);
-                              },
-                              child: Text(
-                                _onDestroy != null
-                                    ? AppLocalizations.of(context).save
-                                    : AppLocalizations.of(context).add,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .bodyText1,
-                              )),
-                        ),
-                      ],
+                    _onDestroy != null
+                        ? Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Card(
+                              color: Theme.of(context)
+                                  .buttonTheme
+                                  .colorScheme
+                                  .background,
+                              child: TextButton(
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return YesNoDialog(
+                                              _onDestroy, _removeTitle);
+                                        });
+                                  },
+                                  child: Text(
+                                    AppLocalizations.of(context).remove,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .bodyText1,
+                                  )),
+                            ),
+                          )
+                        : Container(),
+                    Card(
+                      color:
+                          Theme.of(context).buttonTheme.colorScheme.background,
+                      child: TextButton(
+                          onPressed: () {
+                            _onPressed(context, ref);
+                          },
+                          child: Text(
+                            _onDestroy != null
+                                ? AppLocalizations.of(context).save
+                                : AppLocalizations.of(context).add,
+                            style: Theme.of(context).primaryTextTheme.bodyText1,
+                          )),
                     ),
                   ],
-                )),
+                ),
+              ],
+            ),
           ),
         ]);
   }

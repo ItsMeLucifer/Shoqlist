@@ -72,6 +72,7 @@ class ShoppingListDisplay extends ConsumerWidget {
     final toolsVM = ref.watch(toolsProvider);
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final friendsServiceVM = ref.watch(friendsServiceProvider);
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       //backgroundColor: Theme.of(context).backgroundColor,
@@ -174,6 +175,18 @@ class ShoppingListDisplay extends ConsumerWidget {
                   indent: 50,
                   endIndent: 50,
                 ),
+                Container(
+                    width: screenSize.width - 100,
+                    child: Text(
+                      'Owner: ' +
+                          shoppingListsVM
+                              .shoppingLists[shoppingListsVM.currentListIndex]
+                              .ownerName,
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      maxLines: 1,
+                    )),
                 Expanded(
                   child: LiquidPullToRefresh(
                       backgroundColor: Theme.of(context).colorScheme.secondary,

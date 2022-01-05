@@ -113,6 +113,7 @@ class FirebaseViewModel extends ChangeNotifier {
   void fetchOneShoppingList(String documentId, String ownerId) async {
     List<String> usersWithAccess = [];
     ShoppingList _currentShoppingList;
+    String ownerName = '';
     DocumentSnapshot doc = await users
         .doc(ownerId)
         .collection('lists')
@@ -134,12 +135,14 @@ class FirebaseViewModel extends ChangeNotifier {
               doc.get('listFavorite')[j]),
         );
       }
+      ownerName = await getUserName(doc.get('ownerId'));
       _currentShoppingList = ShoppingList(
           doc.get('name'),
           items,
           _toolsVM.getImportanceValueFromLabel(doc.get('importance')),
           doc.get('id'),
           doc.get('ownerId'),
+          ownerName,
           usersWithAccess);
     }
     _shoppingListsVM.updateCurrentShoppingList(_currentShoppingList);
@@ -185,10 +188,11 @@ class FirebaseViewModel extends ChangeNotifier {
         .displayLocalShoppingLists(_firebaseAuth.currentUser.userId);
   }
 
-  void addFetchedShoppingListsDataToLocalList() {
+  void addFetchedShoppingListsDataToLocalList() async {
     List<ShoppingList> result = [];
     List<String> usersWithAccess = [];
     List<ShoppingList> shoppingLists = [];
+    String ownerName = "";
     //Fetched Shopping lists to List<ShoppingList>
     for (int i = 0; i < _shoppingListsFetchedFromFirebase.length; i++) {
       _shoppingListsFetchedFromFirebase[i]
@@ -206,6 +210,8 @@ class FirebaseViewModel extends ChangeNotifier {
               _shoppingListsFetchedFromFirebase[i].get('listFavorite')[j]),
         );
       }
+      ownerName = await getUserName(
+          _shoppingListsFetchedFromFirebase[i].get('ownerId'));
       shoppingLists.add(ShoppingList(
           _shoppingListsFetchedFromFirebase[i].get('name'),
           items,
@@ -213,6 +219,7 @@ class FirebaseViewModel extends ChangeNotifier {
               _shoppingListsFetchedFromFirebase[i].get('importance')),
           _shoppingListsFetchedFromFirebase[i].get('id'),
           _shoppingListsFetchedFromFirebase[i].get('ownerId'),
+          ownerName,
           usersWithAccess));
     }
     //Fetched Shared Shopping lists to List<ShoppingList>
@@ -236,6 +243,8 @@ class FirebaseViewModel extends ChangeNotifier {
                   .get('listFavorite')[j]),
         );
       }
+      ownerName = await getUserName(
+          _sharedShoppingListsFetchedFromFirebase[i].get('ownerId'));
       usersWithAccess.clear();
       _sharedShoppingListsFetchedFromFirebase[i]
           .get('usersWithAccess')
@@ -247,6 +256,7 @@ class FirebaseViewModel extends ChangeNotifier {
               _sharedShoppingListsFetchedFromFirebase[i].get('importance')),
           _sharedShoppingListsFetchedFromFirebase[i].get('id'),
           _sharedShoppingListsFetchedFromFirebase[i].get('ownerId'),
+          ownerName,
           usersWithAccess));
     }
     result = [...shoppingLists, ...sharedLists];
@@ -446,6 +456,10 @@ class FirebaseViewModel extends ChangeNotifier {
         .then((value) => print("Changed state of item"))
         .catchError((error) =>
             _toolsVM.printWarning("Failed to toggle item's state: $error"));
+  }
+
+  Future<String> getUserName(String userId) async {
+    return await users.doc(userId).get().then((doc) => doc.get('nickname'));
   }
 
   // -- LOYALTY CARDS

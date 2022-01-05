@@ -29,9 +29,11 @@ class ShoppingList extends HiveObject {
   @HiveField(5)
   final String ownerId;
   @HiveField(6)
+  final String ownerName;
+  @HiveField(7)
   List<String> usersWithAccess = [];
 
-  ShoppingList(
-      this.name, this.list, this.importance, this.documentId, this.ownerId,
+  ShoppingList(this.name, this.list, this.importance, this.documentId,
+      this.ownerId, this.ownerName,
       [this.usersWithAccess]);
 }

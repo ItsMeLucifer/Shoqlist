@@ -20,6 +20,8 @@ class LoyaltyCardButton extends ConsumerWidget {
             children: <Widget>[
               Text(cardName,
                   overflow: TextOverflow.fade,
+                  softWrap: false,
+                  maxLines: 1,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 17,
@@ -28,7 +30,9 @@ class LoyaltyCardButton extends ConsumerWidget {
                         ..strokeWidth = 2
                         ..color = Colors.black)),
               Text(cardName,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  maxLines: 1,
                   style: TextStyle(
                     color: isFavorite ? Colors.yellow : Colors.white,
                     fontWeight: FontWeight.bold,

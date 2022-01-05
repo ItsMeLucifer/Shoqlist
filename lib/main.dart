@@ -72,6 +72,7 @@ void main() async {
       await PlatformViewsService.synchronizeToNativeViewHierarchy(false);
     }
   }
+
   //Orientation
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
