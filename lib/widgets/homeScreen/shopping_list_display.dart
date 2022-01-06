@@ -58,9 +58,29 @@ class ShoppingListDisplay extends ConsumerWidget {
         friendsWithoutAccess[friendsServiceVM.currentUserIndex],
         shoppingListsVM
             .shoppingLists[shoppingListsVM.currentListIndex].documentId);
-    shoppingListsVM.addUserIdToUsersWithAccessList(
-        friendsWithoutAccess[friendsServiceVM.currentUserIndex].userId);
-    Navigator.of(context).popUntil((route) => !Navigator.of(context).canPop());
+    shoppingListsVM.addUserToUsersWithAccessList(
+        friendsWithoutAccess[friendsServiceVM.currentUserIndex]);
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
+  }
+
+  void _denyFriendAccessAfterTap(BuildContext context, WidgetRef ref) {
+    final friendsServiceVM = ref.read(friendsServiceProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final shoppingListsVM = ref.read(shoppingListsProvider);
+    List<User> usersWithAccess = shoppingListsVM
+        .shoppingLists[shoppingListsVM.currentListIndex].usersWithAccess;
+
+    firebaseVM.denyFriendAccessToYourShoppingList(
+        usersWithAccess[friendsServiceVM.currentUserIndex],
+        shoppingListsVM
+            .shoppingLists[shoppingListsVM.currentListIndex].documentId,
+        usersWithAccess);
+
+    shoppingListsVM.removeUserFromUsersWithAccessList(
+        usersWithAccess[friendsServiceVM.currentUserIndex]);
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   void _onRefresh(WidgetRef ref, String documentId, String ownerId) {
@@ -134,6 +154,30 @@ class ShoppingListDisplay extends ConsumerWidget {
                           .floatingActionButtonTheme
                           .backgroundColor,
                       label: AppLocalizations.of(context).giveAccess),
+                  SpeedDialChild(
+                      labelBackgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      labelStyle: Theme.of(context).textTheme.bodyText2,
+                      child: Icon(Icons.info,
+                          color: Theme.of(context)
+                              .floatingActionButtonTheme
+                              .foregroundColor),
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => ChooseUser(
+                                _denyFriendAccessAfterTap,
+                                shoppingListsVM
+                                    .shoppingLists[
+                                        shoppingListsVM.currentListIndex]
+                                    .usersWithAccess,
+                                AppLocalizations.of(context).removeAccessMsg));
+                      },
+                      backgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      label: AppLocalizations.of(context).whoHasAccess),
                 ]
               : [
                   SpeedDialChild(
@@ -178,7 +222,8 @@ class ShoppingListDisplay extends ConsumerWidget {
                 Container(
                     width: screenSize.width - 100,
                     child: Text(
-                      'Owner: ' +
+                      AppLocalizations.of(context).owner +
+                          ": " +
                           shoppingListsVM
                               .shoppingLists[shoppingListsVM.currentListIndex]
                               .ownerName,

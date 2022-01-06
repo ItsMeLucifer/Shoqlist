@@ -1,5 +1,6 @@
 import 'package:shoqlist/models/shopping_list_item.dart';
 import 'package:hive/hive.dart';
+import 'package:shoqlist/models/user.dart';
 part 'shopping_list.g.dart';
 
 @HiveType(typeId: 2)
@@ -31,7 +32,7 @@ class ShoppingList extends HiveObject {
   @HiveField(6)
   final String ownerName;
   @HiveField(7)
-  List<String> usersWithAccess = [];
+  List<User> usersWithAccess = [];
 
   ShoppingList(this.name, this.list, this.importance, this.documentId,
       this.ownerId, this.ownerName,

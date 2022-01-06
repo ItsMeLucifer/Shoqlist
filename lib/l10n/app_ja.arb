@@ -99,5 +99,11 @@
     "low": "微々たる",
     "normal": "正常",
     "important": "重要",
-    "urgent": "アージャント"
+    "urgent": "アージャント",
+
+
+
+    "owner": "オーナー",
+    "whoHasAccess": "誰はアクセスがありますか",
+    "removeAccessMsg": "このユーザーのアクセス権を取り除く"
 }

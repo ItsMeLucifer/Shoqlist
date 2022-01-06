@@ -98,5 +98,11 @@
     "low": "Mało ważne",
     "normal": "Normalne",
     "important": "Ważne",
-    "urgent": "Pilne"
+    "urgent": "Pilne",
+
+
+
+    "owner": "Właściciel",
+    "whoHasAccess": "Kto ma dostęp?",
+    "removeAccessMsg": "Zabrać dostęp temu użytkownikowi?"
 }

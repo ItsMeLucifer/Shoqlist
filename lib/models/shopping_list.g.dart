@@ -72,7 +72,7 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
       fields[3] as String,
       fields[5] as String,
       fields[6] as String,
-      (fields[7] as List)?.cast<String>(),
+      (fields[7] as List)?.cast<User>(),
     );
   }
 

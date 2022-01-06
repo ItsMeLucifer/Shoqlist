@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
+import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/utilities/boxes.dart';
 
 enum ShoppingListType { ownShoppingLists, sharedShoppingLists }
@@ -236,13 +237,19 @@ class ShoppingListsViewModel extends ChangeNotifier {
     });
   }
 
-  List<String> getUsersWithAccessToCurrentList() {
+  List<User> getUsersWithAccessToCurrentList() {
     return shoppingLists[_currentListIndex].usersWithAccess;
   }
 
-  void addUserIdToUsersWithAccessList(String userId) {
-    if (userId == currentUserId) return;
-    shoppingLists[_currentListIndex].usersWithAccess.add(userId);
+  void addUserToUsersWithAccessList(User user) {
+    if (user.userId == currentUserId) return;
+    shoppingLists[_currentListIndex].usersWithAccess.add(user);
+    notifyListeners();
+  }
+
+  void removeUserFromUsersWithAccessList(User user) {
+    if (user.userId == currentUserId) return;
+    shoppingLists[_currentListIndex].usersWithAccess.remove(user);
     notifyListeners();
   }
 }

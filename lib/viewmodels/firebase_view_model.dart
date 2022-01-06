@@ -111,7 +111,8 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   void fetchOneShoppingList(String documentId, String ownerId) async {
-    List<String> usersWithAccess = [];
+    List<String> usersIdsWithAccess = [];
+    List<User> usersWithAccess = [];
     ShoppingList _currentShoppingList;
     String ownerName = '';
     DocumentSnapshot doc = await users
@@ -126,8 +127,11 @@ class FirebaseViewModel extends ChangeNotifier {
     if (doc != null && doc.exists) {
       doc
           .get('usersWithAccess')
-          .forEach((userId) => usersWithAccess.add(userId));
-
+          .forEach((userId) => usersIdsWithAccess.add(userId));
+      usersIdsWithAccess.forEach((userId) async {
+        User user = await getUserById(userId);
+        usersWithAccess.add(user);
+      });
       List<ShoppingListItem> items = [];
       for (int j = 0; j < doc.get('listContent').length; j++) {
         items.add(
@@ -135,6 +139,7 @@ class FirebaseViewModel extends ChangeNotifier {
               doc.get('listFavorite')[j]),
         );
       }
+
       ownerName = await getUserName(doc.get('ownerId'));
       _currentShoppingList = ShoppingList(
           doc.get('name'),
@@ -154,6 +159,7 @@ class FirebaseViewModel extends ChangeNotifier {
     List<String> listContent = [];
     List<bool> listFavorite = [];
     List<bool> listState = [];
+    List<String> usersWithAccess = [];
     for (ShoppingList localList in localLists) {
       listContent.clear();
       listFavorite.clear();
@@ -162,6 +168,10 @@ class FirebaseViewModel extends ChangeNotifier {
         listContent.add(element.itemName);
         listFavorite.add(element.isFavorite);
         listState.add(element.gotItem);
+      });
+      usersWithAccess.clear();
+      localList.usersWithAccess.forEach((user) {
+        usersWithAccess.add(user.userId);
       });
       users
           .doc(localList.ownerId)
@@ -175,7 +185,7 @@ class FirebaseViewModel extends ChangeNotifier {
             'listFavorite': listFavorite,
             'id': localList.documentId,
             'ownerId': localList.ownerId,
-            'usersWithAccess': localList.usersWithAccess
+            'usersWithAccess': usersWithAccess
           })
           .then((value) => print("Updated list on Firebase"))
           .catchError((error) => _toolsVM
@@ -190,15 +200,21 @@ class FirebaseViewModel extends ChangeNotifier {
 
   void addFetchedShoppingListsDataToLocalList() async {
     List<ShoppingList> result = [];
-    List<String> usersWithAccess = [];
+    List<String> usersIdsWithAccess = [];
+    List<User> usersWithAccess = [];
     List<ShoppingList> shoppingLists = [];
     String ownerName = "";
     //Fetched Shopping lists to List<ShoppingList>
     for (int i = 0; i < _shoppingListsFetchedFromFirebase.length; i++) {
+      usersIdsWithAccess.clear();
+      usersWithAccess.clear();
       _shoppingListsFetchedFromFirebase[i]
           .get('usersWithAccess')
-          .forEach((userId) => usersWithAccess.add(userId));
-
+          .forEach((userId) => usersIdsWithAccess.add(userId));
+      usersIdsWithAccess.forEach((userId) async {
+        User user = await getUserById(userId);
+        usersWithAccess.add(user);
+      });
       List<ShoppingListItem> items = [];
       for (int j = 0;
           j < _shoppingListsFetchedFromFirebase[i].get('listContent').length;
@@ -245,10 +261,21 @@ class FirebaseViewModel extends ChangeNotifier {
       }
       ownerName = await getUserName(
           _sharedShoppingListsFetchedFromFirebase[i].get('ownerId'));
-      usersWithAccess.clear();
-      _sharedShoppingListsFetchedFromFirebase[i]
-          .get('usersWithAccess')
-          .forEach((userId) => usersWithAccess.add(userId));
+
+      //To be honest, it is not necessary to fetch informations
+      //about who has the access to shared list, this information
+      //has only a meaning for the owner of list. So the function doesn't
+      //pass anything
+
+      // usersIdsWithAccess.clear();
+      // usersWithAccess.clear();
+      // _sharedShoppingListsFetchedFromFirebase[i]
+      //     .get('usersWithAccess')
+      //     .forEach((userId) => usersIdsWithAccess.add(userId));
+      // usersIdsWithAccess.forEach((userId) async {
+      //   User user = await getUserById(userId);
+      //   usersWithAccess.add(user);
+      // });
       sharedLists.add(ShoppingList(
           _sharedShoppingListsFetchedFromFirebase[i].get('name'),
           sharedItems,
@@ -256,8 +283,7 @@ class FirebaseViewModel extends ChangeNotifier {
               _sharedShoppingListsFetchedFromFirebase[i].get('importance')),
           _sharedShoppingListsFetchedFromFirebase[i].get('id'),
           _sharedShoppingListsFetchedFromFirebase[i].get('ownerId'),
-          ownerName,
-          usersWithAccess));
+          ownerName));
     }
     result = [...shoppingLists, ...sharedLists];
     _shoppingListsVM.overrideShoppingListsLocally(
@@ -460,6 +486,14 @@ class FirebaseViewModel extends ChangeNotifier {
 
   Future<String> getUserName(String userId) async {
     return await users.doc(userId).get().then((doc) => doc.get('nickname'));
+  }
+
+  Future<User> getUserById(String userId) async {
+    String nickname =
+        await users.doc(userId).get().then((doc) => doc.get('nickname'));
+    String email =
+        await users.doc(userId).get().then((doc) => doc.get('email'));
+    return User(nickname, email, userId);
   }
 
   // -- LOYALTY CARDS
@@ -749,6 +783,29 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('lists')
         .doc(documentId)
         .update({'usersWithAccess': usersWithAccess});
+  }
+
+  void denyFriendAccessToYourShoppingList(
+      User friend, String documentId, List<User> usersWithAccess) async {
+    if (friend.userId == _firebaseAuth.auth.currentUser.uid) return;
+    //Remove shopping list's data from friend's sharedLists
+    await users
+        .doc(friend.userId)
+        .collection('sharedLists')
+        .doc(documentId)
+        .delete();
+    //Remove friend's id from shoppingList's usersWithAccess list
+    List<String> usersIdsWithAccess = [];
+    usersWithAccess.forEach((user) {
+      if (user.userId != friend.userId) {
+        usersIdsWithAccess.add(user.userId);
+      }
+    });
+    await users
+        .doc(_firebaseAuth.currentUser.userId)
+        .collection('lists')
+        .doc(documentId)
+        .update({'usersWithAccess': usersIdsWithAccess});
   }
 
   // -- SETTINGS

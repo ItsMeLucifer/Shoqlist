@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
 import 'package:shoqlist/viewmodels/firebase_view_model.dart';
 import 'package:shoqlist/viewmodels/friends_service_view_model.dart';
@@ -53,6 +54,7 @@ void main() async {
   Hive.registerAdapter(ShoppingListAdapter());
   Hive.registerAdapter(ImportanceAdapter());
   Hive.registerAdapter(ShoppingListItemAdapter());
+  Hive.registerAdapter(UserAdapter());
   await Hive.openBox<ShoppingList>('shopping_lists');
   await Hive.openBox<int>('data_variables');
 

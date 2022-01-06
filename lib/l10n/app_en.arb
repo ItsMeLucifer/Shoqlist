@@ -323,5 +323,21 @@
     "urgent": "Urgent",
     "@urgent":{
         "description": "The urgent importance word"
+    },
+
+
+
+    "owner": "Owner",
+    "@owner":{
+        "description": "The 'Owner' word"
+    },
+    "whoHasAccess": "Who has access?",
+    "@whoHasAccess":{
+        "description": "Message displayed when user want to check who has the access to current shopping list"
+    },
+    "removeAccessMsg": "Take away this user's access?",
+    "@removeAccessMsg":{
+        "description": "Message displayed when user want to take away someone's access to his list"
     }
+
 }
