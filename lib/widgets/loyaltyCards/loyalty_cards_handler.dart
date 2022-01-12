@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
@@ -72,6 +74,8 @@ class LoyaltyCardsHandler extends ConsumerWidget {
   }
 
   Widget build(BuildContext context, WidgetRef ref) {
+    final screenSize = MediaQuery.of(context).size;
+    final toolsVM = ref.watch(toolsProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: SafeArea(
@@ -88,21 +92,33 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                   endIndent: 50,
                 ),
                 Expanded(
-                  child: LiquidPullToRefresh(
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                      color: Theme.of(context).primaryColor,
-                      height: 50,
-                      animSpeedFactor: 5,
-                      showChildOpacityTransition: false,
-                      onRefresh: () async {
-                        _onRefresh(ref);
-                      },
-                      child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: loyaltyCardsList(ref))),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 50.0),
+                    child: LiquidPullToRefresh(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
+                        color: Theme.of(context).primaryColor,
+                        height: 50,
+                        animSpeedFactor: 5,
+                        showChildOpacityTransition: false,
+                        onRefresh: () async {
+                          _onRefresh(ref);
+                        },
+                        child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: loyaltyCardsList(ref))),
+                  ),
                 ),
               ],
             ),
+            Positioned(
+                bottom: 0,
+                child: Container(
+                    height: 50,
+                    width: screenSize.width,
+                    child: !kDebugMode
+                        ? AdWidget(ad: toolsVM.adBanner)
+                        : Container()))
           ],
         ),
       ),

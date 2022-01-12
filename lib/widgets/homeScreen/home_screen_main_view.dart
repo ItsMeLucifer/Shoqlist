@@ -148,7 +148,6 @@ class HomeScreenMainView extends ConsumerWidget {
                             ],
                           )),
               ),
-              SizedBox(height: 50)
             ],
           ),
         ],

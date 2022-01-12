@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -164,4 +165,11 @@ class Tools extends ChangeNotifier {
     _refreshStatus = newStatus;
     notifyListeners();
   }
+
+  //Ad
+  final BannerAd adBanner = BannerAd(
+      adUnitId: 'ca-app-pub-6556175768591042/6145501750',
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: AdListener());
 }
