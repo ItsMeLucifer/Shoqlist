@@ -1,3 +1,7 @@
+<a href = "https://play.google.com/store/apps/details?id=com.jocs.shoqlist">
+  <img src ="./github/img/google_play_button.png" height=40 align=right>
+</a>
+
 # Shoqlist
 
 Shoqlist is an app for creating and sharing shopping lists. In addition to basic functionality, it also has the option to scan loyalty cards and store digital versions of them.
@@ -17,11 +21,13 @@ The main page of the app displays shopping lists created by the user. The user c
 ## **Shopping List's display**
 
 When you click on a shopping list tile, you will be taken to a page where you can see what the list contains. Using the entry box at the bottom of the screen, the user can quickly add more items to the shopping list. With a long press on any item, the user has the option to delete the item. Additionally, by simply clicking on an item, the user can mark or unmark it as done - the done items will be moved to the bottom of the list. On the other hand, if the user clicks on the star, the item will be set as favorite and thrown to the top of the list.
-The last feature is the ability to share the list using the classic sharing tool built into Android.
+Next feature is the ability to share the list using the classic sharing tool built into Android. The last feature is in-app sharing, you can give access to one of your friends.
 <div align='center'><img src="./github/img/shopping_list.png"
      alt="Shopping List"
      width="250" /><img src="./github/img/shopping_list_share_text.png"
      alt="Shopping List - share"
+     width="250" /><img src="./github/img/shopping_list_give_access.png"
+     alt="Shopping List - in-app share"
      width="250" /></div>
 Below I show what a text file that is shared looks like.
 <div align='center'><img src="./github/img/shopping_list_shared_text_example.png"
@@ -37,6 +43,17 @@ Users can store their loyalty cards in the app - saving space in their wallet. B
      alt="Loyalty Cards - Card display"
      width="200" /><img src="./github/img/loyalty_cards_add_card.png"
      alt="Loyalty Cards - Add new card"
+     width="200" /></div>
+
+## **Friends**
+
+In the app, you can add other users as friends. Using the search engine, simply enter the exact email of the user you want to add to your friends and send a friend invitation. Then, the other person has to accept the invitation to become a friend so that both people can be friends and share shopping lists
+<div align='center'><img src="./github/img/friends_search.png"
+     alt="Friends search"
+     width="200" /><img src="./github/img/friend_requests.png"
+     alt="Friend requests"
+     width="200" /><img src="./github/img/friends.png"
+     alt="Friends"
      width="200" /></div>
 
 ## **Backend**
@@ -97,4 +114,42 @@ void whenInternetConnectionIsRestoredCompareDatabasesAgain() {
    }
  });
 }
+```
+
+## **Internalization**
+With l10n, the application supports three different language versions: English, Polish and Japanese. The application version changes based on the current system language. 
+
+Below I will show what the word file looks like for the English version:
+```ruby
+{
+    "language": "English",
+    "@language":{
+        "description": "The current language"
+    },
+    "appName": "Shoqlist",
+    "@appName":{
+        "description": "Application name"
+    }
+}
+```
+Japanese version:
+```ruby
+{
+    "language": "日本語",
+    "appName": "ショクリスト"
+}
+```
+Polish version:
+```ruby
+{
+    "language": "Polski",
+    "appName": "Shoqlist"
+}
+```
+Then, using the flutter gen-l10n command, I generate a file that returns me the previously mentioned translations using variables. This is what using variables in an application looks like:
+
+```dart
+Text(
+  AppLocalizations.of(context).appName, //The name of the application in the relevant language
+  style: Theme.of(context).primaryTextTheme.headline3),
 ```
