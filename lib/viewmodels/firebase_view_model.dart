@@ -30,6 +30,7 @@ class FirebaseViewModel extends ChangeNotifier {
     if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
       return addFetchedShoppingListsDataToLocalList();
     }
+    _toolsVM.fetchStatus = FetchStatus.fetched;
     return putLocalShoppingListsDataToFirebase();
   }
 
@@ -85,7 +86,7 @@ class FirebaseViewModel extends ChangeNotifier {
     } else {
       addFetchedShoppingListsDataToLocalList();
     }
-    _toolsVM.fetchStatus = FetchStatus.fetched;
+
     if (_toolsVM.refreshStatus == RefreshStatus.duringRefresh) {
       _toolsVM.refreshStatus = RefreshStatus.refreshed;
     }
@@ -94,10 +95,12 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> getDocumentsFromReferences(List<DocumentSnapshot> _list) async {
     _sharedShoppingListsFetchedFromFirebase.clear();
     for (DocumentSnapshot doc in _list) {
+      String ownerId = doc.get('ownerId');
+      String documentId = doc.get('documentId');
       await users
-          .doc(doc.get('ownerId'))
+          .doc(ownerId)
           .collection('lists')
-          .doc(doc.get('documentId'))
+          .doc(documentId)
           .get()
           .then((DocumentSnapshot document) => {
                 if (document.exists)
@@ -288,6 +291,7 @@ class FirebaseViewModel extends ChangeNotifier {
     result = [...shoppingLists, ...sharedLists];
     _shoppingListsVM.overrideShoppingListsLocally(
         result, _cloudTimestamp, _firebaseAuth.auth.currentUser.uid);
+    _toolsVM.fetchStatus = FetchStatus.fetched;
   }
 
   void putShoppingListToFirebase(

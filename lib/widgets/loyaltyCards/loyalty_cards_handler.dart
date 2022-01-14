@@ -131,7 +131,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
     return GridView.builder(
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-        shrinkWrap: true,
+        shrinkWrap: false,
         itemCount: loyaltyCardsVM.loyaltyCardsList.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {

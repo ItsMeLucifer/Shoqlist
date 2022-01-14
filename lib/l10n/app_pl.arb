@@ -104,5 +104,10 @@
 
     "owner": "Właściciel",
     "whoHasAccess": "Kto ma dostęp?",
-    "removeAccessMsg": "Zabrać dostęp temu użytkownikowi?"
+    "removeAccessMsg": "Zabrać dostęp temu użytkownikowi?",
+
+
+
+    "you": "Ty",
+    "noUsersYouHaveSharedListMsg": "Ta lista zakupów nie została nikomu udostępniona"
 }

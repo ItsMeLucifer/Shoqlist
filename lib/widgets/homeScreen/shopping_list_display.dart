@@ -148,7 +148,10 @@ class ShoppingListDisplay extends ConsumerWidget {
                                     .getFriendsWithoutAccessToCurrentShoppingList(
                                         shoppingListsVM
                                             .getUsersWithAccessToCurrentList()),
-                                AppLocalizations.of(context).giveAccessTitle));
+                                AppLocalizations.of(context).giveAccessTitle,
+                                AppLocalizations.of(context).chooseUser,
+                                AppLocalizations.of(context)
+                                    .chooseUserEmptyMessage));
                       },
                       backgroundColor: Theme.of(context)
                           .floatingActionButtonTheme
@@ -172,7 +175,10 @@ class ShoppingListDisplay extends ConsumerWidget {
                                     .shoppingLists[
                                         shoppingListsVM.currentListIndex]
                                     .usersWithAccess,
-                                AppLocalizations.of(context).removeAccessMsg));
+                                AppLocalizations.of(context).removeAccessMsg,
+                                AppLocalizations.of(context).whoHasAccess,
+                                AppLocalizations.of(context)
+                                    .noUsersYouHaveSharedListMsg));
                       },
                       backgroundColor: Theme.of(context)
                           .floatingActionButtonTheme

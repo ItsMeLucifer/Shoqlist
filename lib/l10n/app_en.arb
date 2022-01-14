@@ -338,6 +338,17 @@
     "removeAccessMsg": "Take away this user's access?",
     "@removeAccessMsg":{
         "description": "Message displayed when user want to take away someone's access to his list"
+    },
+
+
+
+    "you": "You",
+    "@you":{
+        "description": "The 'you' word"
+    },
+    "noUsersYouHaveSharedListMsg": "You have not shared this shopping list with anyone",
+    "@noUsersYouHaveSharedListMsg":{
+        "description": "The message displayed when there is no users you have shared the shopping list"
     }
 
 }

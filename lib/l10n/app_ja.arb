@@ -105,5 +105,10 @@
 
     "owner": "オーナー",
     "whoHasAccess": "誰はアクセスがありますか",
-    "removeAccessMsg": "このユーザーのアクセス権を取り除く"
+    "removeAccessMsg": "このユーザーのアクセス権を取り除く",
+
+
+
+    "you": "あなた",
+    "noUsersYouHaveSharedListMsg": "このショッピングリストは誰にも公開されていません"
 }

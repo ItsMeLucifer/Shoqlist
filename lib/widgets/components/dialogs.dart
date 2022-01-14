@@ -198,8 +198,11 @@ class PutShoppingListData extends ConsumerWidget {
 class ChooseUser extends ConsumerWidget {
   final Function _actionAfterTapUser;
   final List<User> _usersList;
-  final String _titleToDisplay;
-  ChooseUser(this._actionAfterTapUser, this._usersList, this._titleToDisplay);
+  final String _titleToDisplayAfterTapUser;
+  final String _dialogTitle;
+  final String _noContentMsg;
+  ChooseUser(this._actionAfterTapUser, this._usersList,
+      this._titleToDisplayAfterTapUser, this._dialogTitle, this._noContentMsg);
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     return AlertDialog(
@@ -208,7 +211,7 @@ class ChooseUser extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(AppLocalizations.of(context).chooseUser,
+          Text(_dialogTitle,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center),
           SizedBox(height: 10),
@@ -217,8 +220,8 @@ class ChooseUser extends ConsumerWidget {
                   height: size.height * 0.6,
                   width: size.width * 0.9,
                   child: UsersList(_actionAfterTapUser, _usersList,
-                      _titleToDisplay, null, 0.4))
-              : Text(AppLocalizations.of(context).chooseUserEmptyMessage,
+                      _titleToDisplayAfterTapUser, null, 0.4))
+              : Text(_noContentMsg,
                   style: Theme.of(context).primaryTextTheme.bodyText1,
                   textAlign: TextAlign.center),
         ],
