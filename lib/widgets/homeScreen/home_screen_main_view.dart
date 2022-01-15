@@ -18,6 +18,7 @@ class HomeScreenMainView extends ConsumerWidget {
   void _onRefresh(BuildContext context, WidgetRef ref) {
     ref.read(toolsProvider).refreshStatus = RefreshStatus.duringRefresh;
     ref.read(firebaseProvider).getShoppingListsFromFirebase(true);
+    ref.read(firebaseAuthProvider).setCurrentUserCredentials();
   }
 
   void _deleteShoppingList(BuildContext context, WidgetRef ref) {

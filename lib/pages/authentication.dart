@@ -73,13 +73,14 @@ class Authentication extends ConsumerWidget {
                           style: Theme.of(context).primaryTextTheme.headline3),
                     ],
                   ),
-                  SizedBox(height: screenSize.height * 0.025),
+                  SizedBox(height: screenSize.height * 0.020),
                   Container(
                       width: 30,
                       height: 30,
                       child: firebaseAuthVM.status == Status.DuringAuthorization
                           ? CircularProgressIndicator()
                           : Container()),
+                  SizedBox(height: screenSize.height * 0.005),
                   Text(
                     _exceptionMessages[firebaseAuthVM.exceptionMessageIndex],
                     style: TextStyle(color: Colors.red, fontSize: 12),

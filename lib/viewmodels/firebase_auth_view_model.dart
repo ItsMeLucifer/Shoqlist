@@ -34,7 +34,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   }
 
   model.User currentUser = model.User('Nickname', 'Email', 'UserId');
-  void _setCurrentUserCredentials() async {
+  void setCurrentUserCredentials() async {
     if (_auth.currentUser != null && status == Status.Authenticated) {
       DocumentSnapshot document;
       await FirebaseFirestore.instance
@@ -95,7 +95,9 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   }
 
   Future<void> _onAuthStateChanged(User firebaseUser) async {
-    if (firebaseUser != null) {}
+    if (firebaseUser != null) {
+      status = Status.Authenticated;
+    }
   }
 
   Future<void> register(String email, String password) async {
@@ -166,7 +168,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
       });
     }
     status = Status.Authenticated;
-    _setCurrentUserCredentials();
+    setCurrentUserCredentials();
   }
 
   Future<void> signOut() async {

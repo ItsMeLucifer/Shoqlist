@@ -493,10 +493,18 @@ class FirebaseViewModel extends ChangeNotifier {
   }
 
   Future<User> getUserById(String userId) async {
-    String nickname =
-        await users.doc(userId).get().then((doc) => doc.get('nickname'));
-    String email =
-        await users.doc(userId).get().then((doc) => doc.get('email'));
+    String nickname = "";
+    String email = "";
+    await users.doc(userId).get().then((doc) {
+      if (doc.exists) {
+        nickname = doc.get('nickname');
+      }
+    });
+    await users.doc(userId).get().then((doc) {
+      if (doc.exists) {
+        doc.get('email');
+      }
+    });
     return User(nickname, email, userId);
   }
 
@@ -695,9 +703,9 @@ class FirebaseViewModel extends ChangeNotifier {
     await users
         .doc(friendRequestReceiver.userId)
         .collection('friendRequests')
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .set({
-      'userId': _firebaseAuth.currentUser.userId,
+      'userId': _firebaseAuth.auth.currentUser.uid,
       'email': _firebaseAuth.auth.currentUser.email
     });
     _friendsServiceVM.removeUserFromUsersList(friendRequestReceiver);
@@ -749,7 +757,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('friends')
         .doc(friendToRemove.userId)
         .delete();
-    //Delete current users from friendToRemove's friends list
+    //Remove current user from friendToRemove's friends list
     await users
         .doc(friendToRemove.userId)
         .collection('friends')
@@ -844,6 +852,23 @@ class FirebaseViewModel extends ChangeNotifier {
             "Failed to delete current user's id from usersWithAccess list in sharedLists: $err");
       }
     });
+    //Remove your friend's sharedLists data
+    _shoppingListsVM.currentlyDisplayedListType =
+        ShoppingListType.ownShoppingLists;
+    _shoppingListsVM.shoppingLists.forEach((list) {
+      list.usersWithAccess.forEach((user) async {
+        await users
+            .doc(user.userId)
+            .collection('sharedLists')
+            .doc(list.documentId)
+            .delete();
+      });
+    });
+    //Remove all friends
+    _friendsServiceVM.friendsList.forEach((friend) {
+      removeFriendFromFriendsList(friend);
+    });
+
     _toolsVM.clearAuthenticationTextEditingControllers();
     //Delete account and Sign-out
     await Hive.box<ShoppingList>('shopping_lists').clear();

@@ -39,7 +39,7 @@ class Settings extends ConsumerWidget {
 
   void _deleteAccount(BuildContext context, WidgetRef ref) {
     ref.read(firebaseProvider).deleteEveryDataRelatedToCurrentUser();
-    Navigator.of(context).pop();
+    Navigator.of(context).popUntil((route) => !Navigator.of(context).canPop());
   }
 
   Widget build(BuildContext context, WidgetRef ref) {
@@ -103,7 +103,9 @@ class Settings extends ConsumerWidget {
                                     width: screenSize.width * 0.4,
                                     child: Text(
                                         firebaseAuthVM.currentUser.email,
-                                        overflow: TextOverflow.ellipsis,
+                                        overflow: TextOverflow.fade,
+                                        softWrap: false,
+                                        maxLines: 1,
                                         style: Theme.of(context)
                                             .primaryTextTheme
                                             .bodyText2),
