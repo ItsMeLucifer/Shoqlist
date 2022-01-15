@@ -35,15 +35,22 @@ class FirebaseAuthViewModel extends ChangeNotifier {
 
   model.User currentUser = model.User('Nickname', 'Email', 'UserId');
   void _setCurrentUserCredentials() async {
-    if (_auth.currentUser == null || status == Status.Unauthenticated) return;
-    DocumentSnapshot document = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(auth.currentUser.uid)
-        .get();
-    if (!document.exists) return;
-    currentUser = model.User(document.get('nickname'), document.get('email'),
-        document.get('userId'));
-    notifyListeners();
+    if (_auth.currentUser != null && status == Status.Authenticated) {
+      DocumentSnapshot document;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(auth.currentUser.uid)
+          .get()
+          .then((DocumentSnapshot doc) {
+        if (doc.exists) {
+          document = doc;
+        }
+      });
+      if (document == null) return;
+      currentUser = model.User(document.get('nickname'), document.get('email'),
+          document.get('userId'));
+      notifyListeners();
+    }
   }
 
   void setExceptionMessagesTranslations(BuildContext context) {}
@@ -84,13 +91,11 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     if (email == "" || password == "") {
       _exceptionMessageIndex = 5;
     }
+    checkIfUserDocumentWasCreated();
   }
 
   Future<void> _onAuthStateChanged(User firebaseUser) async {
-    if (firebaseUser != null) {
-      status = Status.Authenticated;
-      _setCurrentUserCredentials();
-    }
+    if (firebaseUser != null) {}
   }
 
   Future<void> register(String email, String password) async {
@@ -150,28 +155,29 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     var doc = await users.doc(_auth.currentUser.uid).get();
     if (!doc.exists) {
       String nickname = auth.currentUser.email.split("@")[0];
-      users.doc(_auth.currentUser.uid).set(!_auth.currentUser.isAnonymous
-          ? {
-              'email': auth.currentUser.email,
-              'userId': auth.currentUser.uid,
-              'nickname': nickname[0].toUpperCase() + nickname.substring(1)
-            }
-          : {
-              'userId': auth.currentUser.uid,
-            });
+      users.doc(_auth.currentUser.uid).set({
+        'email': !_auth.currentUser.isAnonymous
+            ? auth.currentUser.email
+            : 'anonymous',
+        'userId':
+            !_auth.currentUser.isAnonymous ? auth.currentUser.uid : 'anonymous',
+        'nickname': nickname[0].toUpperCase() + nickname.substring(1),
+        'timestamp': 0
+      });
     }
+    status = Status.Authenticated;
     _setCurrentUserCredentials();
   }
 
   Future<void> signOut() async {
-    status = Status.Unauthenticated;
+    _status = Status.Unauthenticated;
     _exceptionMessageIndex = 10;
     notifyListeners();
     await _auth.signOut();
   }
 
   Future<void> deleteAccount() async {
-    status = Status.Unauthenticated;
+    _status = Status.Unauthenticated;
     _exceptionMessageIndex = 10;
     notifyListeners();
     await _auth.currentUser.delete();

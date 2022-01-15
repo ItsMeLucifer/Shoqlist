@@ -16,8 +16,8 @@ class Settings extends ConsumerWidget {
     Hive.box<ShoppingList>('shopping_lists').clear();
     Hive.box<int>('data_variables').clear();
     toolsVM.clearAuthenticationTextEditingControllers();
-    firebaseAuthVM.signOut();
     firebaseAuthVM.status = Status.Unauthenticated;
+    firebaseAuthVM.signOut();
     Navigator.pop(context);
   }
 
