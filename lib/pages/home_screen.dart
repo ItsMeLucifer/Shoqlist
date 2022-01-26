@@ -40,6 +40,7 @@ class _HomeScreen extends State<HomeScreen> {
 
   void fetchData(WidgetRef ref) {
     final firebaseVM = ref.read(firebaseProvider);
+    ref.read(firebaseAuthProvider).setCurrentUserCredentials();
     firebaseVM.getShoppingListsFromFirebase(true);
     firebaseVM.getLoyaltyCardsFromFirebase(true);
     firebaseVM.fetchFriendsList();

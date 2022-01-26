@@ -55,19 +55,6 @@ class FirebaseAuthViewModel extends ChangeNotifier {
 
   void setExceptionMessagesTranslations(BuildContext context) {}
 
-  // List<String> _exceptionMessages = [
-  //   "An undefined Error happened",
-  //   "No user found for that email",
-  //   "Wrong password provided for that user",
-  //   "Invalid email",
-  //   "User disabled",
-  //   "At least one of the fields is empty",
-  //   "The password provided is too weak",
-  //   "The account already exists for that email",
-  //   "Error with Google sign-in",
-  //   "Error with anonymously sign-in"
-  // ];
-
   Future<void> signIn(String email, String password) async {
     status = Status.DuringAuthorization;
     try {
@@ -97,6 +84,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   Future<void> _onAuthStateChanged(User firebaseUser) async {
     if (firebaseUser != null) {
       status = Status.Authenticated;
+      setCurrentUserCredentials();
     }
   }
 
@@ -190,7 +178,8 @@ class FirebaseAuthViewModel extends ChangeNotifier {
         .collection('users')
         .doc(auth.currentUser.uid)
         .update({'nickname': newNickname});
-    currentUser = currentUser..nickname = newNickname;
+    currentUser =
+        model.User(newNickname, currentUser.email, currentUser.userId);
     notifyListeners();
   }
 }

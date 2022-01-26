@@ -198,7 +198,7 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(_firebaseAuth.auth.currentUser.uid)
         .update({'timestamp': _shoppingListsVM.getLocalTimestamp()});
     _shoppingListsVM
-        .displayLocalShoppingLists(_firebaseAuth.currentUser.userId);
+        .displayLocalShoppingLists(_firebaseAuth.auth.currentUser.uid);
   }
 
   void addFetchedShoppingListsDataToLocalList() async {
@@ -580,7 +580,7 @@ class FirebaseViewModel extends ChangeNotifier {
 
   void deleteLoyaltyCardOnFirebase(String documentId) async {
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('loyaltyCards')
         .doc(documentId)
         .delete()
@@ -621,7 +621,7 @@ class FirebaseViewModel extends ChangeNotifier {
     input = _toolsVM.deleteAllWhitespacesFromString(input);
     await users.where("email", isEqualTo: input).get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
-        if (document.get('userId') != _firebaseAuth.currentUser.userId &&
+        if (document.get('userId') != _firebaseAuth.auth.currentUser.uid &&
             !_friendsServiceVM.friendsList.any((element) {
               return element.email == input;
             }) &&
@@ -714,13 +714,13 @@ class FirebaseViewModel extends ChangeNotifier {
   void acceptFriendRequest(User friendRequestSender) async {
     //Delete user from requests list
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friendRequests')
         .doc(friendRequestSender.userId)
         .delete();
     //Add user to currentUser's friends list
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friends')
         .doc(friendRequestSender.userId)
         .set({
@@ -731,9 +731,9 @@ class FirebaseViewModel extends ChangeNotifier {
     await users
         .doc(friendRequestSender.userId)
         .collection('friends')
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .set({
-      'userId': _firebaseAuth.currentUser.userId,
+      'userId': _firebaseAuth.auth.currentUser.uid,
       'email': _firebaseAuth.auth.currentUser.email
     });
     _friendsServiceVM.addUserToFriendsList(friendRequestSender);
@@ -743,7 +743,7 @@ class FirebaseViewModel extends ChangeNotifier {
   void declineFriendRequest(User friendRequestSender) async {
     //Delete user from requests list
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friendRequests')
         .doc(friendRequestSender.userId)
         .delete();
@@ -753,7 +753,7 @@ class FirebaseViewModel extends ChangeNotifier {
   void removeFriendFromFriendsList(User friendToRemove) async {
     //Delete friendToRemove from current user's friends list
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('friends')
         .doc(friendToRemove.userId)
         .delete();
@@ -761,7 +761,7 @@ class FirebaseViewModel extends ChangeNotifier {
     await users
         .doc(friendToRemove.userId)
         .collection('friends')
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .delete();
     _friendsServiceVM.removeUserFromFriendsList(friendToRemove);
   }
@@ -791,7 +791,7 @@ class FirebaseViewModel extends ChangeNotifier {
     List<dynamic> usersWithAccess = document.get('usersWithAccess');
     usersWithAccess.add(friend.userId);
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('lists')
         .doc(documentId)
         .update({'usersWithAccess': usersWithAccess});
@@ -814,7 +814,7 @@ class FirebaseViewModel extends ChangeNotifier {
       }
     });
     await users
-        .doc(_firebaseAuth.currentUser.userId)
+        .doc(_firebaseAuth.auth.currentUser.uid)
         .collection('lists')
         .doc(documentId)
         .update({'usersWithAccess': usersIdsWithAccess});
