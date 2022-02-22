@@ -9,15 +9,18 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class Authentication extends ConsumerWidget {
   void _registerUserFirebase(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.read(toolsProvider);
-    ref.read(firebaseAuthProvider).register(
-        toolsVM.emailController.text, toolsVM.passwordController.text);
+    ref
+        .read(firebaseAuthProvider)
+        .register(toolsVM.emailController.text, toolsVM.passwordController.text)
+        .then((_) => toolsVM.clearAuthenticationTextEditingControllers());
   }
 
   void _signInUserFirebase(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.read(toolsProvider);
     ref
         .read(firebaseAuthProvider)
-        .signIn(toolsVM.emailController.text, toolsVM.passwordController.text);
+        .signIn(toolsVM.emailController.text, toolsVM.passwordController.text)
+        .then((_) => toolsVM.clearAuthenticationTextEditingControllers());
   }
 
   void _resetExceptionMessage(BuildContext context, WidgetRef ref) {

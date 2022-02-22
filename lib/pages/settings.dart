@@ -1,22 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:shoqlist/main.dart';
-import 'package:shoqlist/models/shopping_list.dart';
-import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Settings extends ConsumerWidget {
   void _signOut(BuildContext context, WidgetRef ref) {
-    final toolsVM = ref.read(toolsProvider);
     final firebaseAuthVM = ref.read(firebaseAuthProvider);
     ref.read(shoppingListsProvider).clearDisplayedData();
-    Hive.box<ShoppingList>('shopping_lists').clear();
-    Hive.box<int>('data_variables').clear();
-    toolsVM.clearAuthenticationTextEditingControllers();
-    firebaseAuthVM.status = Status.Unauthenticated;
     firebaseAuthVM.signOut();
     Navigator.pop(context);
   }

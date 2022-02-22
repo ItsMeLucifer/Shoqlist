@@ -63,6 +63,8 @@ class FirebaseViewModel extends ChangeNotifier {
     }).catchError((error) {
       _toolsVM.printWarning(
           "Failed to fetch shopping lists data from Firebase: $error");
+      _shoppingListsVM.clearDisplayedData();
+      return _firebaseAuth.signOut();
     });
     //Fetch informations about shared shopping lists
     List<DocumentSnapshot> _sharedListsReferences = [];

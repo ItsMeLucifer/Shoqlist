@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
+import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/user.dart' as model;
 
 enum Status { Authenticated, Unauthenticated, DuringAuthorization }
@@ -37,19 +39,23 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   void setCurrentUserCredentials() async {
     if (_auth.currentUser != null && status == Status.Authenticated) {
       DocumentSnapshot document;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(auth.currentUser.uid)
-          .get()
-          .then((DocumentSnapshot doc) {
-        if (doc.exists) {
-          document = doc;
-        }
-      });
-      if (document == null) return;
-      currentUser = model.User(document.get('nickname'), document.get('email'),
-          document.get('userId'));
-      notifyListeners();
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(auth.currentUser.uid)
+            .get()
+            .then((DocumentSnapshot doc) {
+          if (doc.exists) {
+            document = doc;
+          }
+        });
+        if (document == null) return;
+        currentUser = model.User(document.get('nickname'),
+            document.get('email'), document.get('userId'));
+        notifyListeners();
+      } catch (err) {
+        print('Couldn\'t fetch current user\'s credentials, error: $err');
+      }
     }
   }
 
@@ -162,6 +168,8 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   Future<void> signOut() async {
     _status = Status.Unauthenticated;
     _exceptionMessageIndex = 10;
+    Hive.box<ShoppingList>('shopping_lists').clear();
+    Hive.box<int>('data_variables').clear();
     notifyListeners();
     await _auth.signOut();
   }
