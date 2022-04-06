@@ -64,27 +64,21 @@ class HomeScreenMainView extends ConsumerWidget {
               SizedBox(height: 5),
               Text(AppLocalizations.of(context).appName,
                   style: Theme.of(context).primaryTextTheme.headline3),
-              Divider(
-                color: Theme.of(context).colorScheme.secondary,
-                indent: 50,
-                endIndent: 50,
-              ),
-              Container(
-                height: screenSize.height * 0.05,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ShoppingListTypeChangeButton(
-                        AppLocalizations.of(context).myLists,
-                        ShoppingListType.ownShoppingLists),
-                    VerticalDivider(
-                      color: Theme.of(context).colorScheme.secondary,
-                      indent: screenSize.height * 0.01,
-                      endIndent: screenSize.height * 0.01,
+                      AppLocalizations.of(context).myLists,
+                      ShoppingListType.ownShoppingLists,
+                      Icons.list,
                     ),
                     ShoppingListTypeChangeButton(
-                        AppLocalizations.of(context).sharedLists,
-                        ShoppingListType.sharedShoppingLists),
+                      AppLocalizations.of(context).sharedLists,
+                      ShoppingListType.sharedShoppingLists,
+                      Icons.people_alt,
+                    ),
                   ],
                 ),
               ),

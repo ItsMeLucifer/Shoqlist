@@ -90,14 +90,22 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
           backgroundColor: Colors.grey[900],
-          textTheme: ThemeData.dark().textTheme,
+          textTheme: ThemeData.dark().textTheme.copyWith(),
           primaryTextTheme: TextTheme(
-              bodyText2: TextStyle(
-                  color: Colors.grey[500], fontWeight: FontWeight.bold),
-              headline3: TextStyle(
-                  color: Colors.white,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold)),
+            bodyText2: TextStyle(
+              color: Colors.grey[500],
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Epilogue',
+            ),
+            headline3: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Epilogue',
+            ),
+            headline6: TextStyle(
+              fontFamily: 'Epilogue',
+            ),
+          ),
           primaryColor: Colors.black,
           colorScheme: ColorScheme.fromSwatch(
               primarySwatch: Colors.grey, accentColor: Colors.white),
