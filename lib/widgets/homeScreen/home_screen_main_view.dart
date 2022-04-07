@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
@@ -48,6 +49,21 @@ class HomeScreenMainView extends ConsumerWidget {
           toolsVM.newListNameController.text,
           toolsVM.newListImportance,
           shoppingListsVM.currentListIndex);
+    }
+  }
+
+  void _createNewShoppingList(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.read(toolsProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final shopingListsProviderVM = ref.read(shoppingListsProvider);
+    if (toolsVM.newListNameController.text != "") {
+      String id = nanoid();
+      //CREATE LIST ON SERVER
+      firebaseVM.putShoppingListToFirebase(
+          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
+      //CREATE LIST LOCALLY
+      shopingListsProviderVM.saveNewShoppingListLocally(
+          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
     }
   }
 
@@ -143,6 +159,29 @@ class HomeScreenMainView extends ConsumerWidget {
                             ],
                           )),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25.0, left: 25, top: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.add,
+                        color: Theme.of(context).colorScheme.secondary,
+                        size: 22),
+                    TextButton(
+                      onPressed: () {
+                        ref.read(toolsProvider).resetNewListData();
+                        showDialog(
+                            context: context,
+                            builder: (context) => PutShoppingListData(
+                                _createNewShoppingList, context));
+                      },
+                      child: Text(
+                        AppLocalizations.of(context).newList,
+                        style: Theme.of(context).textTheme.bodyText2,
+                      ),
+                    )
+                  ],
+                ),
+              )
             ],
           ),
         ],

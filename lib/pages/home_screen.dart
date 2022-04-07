@@ -67,23 +67,7 @@ class _HomeScreen extends State<HomeScreen> {
         context, MaterialPageRoute(builder: (context) => FriendsDisplay()));
   }
 
-  void _createNewShoppingList(BuildContext context, WidgetRef ref) {
-    final toolsVM = ref.read(toolsProvider);
-    final firebaseVM = ref.read(firebaseProvider);
-    final shopingListsProviderVM = ref.read(shoppingListsProvider);
-    if (toolsVM.newListNameController.text != "") {
-      String id = nanoid();
-      //CREATE LIST ON SERVER
-      firebaseVM.putShoppingListToFirebase(
-          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
-      //CREATE LIST LOCALLY
-      shopingListsProviderVM.saveNewShoppingListLocally(
-          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
-    }
-  }
-
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: SpeedDial(
@@ -94,28 +78,6 @@ class _HomeScreen extends State<HomeScreen> {
             backgroundColor:
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,
             children: [
-              SpeedDialChild(
-                  labelBackgroundColor: Theme.of(context)
-                      .floatingActionButtonTheme
-                      .backgroundColor,
-                  labelStyle: Theme.of(context).textTheme.bodyText2,
-                  onTap: () {
-                    ref.read(toolsProvider).resetNewListData();
-                    showDialog(
-                        context: context,
-                        builder: (context) => PutShoppingListData(
-                            _createNewShoppingList, context));
-                  },
-                  backgroundColor: Theme.of(context)
-                      .floatingActionButtonTheme
-                      .backgroundColor,
-                  child: Icon(
-                    Icons.add,
-                    color: Theme.of(context)
-                        .floatingActionButtonTheme
-                        .foregroundColor,
-                  ),
-                  label: AppLocalizations.of(context).newList),
               SpeedDialChild(
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme

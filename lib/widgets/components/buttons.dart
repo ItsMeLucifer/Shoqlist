@@ -83,9 +83,15 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
                         ? Theme.of(context).colorScheme.secondary
                         : Theme.of(context).disabledColor),
                 SizedBox(height: 5),
-                Text(_buttonName,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).primaryTextTheme.headline6),
+                Text(
+                  _buttonName,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).primaryTextTheme.headline6.copyWith(
+                      color: shoppingListsVM.currentlyDisplayedListType ==
+                              _shoppingListType
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context).disabledColor),
+                ),
                 SizedBox(height: 8),
               ],
             ),
@@ -186,6 +192,7 @@ class ShoppingListButton extends ConsumerWidget {
     final screenSize = MediaQuery.of(context).size;
     return Container(
       height: 60,
+      key: UniqueKey(),
       child: GestureDetector(
         onTap: () {
           _onTap(context, _index, ref);
@@ -194,7 +201,7 @@ class ShoppingListButton extends ConsumerWidget {
           _onLongPress(context, _index, ref);
         },
         child: Card(
-          color: Colors.grey[300],
+          color: Color.fromRGBO(237, 236, 243, 1),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -207,6 +214,7 @@ class ShoppingListButton extends ConsumerWidget {
                       child: CircleAvatar(
                         backgroundColor: toolsVM.getImportanceColor(
                             shoppingListsVM.shoppingLists[_index].importance),
+                        foregroundColor: Colors.white,
                         child: Icon(
                           Icons.list,
                         ),
@@ -220,10 +228,7 @@ class ShoppingListButton extends ConsumerWidget {
                         maxLines: 1,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
+                        style: Theme.of(context).primaryTextTheme.button,
                       ),
                     ),
                   ],

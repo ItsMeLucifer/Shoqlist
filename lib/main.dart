@@ -19,7 +19,6 @@ import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:device_info/device_info.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 final ChangeNotifierProvider<ShoppingListsViewModel> shoppingListsProvider =
@@ -89,26 +88,38 @@ class MyApp extends StatelessWidget {
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
-          backgroundColor: Colors.grey[900],
-          textTheme: ThemeData.dark().textTheme.copyWith(),
+          backgroundColor: Colors.white,
+          textTheme: ThemeData.dark().textTheme.copyWith(
+                bodyText2: TextStyle(
+                  fontFamily: 'Epilogue',
+                  color: Color.fromRGBO(242, 102, 116, 1),
+                  fontSize: 18,
+                ),
+              ),
           primaryTextTheme: TextTheme(
-            bodyText2: TextStyle(
-              color: Colors.grey[500],
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Epilogue',
-            ),
-            headline3: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Epilogue',
-            ),
-            headline6: TextStyle(
-              fontFamily: 'Epilogue',
-            ),
-          ),
-          primaryColor: Colors.black,
+              bodyText2: TextStyle(
+                color: Colors.grey[500],
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Epilogue',
+              ),
+              headline3: TextStyle(
+                color: Color.fromRGBO(242, 102, 116, 1),
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Epilogue',
+              ),
+              headline6: TextStyle(
+                fontFamily: 'Epilogue',
+              ),
+              button: TextStyle(
+                fontFamily: 'Epilogue',
+                color: Colors.black,
+                fontSize: 18,
+              )),
+          primaryColor: Colors.white,
           colorScheme: ColorScheme.fromSwatch(
-              primarySwatch: Colors.grey, accentColor: Colors.white),
+            primarySwatch: Colors.grey,
+            accentColor: Color.fromRGBO(242, 102, 116, 1),
+          ),
           buttonTheme: ButtonThemeData(
               colorScheme: ColorScheme.fromSwatch(
                   primarySwatch: Colors.grey,
@@ -117,7 +128,7 @@ class MyApp extends StatelessWidget {
           primaryColorDark: Colors.grey[600],
           primarySwatch: Colors.grey,
           floatingActionButtonTheme: FloatingActionButtonThemeData(
-              backgroundColor: Colors.grey[850],
+              backgroundColor: Color.fromRGBO(242, 102, 116, 1),
               foregroundColor: Colors.white)),
       themeMode: ThemeMode.dark,
       supportedLocales: L10n.all,
