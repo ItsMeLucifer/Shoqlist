@@ -105,6 +105,7 @@ class MyApp extends StatelessWidget {
               headline3: TextStyle(
                 color: Color.fromRGBO(242, 102, 116, 1),
                 fontWeight: FontWeight.bold,
+                fontSize: 50,
                 fontFamily: 'Epilogue',
               ),
               headline6: TextStyle(
@@ -121,9 +122,11 @@ class MyApp extends StatelessWidget {
             accentColor: Color.fromRGBO(242, 102, 116, 1),
           ),
           buttonTheme: ButtonThemeData(
-              colorScheme: ColorScheme.fromSwatch(
-                  primarySwatch: Colors.grey,
-                  backgroundColor: Colors.grey[800])),
+            colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: Colors.grey,
+              backgroundColor: Color.fromRGBO(237, 236, 242, 1),
+            ),
+          ),
           disabledColor: Colors.grey[400],
           primaryColorDark: Colors.grey[600],
           primarySwatch: Colors.grey,

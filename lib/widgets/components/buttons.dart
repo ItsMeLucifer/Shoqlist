@@ -121,7 +121,7 @@ class BasicButton extends ConsumerWidget {
           height: 40,
           decoration: BoxDecoration(
             color: Theme.of(context).buttonTheme.colorScheme.background,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(25),
           ),
           child: Padding(
             padding: const EdgeInsets.all(5.0),

@@ -45,14 +45,13 @@ class FriendsSearchDisplay extends ConsumerWidget {
                     endIndent: 50,
                   ),
                   BasicForm(
-                      TextInputType.emailAddress,
-                      friendsServiceVM.searchFriendTextController,
-                      AppLocalizations.of(context).email,
-                      _onChanged,
-                      Icons.email,
-                      false,
-                      null,
-                      _searchForFriend),
+                    keyboardType: TextInputType.emailAddress,
+                    controller: friendsServiceVM.searchFriendTextController,
+                    hintText: AppLocalizations.of(context).email,
+                    onChanged: _onChanged,
+                    prefixIcon: Icons.email,
+                    onSubmitted: _searchForFriend,
+                  ),
                   SizedBox(height: 5),
                   Expanded(
                       child: friendsServiceVM.usersList.isEmpty &&
