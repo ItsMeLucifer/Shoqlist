@@ -185,21 +185,21 @@ class ShoppingListButton extends ConsumerWidget {
   final Function _onTap;
   final Function _onLongPress;
   final int _index;
-  ShoppingListButton(this._onTap, this._onLongPress, this._index);
+  ShoppingListButton(
+    this._onTap,
+    this._onLongPress,
+    this._index,
+  );
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
-    return Container(
-      height: 60,
-      key: UniqueKey(),
-      child: GestureDetector(
-        onTap: () {
-          _onTap(context, _index, ref);
-        },
-        onLongPress: () {
-          _onLongPress(context, _index, ref);
-        },
+    return GestureDetector(
+      onTap: _onTap,
+      onLongPress: _onLongPress,
+      child: Container(
+        height: 60,
+        key: UniqueKey(),
         child: Card(
           color: Color.fromRGBO(237, 236, 243, 1),
           child: Padding(

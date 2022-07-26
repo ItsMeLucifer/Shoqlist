@@ -230,14 +230,17 @@ class HomeScreenMainView extends ConsumerWidget {
         itemCount: shoppingListsVM.shoppingLists.length,
         itemBuilder: (context, index) {
           return Padding(
-              padding: EdgeInsets.only(
-                  left: 8.0,
-                  right: 8.0,
-                  bottom: index == shoppingListsVM.shoppingLists.length - 1
-                      ? 50
-                      : 0),
-              child: ShoppingListButton(_onTapShoppingListButton,
-                  _onLongPressShoppingListButton, index));
+            padding: EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+                bottom:
+                    index == shoppingListsVM.shoppingLists.length - 1 ? 50 : 0),
+            child: ShoppingListButton(
+              () => _onTapShoppingListButton(context, index, ref),
+              () => _onLongPressShoppingListButton(context, index, ref),
+              index,
+            ),
+          );
         });
   }
 }

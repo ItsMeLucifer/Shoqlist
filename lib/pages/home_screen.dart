@@ -82,7 +82,9 @@ class _HomeScreen extends State<HomeScreen> {
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  labelStyle: Theme.of(context).textTheme.bodyText2,
+                  labelStyle: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .extendedTextStyle,
                   onTap: () {
                     _navigateToLoyaltyCardsHandler(context);
                   },
@@ -100,7 +102,9 @@ class _HomeScreen extends State<HomeScreen> {
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  labelStyle: Theme.of(context).textTheme.bodyText2,
+                  labelStyle: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .extendedTextStyle,
                   onTap: () {
                     _navigateToFriendsDisplay(context);
                   },
@@ -118,7 +122,9 @@ class _HomeScreen extends State<HomeScreen> {
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  labelStyle: Theme.of(context).textTheme.bodyText2,
+                  labelStyle: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .extendedTextStyle,
                   onTap: () {
                     _navigateToSettings(context);
                   },

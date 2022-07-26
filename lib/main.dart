@@ -87,53 +87,60 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
-      darkTheme: ThemeData(
-          backgroundColor: Colors.white,
-          textTheme: ThemeData.dark().textTheme.copyWith(
-                bodyText2: TextStyle(
-                  fontFamily: 'Epilogue',
-                  color: Color.fromRGBO(242, 102, 116, 1),
-                  fontSize: 18,
-                ),
-              ),
-          primaryTextTheme: TextTheme(
+      theme: ThemeData(
+        backgroundColor: Colors.white,
+        textTheme: ThemeData.dark().textTheme.copyWith(
               bodyText2: TextStyle(
-                color: Colors.grey[500],
-                fontWeight: FontWeight.bold,
                 fontFamily: 'Epilogue',
-              ),
-              headline3: TextStyle(
                 color: Color.fromRGBO(242, 102, 116, 1),
-                fontWeight: FontWeight.bold,
-                fontSize: 50,
-                fontFamily: 'Epilogue',
-              ),
-              headline6: TextStyle(
-                fontFamily: 'Epilogue',
-              ),
-              button: TextStyle(
-                fontFamily: 'Epilogue',
-                color: Colors.black,
                 fontSize: 18,
-              )),
-          primaryColor: Colors.white,
+              ),
+            ),
+        primaryTextTheme: TextTheme(
+            bodyText2: TextStyle(
+              color: Colors.grey[500],
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Epilogue',
+            ),
+            headline3: TextStyle(
+              color: Color.fromRGBO(242, 102, 116, 1),
+              fontWeight: FontWeight.bold,
+              fontSize: 50,
+              fontFamily: 'Epilogue',
+            ),
+            headline6: TextStyle(
+              fontFamily: 'Epilogue',
+            ),
+            button: TextStyle(
+              fontFamily: 'Epilogue',
+              color: Colors.black,
+              fontSize: 18,
+            )),
+        primaryColor: Colors.white,
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.grey,
+          accentColor: Color.fromRGBO(242, 102, 116, 1),
+        ),
+        buttonTheme: ButtonThemeData(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.grey,
-            accentColor: Color.fromRGBO(242, 102, 116, 1),
+            backgroundColor: Color.fromRGBO(237, 236, 242, 1),
           ),
-          buttonTheme: ButtonThemeData(
-            colorScheme: ColorScheme.fromSwatch(
-              primarySwatch: Colors.grey,
-              backgroundColor: Color.fromRGBO(237, 236, 242, 1),
-            ),
+        ),
+        disabledColor: Colors.grey[400],
+        primaryColorDark: Colors.grey[600],
+        primarySwatch: Colors.grey,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Color.fromRGBO(242, 102, 116, 1),
+          foregroundColor: Colors.white,
+          extendedTextStyle: TextStyle(
+            fontFamily: 'Epilogue',
+            color: Colors.white,
+            fontSize: 15,
           ),
-          disabledColor: Colors.grey[400],
-          primaryColorDark: Colors.grey[600],
-          primarySwatch: Colors.grey,
-          floatingActionButtonTheme: FloatingActionButtonThemeData(
-              backgroundColor: Color.fromRGBO(242, 102, 116, 1),
-              foregroundColor: Colors.white)),
-      themeMode: ThemeMode.dark,
+        ),
+      ),
+      themeMode: ThemeMode.light,
       supportedLocales: L10n.all,
       localizationsDelegates: [
         AppLocalizations.delegate,
