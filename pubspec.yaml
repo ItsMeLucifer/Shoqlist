@@ -100,4 +100,4 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 flutter_native_splash:
   image: images/icon.png
-  color: 000000
+  color: "#ffffff"

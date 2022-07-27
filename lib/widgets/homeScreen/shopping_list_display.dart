@@ -8,6 +8,7 @@ import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shoqlist/widgets/components/forms.dart';
 
 class ShoppingListDisplay extends ConsumerWidget {
   void _onLongPressShoppingListItem(BuildContext context, WidgetRef ref) {
@@ -93,154 +94,168 @@ class ShoppingListDisplay extends ConsumerWidget {
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
+    final currentListImportanceColor = toolsVM.getImportanceColor(
+        shoppingListsVM
+            .shoppingLists[shoppingListsVM.currentListIndex].importance);
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
-      //backgroundColor: Theme.of(context).backgroundColor,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 60.0),
-        child: SpeedDial(
-          overlayOpacity: 0,
-          animatedIcon: AnimatedIcons.menu_close,
-          foregroundColor:
-              Theme.of(context).floatingActionButtonTheme.foregroundColor,
-          backgroundColor:
-              Theme.of(context).floatingActionButtonTheme.backgroundColor,
-          children: shoppingListsVM
-                      .shoppingLists[shoppingListsVM.currentListIndex]
-                      .ownerId ==
-                  firebaseAuthVM.currentUser.userId
-              ? [
-                  SpeedDialChild(
-                      labelBackgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      labelStyle: Theme.of(context).textTheme.bodyText2,
-                      child: Icon(Icons.share,
-                          color: Theme.of(context)
-                              .floatingActionButtonTheme
-                              .foregroundColor),
-                      onTap: () {
-                        Share.share(
-                            shoppingListsVM
-                                .getCurrentShoppingListDataInString(),
-                            subject:
-                                AppLocalizations.of(context).shareListSubject);
-                      },
-                      backgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      label: AppLocalizations.of(context).share),
-                  SpeedDialChild(
-                      labelBackgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      labelStyle: Theme.of(context).textTheme.bodyText2,
-                      child: Icon(Icons.add_moderator,
-                          color: Theme.of(context)
-                              .floatingActionButtonTheme
-                              .foregroundColor),
-                      onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => ChooseUser(
-                                _giveAccessToTheFriendAfterTap,
-                                friendsServiceVM
-                                    .getFriendsWithoutAccessToCurrentShoppingList(
-                                        shoppingListsVM
-                                            .getUsersWithAccessToCurrentList()),
-                                AppLocalizations.of(context).giveAccessTitle,
-                                AppLocalizations.of(context).chooseUser,
-                                AppLocalizations.of(context)
-                                    .chooseUserEmptyMessage));
-                      },
-                      backgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      label: AppLocalizations.of(context).giveAccess),
-                  SpeedDialChild(
-                      labelBackgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      labelStyle: Theme.of(context).textTheme.bodyText2,
-                      child: Icon(Icons.info,
-                          color: Theme.of(context)
-                              .floatingActionButtonTheme
-                              .foregroundColor),
-                      onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => ChooseUser(
-                                _denyFriendAccessAfterTap,
-                                shoppingListsVM
-                                    .shoppingLists[
-                                        shoppingListsVM.currentListIndex]
-                                    .usersWithAccess,
-                                AppLocalizations.of(context).removeAccessMsg,
-                                AppLocalizations.of(context).whoHasAccess,
-                                AppLocalizations.of(context)
-                                    .noUsersYouHaveSharedListMsg));
-                      },
-                      backgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      label: AppLocalizations.of(context).whoHasAccess),
-                ]
-              : [
-                  SpeedDialChild(
-                      labelBackgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      labelStyle: Theme.of(context).textTheme.bodyText2,
-                      child: Icon(Icons.share,
-                          color: Theme.of(context)
-                              .floatingActionButtonTheme
-                              .foregroundColor),
-                      onTap: () {
-                        Share.share(
-                            shoppingListsVM
-                                .getCurrentShoppingListDataInString(),
-                            subject:
-                                AppLocalizations.of(context).shareListSubject);
-                      },
-                      backgroundColor: Theme.of(context)
-                          .floatingActionButtonTheme
-                          .backgroundColor,
-                      label: AppLocalizations.of(context).share),
-                ],
-        ),
+      floatingActionButton: SpeedDial(
+        overlayOpacity: 0,
+        animatedIcon: AnimatedIcons.menu_close,
+        foregroundColor:
+            Theme.of(context).floatingActionButtonTheme.foregroundColor,
+        backgroundColor:
+            Theme.of(context).floatingActionButtonTheme.backgroundColor,
+        children: shoppingListsVM
+                    .shoppingLists[shoppingListsVM.currentListIndex].ownerId ==
+                firebaseAuthVM.currentUser.userId
+            ? [
+                SpeedDialChild(
+                    labelBackgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    labelStyle: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .extendedTextStyle,
+                    child: Icon(Icons.share,
+                        color: Theme.of(context)
+                            .floatingActionButtonTheme
+                            .foregroundColor),
+                    onTap: () {
+                      Share.share(
+                          shoppingListsVM.getCurrentShoppingListDataInString(),
+                          subject:
+                              AppLocalizations.of(context).shareListSubject);
+                    },
+                    backgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    label: AppLocalizations.of(context).share),
+                SpeedDialChild(
+                    labelBackgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    labelStyle: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .extendedTextStyle,
+                    child: Icon(Icons.add_moderator,
+                        color: Theme.of(context)
+                            .floatingActionButtonTheme
+                            .foregroundColor),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => ChooseUser(
+                              _giveAccessToTheFriendAfterTap,
+                              friendsServiceVM
+                                  .getFriendsWithoutAccessToCurrentShoppingList(
+                                      shoppingListsVM
+                                          .getUsersWithAccessToCurrentList()),
+                              AppLocalizations.of(context).giveAccessTitle,
+                              AppLocalizations.of(context).chooseUser,
+                              AppLocalizations.of(context)
+                                  .chooseUserEmptyMessage));
+                    },
+                    backgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    label: AppLocalizations.of(context).giveAccess),
+                SpeedDialChild(
+                    labelBackgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    labelStyle: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .extendedTextStyle,
+                    child: Icon(Icons.info,
+                        color: Theme.of(context)
+                            .floatingActionButtonTheme
+                            .foregroundColor),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => ChooseUser(
+                              _denyFriendAccessAfterTap,
+                              shoppingListsVM
+                                  .shoppingLists[
+                                      shoppingListsVM.currentListIndex]
+                                  .usersWithAccess,
+                              AppLocalizations.of(context).removeAccessMsg,
+                              AppLocalizations.of(context).whoHasAccess,
+                              AppLocalizations.of(context)
+                                  .noUsersYouHaveSharedListMsg));
+                    },
+                    backgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    label: AppLocalizations.of(context).whoHasAccess),
+              ]
+            : [
+                SpeedDialChild(
+                    labelBackgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    labelStyle: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .extendedTextStyle,
+                    child: Icon(Icons.share,
+                        color: Theme.of(context)
+                            .floatingActionButtonTheme
+                            .foregroundColor),
+                    onTap: () {
+                      Share.share(
+                          shoppingListsVM.getCurrentShoppingListDataInString(),
+                          subject:
+                              AppLocalizations.of(context).shareListSubject);
+                    },
+                    backgroundColor: Theme.of(context)
+                        .floatingActionButtonTheme
+                        .backgroundColor,
+                    label: AppLocalizations.of(context).share),
+              ],
       ),
       body: SafeArea(
         child: Stack(
           children: [
             Column(
               children: [
-                SizedBox(height: 5),
-                Text(
+                SizedBox(height: 20),
+                Container(
+                  width: screenSize.width,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Text(
                     shoppingListsVM
                         .shoppingLists[shoppingListsVM.currentListIndex].name,
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-                Divider(
-                  color: Theme.of(context).colorScheme.secondary,
-                  indent: 50,
-                  endIndent: 50,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                      color: currentListImportanceColor,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
                 ),
+                const SizedBox(height: 5),
                 Container(
-                    width: screenSize.width - 100,
-                    child: Text(
-                      AppLocalizations.of(context).owner +
-                          ": " +
-                          shoppingListsVM
-                              .shoppingLists[shoppingListsVM.currentListIndex]
-                              .ownerName,
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                      maxLines: 1,
-                    )),
+                  width: screenSize.width,
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: Text(
+                    AppLocalizations.of(context).owner +
+                        ": " +
+                        shoppingListsVM
+                            .shoppingLists[shoppingListsVM.currentListIndex]
+                            .ownerName,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    maxLines: 1,
+                    style: Theme.of(context).textTheme.bodyText2.copyWith(
+                          color: currentListImportanceColor,
+                        ),
+                  ),
+                ),
                 Expanded(
                   child: LiquidPullToRefresh(
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      backgroundColor: currentListImportanceColor,
                       color: Theme.of(context).primaryColor,
                       height: 50,
                       animSpeedFactor: 5,
@@ -269,51 +284,50 @@ class ShoppingListDisplay extends ConsumerWidget {
                 color: Theme.of(context).backgroundColor,
                 child: Row(
                   children: [
-                    Expanded(
-                      child: Padding(
+                    Container(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
+                        width: screenSize.width * 0.8,
+                        child: BasicForm(
                           key: toolsVM.addNewItemNameFormFieldKey,
-                          focusNode: toolsVM.newItemFocusNode,
                           keyboardType: TextInputType.name,
-                          autofocus: false,
-                          autocorrect: false,
-                          obscureText: false,
                           controller: toolsVM.newItemNameController,
-                          style: TextStyle(fontWeight: FontWeight.bold),
                           decoration: InputDecoration(
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                _addNewItemToCurrentShoppingList(context, ref);
+                                toolsVM.clearNewItemTextEditingController();
+                                toolsVM.newItemFocusNode.requestFocus();
+                              },
+                              child: Icon(
+                                Icons.add,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                            ),
                             fillColor: Colors.grey[600],
                             hintText: AppLocalizations.of(context).itemNameHint,
                             hintStyle:
                                 Theme.of(context).primaryTextTheme.bodyText2,
                             contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                             enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1,
-                                    color: Theme.of(context).primaryColorDark)),
+                              borderSide: BorderSide(
+                                width: 1,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                            ),
                             focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary)),
+                              borderSide: BorderSide(
+                                width: 1,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                            ),
                           ),
-                          onFieldSubmitted: (value) {
+                          onSubmitted: (value) {
                             _addNewItemToCurrentShoppingList(context, ref);
                             toolsVM.clearNewItemTextEditingController();
                             toolsVM.newItemFocusNode.requestFocus();
                           },
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          _addNewItemToCurrentShoppingList(context, ref);
-                          toolsVM.clearNewItemTextEditingController();
-                          toolsVM.newItemFocusNode.requestFocus();
-                        },
-                        child: Icon(Icons.add,
-                            color: Theme.of(context).colorScheme.secondary)),
+                          style: Theme.of(context).textTheme.bodyText1,
+                        )),
                     SizedBox(width: 10)
                   ],
                 ),
@@ -331,87 +345,100 @@ class ShoppingListDisplay extends ConsumerWidget {
     ShoppingList shoppingList =
         shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
     return ListView.builder(
-        shrinkWrap: false,
-        itemCount: shoppingList.list.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              shoppingListsVM.pickedListItemIndex = index;
-              //TOGGLE ITEM STATE ON FIREBASE
-              firebaseVM.toggleStateOfShoppingListItemOnFirebase(
-                  shoppingList.documentId,
-                  index,
-                  shoppingListsVM
-                      .shoppingLists[shoppingListsVM.currentListIndex].ownerId);
-              //TOGGLE ITEM STATE LOCALLY
-              shoppingListsVM.toggleItemStateLocally(
-                  shoppingListsVM.currentListIndex, index);
-            },
-            onLongPress: () {
-              shoppingListsVM.pickedListItemIndex = index;
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return YesNoDialog(
-                        _onLongPressShoppingListItem,
-                        AppLocalizations.of(context)
-                            .removeItemMsg(shoppingList.list[index].itemName));
-                  });
-            },
-            child: Padding(
-              padding: EdgeInsets.only(
-                  bottom: shoppingList.list.length - 1 == index ? 70 : 0),
-              child: Card(
-                color: Theme.of(context).primaryColor,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Icon(
-                          shoppingList.list[index].gotItem
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_off,
-                          color: Theme.of(context).colorScheme.secondary),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(shoppingList.list[index].itemName,
-                            style: TextStyle(
-                                decoration: shoppingList.list[index].gotItem
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none)),
+      shrinkWrap: false,
+      itemCount: shoppingList.list.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            shoppingListsVM.pickedListItemIndex = index;
+            //TOGGLE ITEM STATE ON FIREBASE
+            firebaseVM.toggleStateOfShoppingListItemOnFirebase(
+                shoppingList.documentId,
+                index,
+                shoppingListsVM
+                    .shoppingLists[shoppingListsVM.currentListIndex].ownerId);
+            //TOGGLE ITEM STATE LOCALLY
+            shoppingListsVM.toggleItemStateLocally(
+                shoppingListsVM.currentListIndex, index);
+          },
+          onLongPress: () {
+            shoppingListsVM.pickedListItemIndex = index;
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return YesNoDialog(
+                      _onLongPressShoppingListItem,
+                      AppLocalizations.of(context)
+                          .removeItemMsg(shoppingList.list[index].itemName));
+                });
+          },
+          child: Padding(
+            padding: EdgeInsets.only(
+                bottom: shoppingList.list.length - 1 == index ? 70 : 0),
+            child: Card(
+              color: Theme.of(context).listTileTheme.tileColor,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: 50,
+                ),
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      shoppingList.list[index].gotItem
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: Theme.of(context).listTileTheme.iconColor,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        shoppingList.list[index].itemName,
+                        style: TextStyle(
+                          color: Colors.black,
+                          decoration: shoppingList.list[index].gotItem
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                        ),
                       ),
-                      GestureDetector(
-                          onTap: () {
-                            //TOGGLE ITEM FAVORITE ON FIREBASE
-                            firebaseVM
-                                .toggleFavoriteOfShoppingListItemOnFirebase(
-                                    shoppingList.documentId,
-                                    index,
-                                    shoppingList.ownerId);
-                            //TOGGLE ITEM FAVORITE LOCALLY
-                            shoppingListsVM.toggleItemFavoriteLocally(
-                                shoppingListsVM.currentListIndex, index);
-                          },
-                          child: Stack(
-                            children: [
-                              Icon(
-                                  !shoppingList.list[index].isFavorite
-                                      ? null
-                                      : Icons.star,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary),
-                              Icon(
-                                Icons.star_border_outlined,
-                                color: Theme.of(context).colorScheme.secondary,
-                              )
-                            ],
-                          )),
-                    ],
-                  ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        //TOGGLE ITEM FAVORITE ON FIREBASE
+                        firebaseVM.toggleFavoriteOfShoppingListItemOnFirebase(
+                            shoppingList.documentId,
+                            index,
+                            shoppingList.ownerId);
+                        //TOGGLE ITEM FAVORITE LOCALLY
+                        shoppingListsVM.toggleItemFavoriteLocally(
+                            shoppingListsVM.currentListIndex, index);
+                      },
+                      child: Stack(
+                        children: [
+                          Icon(
+                            !shoppingList.list[index].isFavorite
+                                ? null
+                                : Icons.star,
+                            color: Theme.of(context).listTileTheme.iconColor,
+                          ),
+                          Icon(
+                            Icons.star_border_outlined,
+                            color: Theme.of(context).listTileTheme.iconColor,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }

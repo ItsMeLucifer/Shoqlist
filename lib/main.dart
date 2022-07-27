@@ -88,12 +88,22 @@ class MyApp extends StatelessWidget {
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        listTileTheme: ListTileThemeData(
+          tileColor: Color.fromRGBO(237, 236, 242, 1),
+          iconColor: Color.fromRGBO(187, 191, 201, 1),
+        ),
         backgroundColor: Colors.white,
         textTheme: ThemeData.dark().textTheme.copyWith(
               bodyText2: TextStyle(
                 fontFamily: 'Epilogue',
                 color: Color.fromRGBO(242, 102, 116, 1),
                 fontSize: 18,
+              ),
+              bodyText1: TextStyle(
+                fontFamily: 'Epilogue',
+                color: Color.fromRGBO(242, 102, 116, 1),
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
               ),
             ),
         primaryTextTheme: TextTheme(
