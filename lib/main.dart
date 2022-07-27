@@ -118,8 +118,22 @@ class MyApp extends StatelessWidget {
               fontSize: 50,
               fontFamily: 'Epilogue',
             ),
+            headline4: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 40,
+              color: Color.fromRGBO(242, 102, 116, 1),
+              fontFamily: 'Epilogue',
+            ),
+            headline5: TextStyle(
+              fontFamily: 'Epilogue',
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
             headline6: TextStyle(
               fontFamily: 'Epilogue',
+              color: Colors.black,
+              fontSize: 18,
             ),
             button: TextStyle(
               fontFamily: 'Epilogue',

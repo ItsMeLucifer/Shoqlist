@@ -123,9 +123,9 @@ class ShoppingListDisplay extends ConsumerWidget {
                             .foregroundColor),
                     onTap: () {
                       Share.share(
-                          shoppingListsVM.getCurrentShoppingListDataInString(),
-                          subject:
-                              AppLocalizations.of(context).shareListSubject);
+                        shoppingListsVM.getCurrentShoppingListDataInString(),
+                        subject: AppLocalizations.of(context).shareListSubject,
+                      );
                     },
                     backgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
@@ -161,34 +161,34 @@ class ShoppingListDisplay extends ConsumerWidget {
                         .backgroundColor,
                     label: AppLocalizations.of(context).giveAccess),
                 SpeedDialChild(
-                    labelBackgroundColor: Theme.of(context)
-                        .floatingActionButtonTheme
-                        .backgroundColor,
-                    labelStyle: Theme.of(context)
-                        .floatingActionButtonTheme
-                        .extendedTextStyle,
-                    child: Icon(Icons.info,
-                        color: Theme.of(context)
-                            .floatingActionButtonTheme
-                            .foregroundColor),
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => ChooseUser(
-                              _denyFriendAccessAfterTap,
-                              shoppingListsVM
-                                  .shoppingLists[
-                                      shoppingListsVM.currentListIndex]
-                                  .usersWithAccess,
-                              AppLocalizations.of(context).removeAccessMsg,
-                              AppLocalizations.of(context).whoHasAccess,
-                              AppLocalizations.of(context)
-                                  .noUsersYouHaveSharedListMsg));
-                    },
-                    backgroundColor: Theme.of(context)
-                        .floatingActionButtonTheme
-                        .backgroundColor,
-                    label: AppLocalizations.of(context).whoHasAccess),
+                  labelBackgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  labelStyle: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .extendedTextStyle,
+                  child: Icon(Icons.info,
+                      color: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .foregroundColor),
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) => ChooseUser(
+                            _denyFriendAccessAfterTap,
+                            shoppingListsVM
+                                .shoppingLists[shoppingListsVM.currentListIndex]
+                                .usersWithAccess,
+                            AppLocalizations.of(context).removeAccessMsg,
+                            AppLocalizations.of(context).whoHasAccess,
+                            AppLocalizations.of(context)
+                                .noUsersYouHaveSharedListMsg));
+                  },
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  label: AppLocalizations.of(context).whoHasAccess,
+                ),
               ]
             : [
                 SpeedDialChild(
@@ -226,11 +226,10 @@ class ShoppingListDisplay extends ConsumerWidget {
                   child: Text(
                     shoppingListsVM
                         .shoppingLists[shoppingListsVM.currentListIndex].name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40,
-                      color: currentListImportanceColor,
-                    ),
+                    style: Theme.of(context)
+                        .primaryTextTheme
+                        .headline4
+                        .copyWith(color: currentListImportanceColor),
                     textAlign: TextAlign.left,
                   ),
                 ),
