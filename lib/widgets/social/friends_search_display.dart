@@ -28,6 +28,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
     final friendsServiceVM = ref.watch(friendsServiceProvider);
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: SafeArea(
@@ -36,23 +37,20 @@ class FriendsSearchDisplay extends ConsumerWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 5),
-                  Text(AppLocalizations.of(context).searchFriends,
-                      style: Theme.of(context).primaryTextTheme.headline4),
-                  Divider(
-                    color: Theme.of(context).colorScheme.secondary,
-                    indent: 50,
-                    endIndent: 50,
+                  Container(
+                    padding: const EdgeInsets.all(20.0),
+                    width: screenSize.width,
+                    child: Text(AppLocalizations.of(context).searchFriends,
+                        style: Theme.of(context).primaryTextTheme.headline4),
                   ),
                   BasicForm(
-                      TextInputType.emailAddress,
-                      friendsServiceVM.searchFriendTextController,
-                      AppLocalizations.of(context).email,
-                      _onChanged,
-                      Icons.email,
-                      false,
-                      null,
-                      _searchForFriend),
+                    keyboardType: TextInputType.emailAddress,
+                    controller: friendsServiceVM.searchFriendTextController,
+                    hintText: AppLocalizations.of(context).email,
+                    onChanged: _onChanged,
+                    prefixIcon: Icons.email,
+                    onSubmitted: _searchForFriend,
+                  ),
                   SizedBox(height: 5),
                   Expanded(
                       child: friendsServiceVM.usersList.isEmpty &&

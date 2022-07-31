@@ -31,7 +31,9 @@ class FirebaseViewModel extends ChangeNotifier {
       return addFetchedShoppingListsDataToLocalList();
     }
     _toolsVM.fetchStatus = FetchStatus.fetched;
-    return putLocalShoppingListsDataToFirebase();
+    if (localTimestamp != null && _cloudTimestamp < localTimestamp) {
+      return putLocalShoppingListsDataToFirebase();
+    }
   }
 
   // -- SHOPPING LISTS
@@ -54,7 +56,9 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('lists')
         .get()
         .then((QuerySnapshot querySnapshot) {
-      if (querySnapshot.size > 0) {
+      if (querySnapshot != null &&
+          querySnapshot.size > 0 &&
+          querySnapshot.docs != null) {
         _shoppingListsFetchedFromFirebase.clear();
         querySnapshot.docs.forEach((doc) {
           _shoppingListsFetchedFromFirebase.add(doc);
@@ -73,7 +77,9 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('sharedLists')
         .get()
         .then((QuerySnapshot querySnapshot) {
-      if (querySnapshot.size > 0) {
+      if (querySnapshot != null &&
+          querySnapshot.size > 0 &&
+          querySnapshot.docs != null) {
         querySnapshot.docs.forEach((doc) {
           _sharedListsReferences.add(doc);
         });

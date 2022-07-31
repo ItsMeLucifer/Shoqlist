@@ -1,0 +1,29 @@
+I/DynamiteModule(13849): Considering local module providerinstaller:0 and remote module providerinstaller:0
+W/ProviderInstaller(13849): Failed to load providerinstaller module: No acceptable module found. Local version is 0 and remote version is 0.
+E/flutter (13849): [ERROR:flutter/lib/ui/ui_dart_state.cc(209)] Unhandled Exception: NoSuchMethodError: The method 'forEach' was called on null.
+E/flutter (13849): Receiver: null
+E/flutter (13849): Tried calling: forEach(Closure: (User) => Null)
+E/flutter (13849): #0      Object.noSuchMethod (dart:core-patch/object_patch.dart:68:5)
+E/flutter (13849): #1      FirebaseViewModel.putLocalShoppingListsDataToFirebase
+package:shoqlist/viewmodels/firebase_view_model.dart:178
+E/flutter (13849): #2      FirebaseViewModel.compareDiscrepanciesBetweenCloudAndLocalData
+package:shoqlist/viewmodels/firebase_view_model.dart:34
+E/flutter (13849): #3      FirebaseViewModel.getShoppingListsFromFirebase
+package:shoqlist/viewmodels/firebase_view_model.dart:87
+E/flutter (13849): <asynchronous suspension>
+E/flutter (13849):
+E/flutter (13849): [ERROR:flutter/lib/ui/ui_dart_state.cc(209)] Unhandled Exception: NoSuchMethodError: The method 'forEach' was called on null.
+E/flutter (13849): Receiver: null
+E/flutter (13849): Tried calling: forEach(Closure: (User) => Null)
+E/flutter (13849): #0      Object.noSuchMethod (dart:core-patch/object_patch.dart:68:5)
+E/flutter (13849): #1      FirebaseViewModel.putLocalShoppingListsDataToFirebase
+package:shoqlist/viewmodels/firebase_view_model.dart:178
+E/flutter (13849): #2      FirebaseViewModel.compareDiscrepanciesBetweenCloudAndLocalData
+package:shoqlist/viewmodels/firebase_view_model.dart:34
+E/flutter (13849): #3      FirebaseViewModel.getShoppingListsFromFirebase
+package:shoqlist/viewmodels/firebase_view_model.dart:87
+E/flutter (13849): <asynchronous suspension>
+E/flutter (13849):
+I/flutter (13849): Updated list on Firebase
+I/chatty  (13849): uid=10138(com.jocs.shoqlist) 1.ui identical 8 lines
+I/flutter (13849): Updated list on Firebase

@@ -83,13 +83,13 @@ class LoyaltyCardsHandler extends ConsumerWidget {
           children: [
             Column(
               children: [
-                SizedBox(height: 5),
-                Text(AppLocalizations.of(context).loyaltyCards,
-                    style: Theme.of(context).primaryTextTheme.headline4),
-                Divider(
-                  color: Theme.of(context).colorScheme.secondary,
-                  indent: 50,
-                  endIndent: 50,
+                Container(
+                  padding: const EdgeInsets.all(20.0),
+                  width: screenSize.width,
+                  child: Text(
+                    AppLocalizations.of(context).loyaltyCards,
+                    style: Theme.of(context).primaryTextTheme.headline4,
+                  ),
                 ),
                 Expanded(
                   child: Padding(
@@ -136,32 +136,33 @@ class LoyaltyCardsHandler extends ConsumerWidget {
         itemBuilder: (context, index) {
           if (index == 0) {
             return GestureDetector(
-                onTap: () {
-                  toolsVM.clearLoyaltyCardTextEditingControllers();
-                  showDialog(
-                      context: context,
-                      builder: (context) => PutLoyaltyCardsData(
-                          _addNewLoyaltyCard,
-                          AppLocalizations.of(context).newCardTitle));
-                },
-                child: Card(
-                  color: Theme.of(context).disabledColor.withOpacity(0.5),
-                  child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Center(
-                          child:
-                              Icon(Icons.add, size: 50, color: Colors.white))),
-                ));
+              onTap: () {
+                toolsVM.clearLoyaltyCardTextEditingControllers();
+                showDialog(
+                    context: context,
+                    builder: (context) => PutLoyaltyCardsData(
+                        _addNewLoyaltyCard,
+                        AppLocalizations.of(context).newCardTitle));
+              },
+              child: Card(
+                color: Theme.of(context).disabledColor.withOpacity(0.5),
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                        child: Icon(Icons.add, size: 50, color: Colors.white))),
+              ),
+            );
           }
           int fixedIndex = index - 1;
           return GestureDetector(
               onTap: () {
                 loyaltyCardsVM.currentLoyaltyCardsListIndex = fixedIndex;
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return LoyaltyCardInfo();
-                    });
+                  context: context,
+                  builder: (context) {
+                    return LoyaltyCardInfo();
+                  },
+                );
               },
               onLongPress: () {
                 loyaltyCardsVM.currentLoyaltyCardsListIndex = fixedIndex;

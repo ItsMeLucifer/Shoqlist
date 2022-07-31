@@ -19,7 +19,6 @@ import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:device_info/device_info.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 final ChangeNotifierProvider<ShoppingListsViewModel> shoppingListsProvider =
@@ -88,30 +87,84 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Shoqlist',
       debugShowCheckedModeBanner: false,
-      darkTheme: ThemeData(
-          backgroundColor: Colors.grey[900],
-          textTheme: ThemeData.dark().textTheme,
-          primaryTextTheme: TextTheme(
+      theme: ThemeData(
+        listTileTheme: ListTileThemeData(
+          tileColor: Color.fromRGBO(237, 236, 242, 1),
+          iconColor: Color.fromRGBO(187, 191, 201, 1),
+        ),
+        backgroundColor: Colors.white,
+        textTheme: ThemeData.dark().textTheme.copyWith(
               bodyText2: TextStyle(
-                  color: Colors.grey[500], fontWeight: FontWeight.bold),
-              headline3: TextStyle(
-                  color: Colors.white,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold)),
-          primaryColor: Colors.black,
-          colorScheme: ColorScheme.fromSwatch(
-              primarySwatch: Colors.grey, accentColor: Colors.white),
-          buttonTheme: ButtonThemeData(
-              colorScheme: ColorScheme.fromSwatch(
-                  primarySwatch: Colors.grey,
-                  backgroundColor: Colors.grey[800])),
-          disabledColor: Colors.grey[400],
-          primaryColorDark: Colors.grey[600],
+                fontFamily: 'Epilogue',
+                color: Color.fromRGBO(242, 102, 116, 1),
+                fontSize: 18,
+              ),
+              bodyText1: TextStyle(
+                fontFamily: 'Epilogue',
+                color: Color.fromRGBO(242, 102, 116, 1),
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+        primaryTextTheme: TextTheme(
+            bodyText2: TextStyle(
+              color: Colors.grey[500],
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Epilogue',
+            ),
+            headline3: TextStyle(
+              color: Color.fromRGBO(242, 102, 116, 1),
+              fontWeight: FontWeight.bold,
+              fontSize: 50,
+              fontFamily: 'Epilogue',
+            ),
+            headline4: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 40,
+              color: Color.fromRGBO(242, 102, 116, 1),
+              fontFamily: 'Epilogue',
+            ),
+            headline5: TextStyle(
+              fontFamily: 'Epilogue',
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+            headline6: TextStyle(
+              fontFamily: 'Epilogue',
+              color: Colors.black,
+              fontSize: 18,
+            ),
+            button: TextStyle(
+              fontFamily: 'Epilogue',
+              color: Colors.black,
+              fontSize: 18,
+            )),
+        primaryColor: Colors.white,
+        colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.grey,
-          floatingActionButtonTheme: FloatingActionButtonThemeData(
-              backgroundColor: Colors.grey[850],
-              foregroundColor: Colors.white)),
-      themeMode: ThemeMode.dark,
+          accentColor: Color.fromRGBO(242, 102, 116, 1),
+        ),
+        buttonTheme: ButtonThemeData(
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.grey,
+            backgroundColor: Color.fromRGBO(237, 236, 242, 1),
+          ),
+        ),
+        disabledColor: Colors.grey[400],
+        primaryColorDark: Colors.grey[600],
+        primarySwatch: Colors.grey,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Color.fromRGBO(242, 102, 116, 1),
+          foregroundColor: Colors.white,
+          extendedTextStyle: TextStyle(
+            fontFamily: 'Epilogue',
+            color: Colors.white,
+            fontSize: 15,
+          ),
+        ),
+      ),
+      themeMode: ThemeMode.light,
       supportedLocales: L10n.all,
       localizationsDelegates: [
         AppLocalizations.delegate,

@@ -35,6 +35,7 @@ class FriendsDisplay extends ConsumerWidget {
 
   Widget build(BuildContext context, WidgetRef ref) {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         floatingActionButton: SpeedDial(
@@ -49,7 +50,9 @@ class FriendsDisplay extends ConsumerWidget {
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  labelStyle: Theme.of(context).textTheme.bodyText2,
+                  labelStyle: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .extendedTextStyle,
                   onTap: () {
                     _navigateToFriendsSearchList(context, ref);
                     friendsServiceVM.clearSearchFriendTextController();
@@ -68,7 +71,9 @@ class FriendsDisplay extends ConsumerWidget {
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  labelStyle: Theme.of(context).textTheme.bodyText2,
+                  labelStyle: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .extendedTextStyle,
                   onTap: () {
                     _navigateToFriendRequestsList(context);
                   },
@@ -89,13 +94,13 @@ class FriendsDisplay extends ConsumerWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 5),
-                  Text(AppLocalizations.of(context).friends,
-                      style: Theme.of(context).primaryTextTheme.headline4),
-                  Divider(
-                    color: Theme.of(context).colorScheme.secondary,
-                    indent: 50,
-                    endIndent: 50,
+                  Container(
+                    padding: const EdgeInsets.all(20.0),
+                    width: screenSize.width,
+                    child: Text(
+                      AppLocalizations.of(context).friends,
+                      style: Theme.of(context).primaryTextTheme.headline4,
+                    ),
                   ),
                   Expanded(
                     child: LiquidPullToRefresh(

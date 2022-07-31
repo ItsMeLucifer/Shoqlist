@@ -29,6 +29,7 @@ class FriendRequestsDisplay extends ConsumerWidget {
 
   Widget build(BuildContext context, WidgetRef ref) {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: SafeArea(
@@ -37,16 +38,13 @@ class FriendRequestsDisplay extends ConsumerWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 5),
-                  Text(
-                    AppLocalizations.of(context).friendRequests,
-                    style: Theme.of(context).primaryTextTheme.headline4,
-                    textAlign: TextAlign.center,
-                  ),
-                  Divider(
-                    color: Theme.of(context).colorScheme.secondary,
-                    indent: 50,
-                    endIndent: 50,
+                  Container(
+                    padding: const EdgeInsets.all(20.0),
+                    width: screenSize.width,
+                    child: Text(
+                      AppLocalizations.of(context).friendRequests,
+                      style: Theme.of(context).primaryTextTheme.headline4,
+                    ),
                   ),
                   Expanded(
                       child: LiquidPullToRefresh(

@@ -16,6 +16,11 @@ class UsersList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
+    final arrowIcon = Icon(
+      Icons.arrow_forward_ios,
+      color: Theme.of(context).listTileTheme.iconColor,
+      size: 20,
+    );
     return ListView.builder(
         shrinkWrap: false,
         itemCount: _usersList.length,
@@ -29,48 +34,62 @@ class UsersList extends ConsumerWidget {
                   _acceptAction(context);
                 } else {
                   showDialog(
-                      context: context,
-                      builder: (context) {
-                        return YesNoDialog(
-                            _acceptAction, _dialogTitle, _declineAction);
-                      });
+                    context: context,
+                    builder: (context) {
+                      return YesNoDialog(
+                          _acceptAction, _dialogTitle, _declineAction);
+                    },
+                  );
                 }
               },
               child: Card(
-                color: Theme.of(context).primaryColor,
-                child: Padding(
+                color: Theme.of(context).listTileTheme.tileColor,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: 60,
+                  ),
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
                     children: [
                       Icon(
                         Icons.person,
-                        color: Theme.of(context).colorScheme.secondary,
+                        color: Theme.of(context).listTileTheme.iconColor,
+                        size: 40,
                       ),
                       SizedBox(width: screenSize.width * 0.05 * _elementWidth),
                       Column(
                         children: [
                           Container(
-                            width: screenSize.width * _elementWidth,
-                            child: Text(_usersList[index].nickname,
-                                overflow: TextOverflow.fade,
-                                maxLines: 1,
-                                softWrap: false,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .headline6),
+                            width: screenSize.width * _elementWidth -
+                                arrowIcon.size / 5,
+                            child: Text(
+                              _usersList[index].nickname,
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                              softWrap: false,
+                              style:
+                                  Theme.of(context).primaryTextTheme.headline6,
+                            ),
                           ),
                           Container(
-                            width: screenSize.width * _elementWidth,
-                            child: Text(_usersList[index].email,
-                                overflow: TextOverflow.fade,
-                                maxLines: 1,
-                                softWrap: false,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .bodyText2),
+                            width: screenSize.width * _elementWidth -
+                                arrowIcon.size / 5,
+                            child: Text(
+                              _usersList[index].email,
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                              softWrap: false,
+                              style:
+                                  Theme.of(context).primaryTextTheme.bodyText2,
+                            ),
                           ),
                         ],
                       ),
+                      arrowIcon,
                     ],
                   ),
                 ),

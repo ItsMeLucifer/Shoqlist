@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
@@ -51,6 +52,21 @@ class HomeScreenMainView extends ConsumerWidget {
     }
   }
 
+  void _createNewShoppingList(BuildContext context, WidgetRef ref) {
+    final toolsVM = ref.read(toolsProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final shopingListsProviderVM = ref.read(shoppingListsProvider);
+    if (toolsVM.newListNameController.text != "") {
+      String id = nanoid();
+      //CREATE LIST ON SERVER
+      firebaseVM.putShoppingListToFirebase(
+          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
+      //CREATE LIST LOCALLY
+      shopingListsProviderVM.saveNewShoppingListLocally(
+          toolsVM.newListNameController.text, toolsVM.newListImportance, id);
+    }
+  }
+
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
@@ -64,27 +80,21 @@ class HomeScreenMainView extends ConsumerWidget {
               SizedBox(height: 5),
               Text(AppLocalizations.of(context).appName,
                   style: Theme.of(context).primaryTextTheme.headline3),
-              Divider(
-                color: Theme.of(context).colorScheme.secondary,
-                indent: 50,
-                endIndent: 50,
-              ),
-              Container(
-                height: screenSize.height * 0.05,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ShoppingListTypeChangeButton(
-                        AppLocalizations.of(context).myLists,
-                        ShoppingListType.ownShoppingLists),
-                    VerticalDivider(
-                      color: Theme.of(context).colorScheme.secondary,
-                      indent: screenSize.height * 0.01,
-                      endIndent: screenSize.height * 0.01,
+                      AppLocalizations.of(context).myLists,
+                      ShoppingListType.ownShoppingLists,
+                      Icons.list,
                     ),
                     ShoppingListTypeChangeButton(
-                        AppLocalizations.of(context).sharedLists,
-                        ShoppingListType.sharedShoppingLists),
+                      AppLocalizations.of(context).sharedLists,
+                      ShoppingListType.sharedShoppingLists,
+                      Icons.people_alt,
+                    ),
                   ],
                 ),
               ),
@@ -149,6 +159,29 @@ class HomeScreenMainView extends ConsumerWidget {
                             ],
                           )),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25.0, left: 25, top: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.add,
+                        color: Theme.of(context).colorScheme.secondary,
+                        size: 22),
+                    TextButton(
+                      onPressed: () {
+                        ref.read(toolsProvider).resetNewListData();
+                        showDialog(
+                            context: context,
+                            builder: (context) => PutShoppingListData(
+                                _createNewShoppingList, context));
+                      },
+                      child: Text(
+                        AppLocalizations.of(context).newList,
+                        style: Theme.of(context).textTheme.bodyText2,
+                      ),
+                    )
+                  ],
+                ),
+              )
             ],
           ),
         ],
@@ -197,14 +230,17 @@ class HomeScreenMainView extends ConsumerWidget {
         itemCount: shoppingListsVM.shoppingLists.length,
         itemBuilder: (context, index) {
           return Padding(
-              padding: EdgeInsets.only(
-                  left: 8.0,
-                  right: 8.0,
-                  bottom: index == shoppingListsVM.shoppingLists.length - 1
-                      ? 50
-                      : 0),
-              child: ShoppingListButton(_onTapShoppingListButton,
-                  _onLongPressShoppingListButton, index));
+            padding: EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+                bottom:
+                    index == shoppingListsVM.shoppingLists.length - 1 ? 50 : 0),
+            child: ShoppingListButton(
+              () => _onTapShoppingListButton(context, index, ref),
+              () => _onLongPressShoppingListButton(context, index, ref),
+              index,
+            ),
+          );
         });
   }
 }

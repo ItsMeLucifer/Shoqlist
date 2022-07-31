@@ -10,13 +10,13 @@ class Tools extends ChangeNotifier {
   Color getImportanceColor(Importance importance) {
     switch (importance) {
       case Importance.important:
-        return Colors.orange[200];
+        return Color.fromRGBO(253, 202, 64, 1);
       case Importance.urgent:
-        return Colors.red[300];
+        return Color.fromRGBO(242, 102, 116, 1);
       case Importance.low:
-        return Colors.blue[200];
+        return Color.fromRGBO(66, 129, 164, 1);
       default: //Importance.normal
-        return Colors.green[200];
+        return Color.fromRGBO(67, 197, 158, 1);
     }
   }
 

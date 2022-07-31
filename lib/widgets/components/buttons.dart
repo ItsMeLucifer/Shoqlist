@@ -47,7 +47,9 @@ class LoyaltyCardButton extends ConsumerWidget {
 class ShoppingListTypeChangeButton extends ConsumerWidget {
   final String _buttonName;
   final ShoppingListType _shoppingListType;
-  ShoppingListTypeChangeButton(this._buttonName, this._shoppingListType);
+  final IconData _icon;
+  ShoppingListTypeChangeButton(
+      this._buttonName, this._shoppingListType, this._icon);
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final screenSize = MediaQuery.of(context).size;
@@ -57,16 +59,42 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
       },
       child: Container(
           decoration: BoxDecoration(
-              color: shoppingListsVM.currentlyDisplayedListType ==
-                      _shoppingListType
-                  ? Theme.of(context).colorScheme.secondary.withOpacity(0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(5)),
-          width: screenSize.width * 0.45,
+            border: Border(
+              bottom: BorderSide(
+                color: shoppingListsVM.currentlyDisplayedListType ==
+                        _shoppingListType
+                    ? Theme.of(context).colorScheme.secondary
+                    : Theme.of(context).disabledColor,
+                width: shoppingListsVM.currentlyDisplayedListType ==
+                        _shoppingListType
+                    ? 2
+                    : 1,
+              ),
+            ),
+          ),
+          width: screenSize.width * 0.5,
           child: Center(
-            child: Text(_buttonName,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).primaryTextTheme.headline6),
+            child: Column(
+              children: [
+                Icon(_icon,
+                    size: 30,
+                    color: shoppingListsVM.currentlyDisplayedListType ==
+                            _shoppingListType
+                        ? Theme.of(context).colorScheme.secondary
+                        : Theme.of(context).disabledColor),
+                SizedBox(height: 5),
+                Text(
+                  _buttonName,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).primaryTextTheme.headline6.copyWith(
+                      color: shoppingListsVM.currentlyDisplayedListType ==
+                              _shoppingListType
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context).disabledColor),
+                ),
+                SizedBox(height: 8),
+              ],
+            ),
           )),
     );
   }
@@ -93,7 +121,7 @@ class BasicButton extends ConsumerWidget {
           height: 40,
           decoration: BoxDecoration(
             color: Theme.of(context).buttonTheme.colorScheme.background,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(25),
           ),
           child: Padding(
             padding: const EdgeInsets.all(5.0),
@@ -157,75 +185,76 @@ class ShoppingListButton extends ConsumerWidget {
   final Function _onTap;
   final Function _onLongPress;
   final int _index;
-  ShoppingListButton(this._onTap, this._onLongPress, this._index);
+  ShoppingListButton(
+    this._onTap,
+    this._onLongPress,
+    this._index,
+  );
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
-    return Container(
-      height: 60,
-      child: GestureDetector(
-        onTap: () {
-          _onTap(context, _index, ref);
-        },
-        onLongPress: () {
-          _onLongPress(context, _index, ref);
-        },
+    return GestureDetector(
+      onTap: _onTap,
+      onLongPress: _onLongPress,
+      child: Container(
+        height: 60,
+        key: UniqueKey(),
         child: Card(
-            color: toolsVM.getImportanceColor(
-                shoppingListsVM.shoppingLists[_index].importance),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: screenSize.width * 0.5,
-                    child: Text(
-                      shoppingListsVM.shoppingLists[_index].name,
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
+          color: Color.fromRGBO(237, 236, 243, 1),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: screenSize.width * 0.1,
+                      child: CircleAvatar(
+                        backgroundColor: toolsVM.getImportanceColor(
+                            shoppingListsVM.shoppingLists[_index].importance),
+                        foregroundColor: Colors.white,
+                        child: Icon(
+                          Icons.list,
+                        ),
+                      ),
                     ),
-                  ),
-                  Row(
+                    const SizedBox(width: 10),
+                    Container(
+                      width: screenSize.width * 0.65,
+                      child: Text(
+                        shoppingListsVM.shoppingLists[_index].name,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).primaryTextTheme.button,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  width: screenSize.width * 0.08,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      shoppingListsVM.shoppingLists[_index].list.length != 0
-                          ? Container(
-                              width: screenSize.width * 0.28,
-                              child: Text(
-                                shoppingListsVM.shoppingLists[_index].list[0]
-                                        .itemName +
-                                    "${shoppingListsVM.shoppingLists[_index].list.length > 1 ? ', ...' : ''}",
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 15),
-                                textAlign: TextAlign.end,
-                              ),
-                            )
-                          : Container(),
                       Text(
-                        "   [" +
-                            shoppingListsVM.shoppingLists[_index].list.length
-                                .toString() +
-                            "]",
+                        shoppingListsVM.shoppingLists[_index].list.length
+                            .toString(),
                         style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 15),
                       ),
+                      Icon(Icons.arrow_forward_ios,
+                          color: Theme.of(context).disabledColor, size: 12)
                     ],
                   ),
-                ],
-              ),
-            )),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

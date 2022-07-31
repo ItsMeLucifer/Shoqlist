@@ -20,10 +20,10 @@ class YesNoDialog extends ConsumerWidget {
     return AlertDialog(
       backgroundColor: Theme.of(context).backgroundColor,
       content: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
         child: Container(
             child: Text(_titleToDisplay,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: Theme.of(context).primaryTextTheme.headline6,
                 textAlign: TextAlign.center)),
       ),
       actions: [
@@ -65,6 +65,7 @@ class PutShoppingListData extends ConsumerWidget {
     return SimpleDialog(
         backgroundColor: Theme.of(context).backgroundColor,
         children: [
+          const SizedBox(height: 10.0),
           Container(
             height: 250,
             child: Column(
@@ -74,7 +75,7 @@ class PutShoppingListData extends ConsumerWidget {
                   _onPressedDelete == null
                       ? AppLocalizations.of(context).newListTitle
                       : AppLocalizations.of(context).editListTitle,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: Theme.of(context).primaryTextTheme.headline5,
                   textAlign: TextAlign.center,
                 ),
                 Row(
@@ -82,29 +83,11 @@ class PutShoppingListData extends ConsumerWidget {
                   children: [
                     Container(
                       width: 210,
-                      child: TextFormField(
+                      child: BasicForm(
                         key: toolsVM.newListNameFormFieldKey,
                         keyboardType: TextInputType.name,
-                        autofocus: false,
-                        autocorrect: false,
-                        obscureText: false,
                         controller: toolsVM.newListNameController,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context).listName,
-                          hintStyle:
-                              Theme.of(context).primaryTextTheme.bodyText2,
-                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  width: 1,
-                                  color: Theme.of(context).primaryColorDark)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  width: 1,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary)),
-                        ),
+                        hintText: AppLocalizations.of(context).listName,
                       ),
                     ),
                   ],
@@ -112,7 +95,10 @@ class PutShoppingListData extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(AppLocalizations.of(context).importance + ":"),
+                    Text(
+                      AppLocalizations.of(context).importance + ":",
+                      style: Theme.of(context).primaryTextTheme.headline6,
+                    ),
                     DropdownButton<Importance>(
                       value: toolsVM.newListImportance,
                       dropdownColor: Theme.of(context).backgroundColor,
@@ -139,9 +125,11 @@ class PutShoppingListData extends ConsumerWidget {
                           child: Text(
                               toolsVM.getTranslatedImportanceLabel(
                                   context, value),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2
+                                  .copyWith(
+                                      color: toolsVM.getImportanceColor(value)),
                               textAlign: TextAlign.center),
                         );
                       }).toList(),
@@ -212,7 +200,7 @@ class ChooseUser extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(_dialogTitle,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: Theme.of(context).primaryTextTheme.headline5,
               textAlign: TextAlign.center),
           SizedBox(height: 10),
           _usersList.isNotEmpty
@@ -247,17 +235,19 @@ class ChangeName extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                  child: Text(_titleToDisplay,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center)),
+                child: Text(
+                  _titleToDisplay,
+                  style: Theme.of(context).primaryTextTheme.headline5,
+                  textAlign: TextAlign.center,
+                ),
+              ),
               BasicForm(
-                  TextInputType.name,
-                  toolsVM.newNicknameController,
-                  AppLocalizations.of(context).nickname,
-                  (BuildContext context, WidgetRef ref) => {},
-                  Icons.person,
-                  false)
+                keyboardType: TextInputType.name,
+                controller: toolsVM.newNicknameController,
+                hintText: AppLocalizations.of(context).nickname,
+                onChanged: (BuildContext context, WidgetRef ref) => {},
+                prefixIcon: Icons.person,
+              )
             ],
           ),
         ),
@@ -309,19 +299,20 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: _dividerHeight * 2),
-                BasicForm(TextInputType.name, toolsVM.loyaltyCardNameController,
-                    AppLocalizations.of(context).cardName, null, null, false),
+                BasicForm(
+                  keyboardType: TextInputType.name,
+                  controller: toolsVM.loyaltyCardNameController,
+                  hintText: AppLocalizations.of(context).cardName,
+                ),
                 SizedBox(height: _dividerHeight),
                 ColorPicker(_alertDialogWidth, 100),
                 SizedBox(height: _dividerHeight),
                 BasicForm(
-                    TextInputType.text,
-                    toolsVM.loyaltyCardBarCodeController,
-                    AppLocalizations.of(context).cardCode,
-                    null,
-                    null,
-                    false,
-                    _suffixIcon),
+                  keyboardType: TextInputType.text,
+                  controller: toolsVM.loyaltyCardBarCodeController,
+                  hintText: AppLocalizations.of(context).cardCode,
+                  suffixIcon: _suffixIcon,
+                ),
                 SizedBox(height: _dividerHeight),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

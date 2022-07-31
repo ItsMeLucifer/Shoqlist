@@ -23,10 +23,11 @@ class Settings extends ConsumerWidget {
   void _showDialogWithChangeNickname(BuildContext context, WidgetRef ref) {
     ref.read(toolsProvider).clearNewNicknameController();
     showDialog(
-        context: context,
-        builder: (context) {
-          return ChangeName(_changeNickname, 'Change nickname');
-        });
+      context: context,
+      builder: (context) {
+        return ChangeName(_changeNickname, 'Change nickname');
+      },
+    );
   }
 
   void _deleteAccount(BuildContext context, WidgetRef ref) {
@@ -45,13 +46,12 @@ class Settings extends ConsumerWidget {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 5),
-                Text(AppLocalizations.of(context).settings,
-                    style: Theme.of(context).primaryTextTheme.headline3),
-                Divider(
-                  color: Theme.of(context).colorScheme.secondary,
-                  indent: 50,
-                  endIndent: 50,
+                SizedBox(height: 20),
+                Container(
+                  width: screenSize.width,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(AppLocalizations.of(context).settings,
+                      style: Theme.of(context).primaryTextTheme.headline3),
                 ),
                 Container(
                   height: screenSize.height * 0.8,
