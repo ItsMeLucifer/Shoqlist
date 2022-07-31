@@ -175,32 +175,45 @@ class FirebaseViewModel extends ChangeNotifier {
       listContent.clear();
       listFavorite.clear();
       listState.clear();
-      localList.list.forEach((element) {
-        listContent.add(element.itemName);
-        listFavorite.add(element.isFavorite);
-        listState.add(element.gotItem);
-      });
-      usersWithAccess.clear();
-      localList.usersWithAccess.forEach((user) {
-        usersWithAccess.add(user.userId);
-      });
-      users
-          .doc(localList.ownerId)
-          .collection('lists')
-          .doc(localList.documentId)
-          .set({
-            'name': localList.name,
-            'importance': _toolsVM.getImportanceLabel(localList.importance),
-            'listContent': listContent,
-            'listState': listState,
-            'listFavorite': listFavorite,
-            'id': localList.documentId,
-            'ownerId': localList.ownerId,
-            'usersWithAccess': usersWithAccess
-          })
-          .then((value) => print("Updated list on Firebase"))
-          .catchError((error) => _toolsVM
-              .printWarning("Failed to update list on Firebase: $error"));
+      if (localList.list != null && localList.usersWithAccess != null) {
+        localList.list.forEach(
+          (element) {
+            listContent.add(element.itemName);
+            listFavorite.add(element.isFavorite);
+            listState.add(element.gotItem);
+          },
+        );
+        usersWithAccess.clear();
+        localList.usersWithAccess.forEach(
+          (user) {
+            usersWithAccess.add(user.userId);
+          },
+        );
+        users
+            .doc(localList.ownerId)
+            .collection('lists')
+            .doc(localList.documentId)
+            .set({
+              'name': localList.name,
+              'importance': _toolsVM.getImportanceLabel(localList.importance),
+              'listContent': listContent,
+              'listState': listState,
+              'listFavorite': listFavorite,
+              'id': localList.documentId,
+              'ownerId': localList.ownerId,
+              'usersWithAccess': usersWithAccess
+            })
+            .then(
+              (value) => print(
+                "Updated list on Firebase",
+              ),
+            )
+            .catchError(
+              (error) => _toolsVM.printWarning(
+                "Failed to update list on Firebase: $error",
+              ),
+            );
+      }
     }
     users
         .doc(_firebaseAuth.auth.currentUser.uid)
