@@ -320,7 +320,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          onSubmitted: (value) {
+                          onSubmitted: (ref,value) {
                             _addNewItemToCurrentShoppingList(context, ref);
                             toolsVM.clearNewItemTextEditingController();
                             toolsVM.newItemFocusNode.requestFocus();
