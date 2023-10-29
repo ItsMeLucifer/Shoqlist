@@ -34,7 +34,13 @@ class ShoppingList extends HiveObject {
   @HiveField(7)
   List<User> usersWithAccess = [];
 
-  ShoppingList(this.name, this.list, this.importance, this.documentId,
-      this.ownerId, this.ownerName,
-      [this.usersWithAccess]);
+  ShoppingList(
+    this.name,
+    this.list,
+    this.importance,
+    this.documentId,
+    this.ownerId,
+    this.ownerName, [
+    this.usersWithAccess = const [],
+  ]);
 }

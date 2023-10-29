@@ -56,9 +56,9 @@ class FriendsServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  int _currentUserIndex;
-  int get currentUserIndex => _currentUserIndex;
-  set currentUserIndex(int newUserIndex) {
+  int? _currentUserIndex;
+  int? get currentUserIndex => _currentUserIndex;
+  set currentUserIndex(int? newUserIndex) {
     _currentUserIndex = newUserIndex;
     notifyListeners();
   }

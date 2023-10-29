@@ -14,9 +14,9 @@ class LoyaltyCardButton extends ConsumerWidget {
     return Card(
       color: color,
       child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-              child: Stack(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Stack(
             children: <Widget>[
               Text(cardName,
                   overflow: TextOverflow.fade,
@@ -39,7 +39,9 @@ class LoyaltyCardButton extends ConsumerWidget {
                     fontSize: 17,
                   )),
             ],
-          ))),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -48,8 +50,13 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
   final String _buttonName;
   final ShoppingListType _shoppingListType;
   final IconData _icon;
+
   ShoppingListTypeChangeButton(
-      this._buttonName, this._shoppingListType, this._icon);
+    this._buttonName,
+    this._shoppingListType,
+    this._icon,
+  );
+
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final screenSize = MediaQuery.of(context).size;
@@ -86,7 +93,7 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
                 Text(
                   _buttonName,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).primaryTextTheme.headline6.copyWith(
+                  style: Theme.of(context).primaryTextTheme.headline6?.copyWith(
                       color: shoppingListsVM.currentlyDisplayedListType ==
                               _shoppingListType
                           ? Theme.of(context).colorScheme.secondary
@@ -107,9 +114,15 @@ class BasicButton extends ConsumerWidget {
   final Function _onTap;
   final String _buttonName;
   final double _percentageOfScreenWidth;
-  final IconData _iconData;
-  BasicButton(this._onTap, this._buttonName, this._percentageOfScreenWidth,
-      [this._iconData]);
+  final IconData? _iconData;
+
+  BasicButton(
+    this._onTap,
+    this._buttonName,
+    this._percentageOfScreenWidth, [
+    this._iconData,
+  ]);
+
   Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
@@ -120,20 +133,23 @@ class BasicButton extends ConsumerWidget {
           width: screenSize.width * _percentageOfScreenWidth,
           height: 40,
           decoration: BoxDecoration(
-            color: Theme.of(context).buttonTheme.colorScheme.background,
+            color: Theme.of(context).buttonTheme.colorScheme?.background,
             borderRadius: BorderRadius.circular(25),
           ),
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Center(
-                child: _iconData == null
-                    ? Text(
-                        _buttonName,
-                        style: Theme.of(context).primaryTextTheme.button,
-                        textAlign: TextAlign.center,
-                      )
-                    : Icon(_iconData,
-                        color: Theme.of(context).colorScheme.secondary)),
+              child: _iconData == null
+                  ? Text(
+                      _buttonName,
+                      style: Theme.of(context).primaryTextTheme.button,
+                      textAlign: TextAlign.center,
+                    )
+                  : Icon(
+                      _iconData,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+            ),
           )),
     );
   }
@@ -143,57 +159,68 @@ class WarningButton extends ConsumerWidget {
   final Function _onTap;
   final String _buttonName;
   final double _percentageOfScreenWidth;
-  WarningButton(this._onTap, this._buttonName, this._percentageOfScreenWidth);
+
+  WarningButton(
+    this._onTap,
+    this._buttonName,
+    this._percentageOfScreenWidth,
+  );
+
   Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
         showDialog(
-            context: context,
-            builder: (context) {
-              return YesNoDialog(
-                  _onTap, AppLocalizations.of(context).deleteAccountMsg);
-            });
+          context: context,
+          builder: (context) {
+            return YesNoDialog(
+                _onTap, AppLocalizations.of(context)!.deleteAccountMsg);
+          },
+        );
       },
       child: Container(
-          width: screenSize.width * _percentageOfScreenWidth,
-          height: 40,
-          decoration: BoxDecoration(
-              color: Theme.of(context).buttonTheme.colorScheme.background,
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(color: Colors.red, width: 2)),
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Center(
-              child: Text(
-                _buttonName,
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontFamily:
-                      Theme.of(context).primaryTextTheme.button.fontFamily,
-                ),
-                textAlign: TextAlign.center,
+        width: screenSize.width * _percentageOfScreenWidth,
+        height: 40,
+        decoration: BoxDecoration(
+            color: Theme.of(context).buttonTheme.colorScheme?.background,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.red, width: 2)),
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Center(
+            child: Text(
+              _buttonName,
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontFamily:
+                    Theme.of(context).primaryTextTheme.button?.fontFamily,
               ),
+              textAlign: TextAlign.center,
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 }
 
 class ShoppingListButton extends ConsumerWidget {
-  final Function _onTap;
-  final Function _onLongPress;
+  final Function() _onTap;
+  final Function() _onLongPress;
   final int _index;
+
   ShoppingListButton(
     this._onTap,
     this._onLongPress,
     this._index,
   );
+
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
+
     return GestureDetector(
       onTap: _onTap,
       onLongPress: _onLongPress,

@@ -13,7 +13,8 @@ class FriendsDisplay extends ConsumerWidget {
   void _removeUserFromFriendsListAfterTap(BuildContext context, WidgetRef ref) {
     final firebaseVM = ref.read(firebaseProvider);
     final friendsServiceVM = ref.read(friendsServiceProvider);
-    User user = friendsServiceVM.friendsList[friendsServiceVM.currentUserIndex];
+    User user =
+        friendsServiceVM.friendsList[friendsServiceVM.currentUserIndex!];
     firebaseVM.removeFriendFromFriendsList(user);
     Navigator.of(context).pop();
   }
@@ -57,7 +58,7 @@ class FriendsDisplay extends ConsumerWidget {
                     _navigateToFriendsSearchList(context, ref);
                     friendsServiceVM.clearSearchFriendTextController();
                   },
-                  label: AppLocalizations.of(context).searchFriends,
+                  label: AppLocalizations.of(context)!.searchFriends,
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
@@ -77,7 +78,7 @@ class FriendsDisplay extends ConsumerWidget {
                   onTap: () {
                     _navigateToFriendRequestsList(context);
                   },
-                  label: AppLocalizations.of(context).friendRequests,
+                  label: AppLocalizations.of(context)!.friendRequests,
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
@@ -98,40 +99,40 @@ class FriendsDisplay extends ConsumerWidget {
                     padding: const EdgeInsets.all(20.0),
                     width: screenSize.width,
                     child: Text(
-                      AppLocalizations.of(context).friends,
+                      AppLocalizations.of(context)!.friends,
                       style: Theme.of(context).primaryTextTheme.headline4,
                     ),
                   ),
                   Expanded(
                     child: LiquidPullToRefresh(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                        color: Theme.of(context).primaryColor,
-                        height: 50,
-                        animSpeedFactor: 5,
-                        showChildOpacityTransition: false,
-                        onRefresh: () async {
-                          _onRefresh(ref);
-                        },
-                        child: friendsServiceVM.friendsList.isEmpty
-                            ? ListView(
-                                children: [
-                                  SizedBox(height: 10),
-                                  Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)
-                                            .noFriendsMsg,
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .bodyText1),
-                                  )
-                                ],
-                              )
-                            : UsersList(
-                                _removeUserFromFriendsListAfterTap,
-                                friendsServiceVM.friendsList,
-                                AppLocalizations.of(context)
-                                    .removeFriendTitle)),
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).primaryColor,
+                      height: 50,
+                      animSpeedFactor: 5,
+                      showChildOpacityTransition: false,
+                      onRefresh: () async {
+                        _onRefresh(ref);
+                      },
+                      child: friendsServiceVM.friendsList.isEmpty
+                          ? ListView(
+                              children: [
+                                SizedBox(height: 10),
+                                Center(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.noFriendsMsg,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .bodyText1,
+                                  ),
+                                )
+                              ],
+                            )
+                          : UsersList(
+                              _removeUserFromFriendsListAfterTap,
+                              friendsServiceVM.friendsList,
+                              AppLocalizations.of(context)!.removeFriendTitle,
+                            ),
+                    ),
                   )
                 ],
               ),

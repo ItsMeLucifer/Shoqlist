@@ -11,16 +11,12 @@ import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:shoqlist/l10n/l10n.dart';
 import 'models/shopping_list.dart';
 import 'models/shopping_list_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:device_info/device_info.dart';
-import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 final ChangeNotifierProvider<ShoppingListsViewModel> shoppingListsProvider =
@@ -62,20 +58,6 @@ void main() async {
 
   //Admob
   MobileAds.instance.initialize();
-
-  //PlatformViewLink
-  if (Platform.isAndroid) {
-    var androidInfo = await DeviceInfoPlugin().androidInfo;
-    var isAndroidOld = (androidInfo.version.sdkInt ?? 0) < 29; //Android 10
-    // var useHybridComposition = remoteConfig.getBool(
-    //   isAndroidOld
-    //       ? RemoteConfigKey.useHybridCompositionOlderOS
-    //       : RemoteConfigKey.useHybridCompositionNewerOS,
-    // );
-    if (isAndroidOld) {
-      await PlatformViewsService.synchronizeToNativeViewHierarchy(false);
-    }
-  }
 
   //Orientation
   SystemChrome.setPreferredOrientations(

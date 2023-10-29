@@ -30,7 +30,8 @@ class HomeScreenMainView extends ConsumerWidget {
         .shoppingLists[shoppingListsVM.currentListIndex].documentId);
     //DELETE LIST LOCALLY
     shoppingListsVM.deleteShoppingListLocally(shoppingListsVM.currentListIndex);
-    Navigator.of(context).popUntil((route) => !route.navigator.canPop());
+    Navigator.of(context)
+        .popUntil((route) => route.navigator?.canPop() != false);
   }
 
   void _updateShoppingList(BuildContext context, WidgetRef ref) {
@@ -70,7 +71,6 @@ class HomeScreenMainView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
-    final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Stack(
         children: [
@@ -78,7 +78,7 @@ class HomeScreenMainView extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(height: 5),
-              Text(AppLocalizations.of(context).appName,
+              Text(AppLocalizations.of(context)!.appName,
                   style: Theme.of(context).primaryTextTheme.headline3),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -86,12 +86,12 @@ class HomeScreenMainView extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ShoppingListTypeChangeButton(
-                      AppLocalizations.of(context).myLists,
+                      AppLocalizations.of(context)!.myLists,
                       ShoppingListType.ownShoppingLists,
                       Icons.list,
                     ),
                     ShoppingListTypeChangeButton(
-                      AppLocalizations.of(context).sharedLists,
+                      AppLocalizations.of(context)!.sharedLists,
                       ShoppingListType.sharedShoppingLists,
                       Icons.people_alt,
                     ),
@@ -133,23 +133,24 @@ class HomeScreenMainView extends ConsumerWidget {
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Center(
-                                            child: Text(
-                                                shoppingListsVM
-                                                            .currentlyDisplayedListType ==
-                                                        ShoppingListType
-                                                            .ownShoppingLists
-                                                    ? AppLocalizations.of(
-                                                            context)
-                                                        .noListsMsg
-                                                    : AppLocalizations.of(
-                                                            context)
-                                                        .noSharedListsMsg,
-                                                style: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .bodyText1)),
+                                          child: Text(
+                                            shoppingListsVM
+                                                        .currentlyDisplayedListType ==
+                                                    ShoppingListType
+                                                        .ownShoppingLists
+                                                ? AppLocalizations.of(context)!
+                                                    .noListsMsg
+                                                : AppLocalizations.of(context)!
+                                                    .noSharedListsMsg,
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .bodyText1,
+                                          ),
+                                        ),
                                       )
                                     ],
-                                  ))
+                                  ),
+                          )
                         : Column(
                             children: [
                               Container(
@@ -175,7 +176,7 @@ class HomeScreenMainView extends ConsumerWidget {
                                 _createNewShoppingList, context));
                       },
                       child: Text(
-                        AppLocalizations.of(context).newList,
+                        AppLocalizations.of(context)!.newList,
                         style: Theme.of(context).textTheme.bodyText2,
                       ),
                     )
@@ -197,7 +198,7 @@ class HomeScreenMainView extends ConsumerWidget {
     shoppingListsVM.currentListIndex = index;
     if (shoppingListsVM.shoppingLists[index].ownerId ==
         firebaseAuthVM.currentUser.userId) {
-      String title = AppLocalizations.of(context)
+      String title = AppLocalizations.of(context)!
           .removeListTitle(shoppingListsVM.shoppingLists[index].name);
       showDialog(
           context: context,

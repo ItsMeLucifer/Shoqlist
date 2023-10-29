@@ -3,6 +3,7 @@ import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/shopping_list_item.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/utilities/boxes.dart';
+import 'package:collection/collection.dart';
 
 enum ShoppingListType { ownShoppingLists, sharedShoppingLists }
 
@@ -83,7 +84,7 @@ class ShoppingListsViewModel extends ChangeNotifier {
     filterDisplayedShoppingLists();
   }
 
-  int getLocalTimestamp() {
+  int? getLocalTimestamp() {
     return _boxData.get('timestamp');
   }
 
@@ -129,10 +130,10 @@ class ShoppingListsViewModel extends ChangeNotifier {
 
   void addNewItemToShoppingListLocally(
       String itemName, bool itemGot, bool isFavorited) {
-    ShoppingListItem firstGotItem = shoppingLists[_currentListIndex]
+    ShoppingListItem? firstGotItem = shoppingLists[_currentListIndex]
         .list
-        .firstWhere((element) => element.gotItem, orElse: () => null);
-    int firstDoneItemIndex = firstGotItem != null
+        .firstWhereOrNull((element) => element.gotItem);
+    int? firstDoneItemIndex = firstGotItem != null
         ? shoppingLists[_currentListIndex].list.indexOf(firstGotItem)
         : null;
     if (firstDoneItemIndex != null) {

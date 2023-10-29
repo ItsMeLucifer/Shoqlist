@@ -6,55 +6,6 @@ part of 'shopping_list.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ImportanceAdapter extends TypeAdapter<Importance> {
-  @override
-  final int typeId = 2;
-
-  @override
-  Importance read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return Importance.low;
-      case 1:
-        return Importance.normal;
-      case 2:
-        return Importance.important;
-      case 3:
-        return Importance.urgent;
-      default:
-        return null;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, Importance obj) {
-    switch (obj) {
-      case Importance.low:
-        writer.writeByte(0);
-        break;
-      case Importance.normal:
-        writer.writeByte(1);
-        break;
-      case Importance.important:
-        writer.writeByte(2);
-        break;
-      case Importance.urgent:
-        writer.writeByte(3);
-        break;
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ImportanceAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
 class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
   @override
   final int typeId = 0;
@@ -67,12 +18,12 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
     };
     return ShoppingList(
       fields[0] as String,
-      (fields[1] as List)?.cast<ShoppingListItem>(),
+      (fields[1] as List).cast<ShoppingListItem>(),
       fields[2] as Importance,
       fields[3] as String,
       fields[5] as String,
       fields[6] as String,
-      (fields[7] as List)?.cast<User>(),
+      (fields[7] as List).cast<User>(),
     );
   }
 
@@ -103,6 +54,55 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ShoppingListAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ImportanceAdapter extends TypeAdapter<Importance> {
+  @override
+  final int typeId = 2;
+
+  @override
+  Importance read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return Importance.low;
+      case 1:
+        return Importance.normal;
+      case 2:
+        return Importance.important;
+      case 3:
+        return Importance.urgent;
+      default:
+        return Importance.low;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, Importance obj) {
+    switch (obj) {
+      case Importance.low:
+        writer.writeByte(0);
+        break;
+      case Importance.normal:
+        writer.writeByte(1);
+        break;
+      case Importance.important:
+        writer.writeByte(2);
+        break;
+      case Importance.urgent:
+        writer.writeByte(3);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImportanceAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

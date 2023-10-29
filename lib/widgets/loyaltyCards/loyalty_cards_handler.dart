@@ -87,7 +87,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                   padding: const EdgeInsets.all(20.0),
                   width: screenSize.width,
                   child: Text(
-                    AppLocalizations.of(context).loyaltyCards,
+                    AppLocalizations.of(context)!.loyaltyCards,
                     style: Theme.of(context).primaryTextTheme.headline4,
                   ),
                 ),
@@ -139,10 +139,12 @@ class LoyaltyCardsHandler extends ConsumerWidget {
               onTap: () {
                 toolsVM.clearLoyaltyCardTextEditingControllers();
                 showDialog(
-                    context: context,
-                    builder: (context) => PutLoyaltyCardsData(
-                        _addNewLoyaltyCard,
-                        AppLocalizations.of(context).newCardTitle));
+                  context: context,
+                  builder: (context) => PutLoyaltyCardsData(
+                    _addNewLoyaltyCard,
+                    AppLocalizations.of(context)!.newCardTitle,
+                  ),
+                );
               },
               child: Card(
                 color: Theme.of(context).disabledColor.withOpacity(0.5),
@@ -166,10 +168,10 @@ class LoyaltyCardsHandler extends ConsumerWidget {
               },
               onLongPress: () {
                 loyaltyCardsVM.currentLoyaltyCardsListIndex = fixedIndex;
-                String removeTitle = AppLocalizations.of(context)
+                String removeTitle = AppLocalizations.of(context)!
                     .removeCardTitle(
                         loyaltyCardsVM.loyaltyCardsList[fixedIndex].name);
-                String title = AppLocalizations.of(context).editCardTitle(
+                String title = AppLocalizations.of(context)!.editCardTitle(
                     loyaltyCardsVM.loyaltyCardsList[fixedIndex].name);
                 toolsVM.setLoyaltyCardControllers(
                     loyaltyCardsVM.loyaltyCardsList[fixedIndex].name,

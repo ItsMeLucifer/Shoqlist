@@ -39,7 +39,7 @@ class ColorPicker extends ConsumerWidget {
                                   loyaltyCardsVM
                                       .loyaltyCardsColorsToPick[index],
                                   Colors.black,
-                                  0.5),
+                                  0.5)!,
                           width: 4),
                       borderRadius: BorderRadius.circular(5)),
                 ),

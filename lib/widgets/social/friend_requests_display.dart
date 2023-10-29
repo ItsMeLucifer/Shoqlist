@@ -10,16 +10,16 @@ class FriendRequestsDisplay extends ConsumerWidget {
   void _acceptFriendRequestAfterTap(BuildContext context, WidgetRef ref) {
     final firebaseVM = ref.read(firebaseProvider);
     final friendsServiceVM = ref.read(friendsServiceProvider);
-    firebaseVM.acceptFriendRequest(
-        friendsServiceVM.friendRequestsList[friendsServiceVM.currentUserIndex]);
+    firebaseVM.acceptFriendRequest(friendsServiceVM
+        .friendRequestsList[friendsServiceVM.currentUserIndex!]);
     Navigator.of(context).pop();
   }
 
   void _declineFriendRequestAfterTap(BuildContext context, WidgetRef ref) {
     final firebaseVM = ref.read(firebaseProvider);
     final friendsServiceVM = ref.read(friendsServiceProvider);
-    firebaseVM.declineFriendRequest(
-        friendsServiceVM.friendRequestsList[friendsServiceVM.currentUserIndex]);
+    firebaseVM.declineFriendRequest(friendsServiceVM
+        .friendRequestsList[friendsServiceVM.currentUserIndex!]);
     Navigator.of(context).pop();
   }
 
@@ -42,41 +42,44 @@ class FriendRequestsDisplay extends ConsumerWidget {
                     padding: const EdgeInsets.all(20.0),
                     width: screenSize.width,
                     child: Text(
-                      AppLocalizations.of(context).friendRequests,
+                      AppLocalizations.of(context)!.friendRequests,
                       style: Theme.of(context).primaryTextTheme.headline4,
                     ),
                   ),
                   Expanded(
-                      child: LiquidPullToRefresh(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.secondary,
-                          color: Theme.of(context).primaryColor,
-                          height: 50,
-                          animSpeedFactor: 5,
-                          showChildOpacityTransition: false,
-                          onRefresh: () async {
-                            _onRefresh(ref);
-                          },
-                          child: friendsServiceVM.friendRequestsList.isEmpty
-                              ? ListView(
-                                  children: [
-                                    SizedBox(height: 10),
-                                    Center(
-                                      child: Text(
-                                          AppLocalizations.of(context)
-                                              .noFriendRequestsMsg,
-                                          style: Theme.of(context)
-                                              .primaryTextTheme
-                                              .bodyText1),
-                                    )
-                                  ],
+                    child: LiquidPullToRefresh(
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).primaryColor,
+                      height: 50,
+                      animSpeedFactor: 5,
+                      showChildOpacityTransition: false,
+                      onRefresh: () async {
+                        _onRefresh(ref);
+                      },
+                      child: friendsServiceVM.friendRequestsList.isEmpty
+                          ? ListView(
+                              children: [
+                                SizedBox(height: 10),
+                                Center(
+                                  child: Text(
+                                    AppLocalizations.of(context)!
+                                        .noFriendRequestsMsg,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .bodyText1,
+                                  ),
                                 )
-                              : UsersList(
-                                  _acceptFriendRequestAfterTap,
-                                  friendsServiceVM.friendRequestsList,
-                                  AppLocalizations.of(context)
-                                      .acceptFriendRequestTitle,
-                                  _declineFriendRequestAfterTap)))
+                              ],
+                            )
+                          : UsersList(
+                              _acceptFriendRequestAfterTap,
+                              friendsServiceVM.friendRequestsList,
+                              AppLocalizations.of(context)!
+                                  .acceptFriendRequestTitle,
+                              _declineFriendRequestAfterTap,
+                            ),
+                    ),
+                  )
                 ],
               ),
             ],

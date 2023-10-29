@@ -32,16 +32,16 @@ class Authentication extends ConsumerWidget {
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
     List<String> _exceptionMessages = [
-      AppLocalizations.of(context).undefinedExc,
-      AppLocalizations.of(context).noUserExc,
-      AppLocalizations.of(context).passwordExc,
-      AppLocalizations.of(context).emailExc,
-      AppLocalizations.of(context).userDisabledExc,
-      AppLocalizations.of(context).emptyFieldExc,
-      AppLocalizations.of(context).weakPasswordExc,
-      AppLocalizations.of(context).emailInUseExc,
-      AppLocalizations.of(context).googleSignInExc,
-      AppLocalizations.of(context).anonymousSignInExc,
+      AppLocalizations.of(context)!.undefinedExc,
+      AppLocalizations.of(context)!.noUserExc,
+      AppLocalizations.of(context)!.passwordExc,
+      AppLocalizations.of(context)!.emailExc,
+      AppLocalizations.of(context)!.userDisabledExc,
+      AppLocalizations.of(context)!.emptyFieldExc,
+      AppLocalizations.of(context)!.weakPasswordExc,
+      AppLocalizations.of(context)!.emailInUseExc,
+      AppLocalizations.of(context)!.googleSignInExc,
+      AppLocalizations.of(context)!.anonymousSignInExc,
       ''
     ];
     Widget _passwordVisibilityWidget = GestureDetector(
@@ -73,8 +73,10 @@ class Authentication extends ConsumerWidget {
                         height: 50,
                       ),
                       SizedBox(width: 5),
-                      Text(AppLocalizations.of(context).appName,
-                          style: Theme.of(context).primaryTextTheme.headline3),
+                      Text(
+                        AppLocalizations.of(context)!.appName,
+                        style: Theme.of(context).primaryTextTheme.headline3,
+                      ),
                     ],
                   ),
                   SizedBox(height: screenSize.height * 0.020),
@@ -94,7 +96,7 @@ class Authentication extends ConsumerWidget {
                   BasicForm(
                     keyboardType: TextInputType.emailAddress,
                     controller: toolsVM.emailController,
-                    hintText: AppLocalizations.of(context).email,
+                    hintText: AppLocalizations.of(context)!.email,
                     onChanged: _resetExceptionMessage,
                     prefixIcon: Icons.email,
                     focusedBorder: false,
@@ -105,7 +107,7 @@ class Authentication extends ConsumerWidget {
                   BasicForm(
                     keyboardType: TextInputType.visiblePassword,
                     controller: toolsVM.passwordController,
-                    hintText: AppLocalizations.of(context).password,
+                    hintText: AppLocalizations.of(context)!.password,
                     onChanged: _resetExceptionMessage,
                     prefixIcon: Icons.vpn_key,
                     obscureText: !toolsVM.showPassword,
@@ -117,13 +119,13 @@ class Authentication extends ConsumerWidget {
                   SizedBox(height: 25),
                   BasicButton(
                     _signInUserFirebase,
-                    AppLocalizations.of(context).signIn,
+                    AppLocalizations.of(context)!.signIn,
                     0.7,
                   ),
                   SizedBox(height: 5),
                   BasicButton(
                     _registerUserFirebase,
-                    AppLocalizations.of(context).register,
+                    AppLocalizations.of(context)!.register,
                     0.7,
                   ),
                 ],

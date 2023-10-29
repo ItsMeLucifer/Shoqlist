@@ -12,7 +12,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
   void _sendFriendRequestAfterTap(BuildContext context, WidgetRef ref) {
     final firebaseVM = ref.read(firebaseProvider);
     final friendsServiceVM = ref.read(friendsServiceProvider);
-    User user = friendsServiceVM.usersList[friendsServiceVM.currentUserIndex];
+    User user = friendsServiceVM.usersList[friendsServiceVM.currentUserIndex!];
     firebaseVM.sendFriendRequest(user);
     Navigator.of(context).pop();
   }
@@ -40,43 +40,44 @@ class FriendsSearchDisplay extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(20.0),
                     width: screenSize.width,
-                    child: Text(AppLocalizations.of(context).searchFriends,
+                    child: Text(AppLocalizations.of(context)!.searchFriends,
                         style: Theme.of(context).primaryTextTheme.headline4),
                   ),
                   BasicForm(
                     keyboardType: TextInputType.emailAddress,
                     controller: friendsServiceVM.searchFriendTextController,
-                    hintText: AppLocalizations.of(context).email,
+                    hintText: AppLocalizations.of(context)!.email,
                     onChanged: _onChanged,
                     prefixIcon: Icons.email,
                     onSubmitted: _searchForFriend,
                   ),
                   SizedBox(height: 5),
                   Expanded(
-                      child: friendsServiceVM.usersList.isEmpty &&
-                              toolsVM.friendsFetchStatus == FetchStatus.fetched
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Center(
-                                    child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    AppLocalizations.of(context)
-                                        .cantFindUserMsg,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .bodyText1,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                )),
-                              ],
-                            )
-                          : UsersList(
-                              _sendFriendRequestAfterTap,
-                              friendsServiceVM.usersList,
-                              AppLocalizations.of(context)
-                                  .sendFriendRequestTitle))
+                    child: friendsServiceVM.usersList.isEmpty &&
+                            toolsVM.friendsFetchStatus == FetchStatus.fetched
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  AppLocalizations.of(context)!.cantFindUserMsg,
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .bodyText1,
+                                  textAlign: TextAlign.center,
+                                ),
+                              )),
+                            ],
+                          )
+                        : UsersList(
+                            _sendFriendRequestAfterTap,
+                            friendsServiceVM.usersList,
+                            AppLocalizations.of(context)!
+                                .sendFriendRequestTitle,
+                          ),
+                  )
                 ],
               ),
             ],

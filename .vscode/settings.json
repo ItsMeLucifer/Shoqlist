@@ -1,3 +1,9 @@
 {
-    "dart.flutterSdkPath": "C:/Flutter"
+    "dart.flutterSdkPaths": [
+        "/Users/patrykbozek/Documents/flutter/3.3.4",
+        "/Users/patrykbozek/Documents/flutter/3.7.0",
+        "/Users/patrykbozek/Documents/flutter/3.13.0",
+        "/Users/patrykbozek/Documents/flutter/3.13.4"
+    ],
+    "dart.flutterSdkPath": "~/Documents/flutter/3.13.4",
 }

@@ -46,16 +46,16 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
   }
 
   List<Color> _loyaltyCardsColorsToPick = [
-    Colors.red[300],
-    Colors.blue[300],
+    Colors.red[300]!,
+    Colors.blue[300]!,
     Colors.white,
-    Colors.purple[300],
-    Colors.pink[300],
-    Colors.teal[300],
-    Colors.green[300],
-    Colors.cyan[300],
-    Colors.brown[300],
-    Colors.orange[600]
+    Colors.purple[300]!,
+    Colors.pink[300]!,
+    Colors.teal[300]!,
+    Colors.green[300]!,
+    Colors.cyan[300]!,
+    Colors.brown[300]!,
+    Colors.orange[600]!
   ];
   List<Color> get loyaltyCardsColorsToPick => _loyaltyCardsColorsToPick;
   void sortLoyaltyCardsListLocally() {

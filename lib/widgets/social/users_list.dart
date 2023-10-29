@@ -8,11 +8,18 @@ import '../../main.dart';
 class UsersList extends ConsumerWidget {
   final Function _acceptAction;
   final List<User> _usersList;
-  final String _dialogTitle;
-  final Function _declineAction;
+  final String? _dialogTitle;
+  final Function? _declineAction;
   final double _elementWidth;
-  UsersList(this._acceptAction, this._usersList,
-      [this._dialogTitle, this._declineAction, this._elementWidth = 0.7]);
+
+  UsersList(
+    this._acceptAction,
+    this._usersList, [
+    this._dialogTitle,
+    this._declineAction,
+    this._elementWidth = 0.7,
+  ]);
+
   Widget build(BuildContext context, WidgetRef ref) {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
@@ -31,16 +38,18 @@ class UsersList extends ConsumerWidget {
               onTap: () {
                 friendsServiceVM.currentUserIndex = index;
                 if (_dialogTitle == null) {
-                  _acceptAction(context);
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return YesNoDialog(
-                          _acceptAction, _dialogTitle, _declineAction);
-                    },
-                  );
+                  return _acceptAction(context);
                 }
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return YesNoDialog(
+                      _acceptAction,
+                      _dialogTitle!,
+                      _declineAction,
+                    );
+                  },
+                );
               },
               child: Card(
                 color: Theme.of(context).listTileTheme.tileColor,
@@ -65,7 +74,7 @@ class UsersList extends ConsumerWidget {
                         children: [
                           Container(
                             width: screenSize.width * _elementWidth -
-                                arrowIcon.size / 5,
+                                arrowIcon.size! / 5,
                             child: Text(
                               _usersList[index].nickname,
                               overflow: TextOverflow.fade,
@@ -77,7 +86,7 @@ class UsersList extends ConsumerWidget {
                           ),
                           Container(
                             width: screenSize.width * _elementWidth -
-                                arrowIcon.size / 5,
+                                arrowIcon.size! / 5,
                             child: Text(
                               _usersList[index].email,
                               overflow: TextOverflow.fade,

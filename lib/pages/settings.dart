@@ -50,8 +50,10 @@ class Settings extends ConsumerWidget {
                 Container(
                   width: screenSize.width,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(AppLocalizations.of(context).settings,
-                      style: Theme.of(context).primaryTextTheme.headline3),
+                  child: Text(
+                    AppLocalizations.of(context)!.settings,
+                    style: Theme.of(context).primaryTextTheme.headline3,
+                  ),
                 ),
                 Container(
                   height: screenSize.height * 0.8,
@@ -85,29 +87,31 @@ class Settings extends ConsumerWidget {
                                   Container(
                                     width: screenSize.width * 0.4,
                                     child: Text(
-                                        firebaseAuthVM.currentUser.nickname,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .headline5),
+                                      firebaseAuthVM.currentUser.nickname,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .headline5,
+                                    ),
                                   ),
                                   Container(
                                     width: screenSize.width * 0.4,
                                     child: Text(
-                                        firebaseAuthVM.currentUser.email,
-                                        overflow: TextOverflow.fade,
-                                        softWrap: false,
-                                        maxLines: 1,
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .bodyText2),
+                                      firebaseAuthVM.currentUser.email,
+                                      overflow: TextOverflow.fade,
+                                      softWrap: false,
+                                      maxLines: 1,
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .bodyText2,
+                                    ),
                                   )
                                 ],
                               ),
                               SizedBox(width: screenSize.width * 0.1),
                               BasicButton(
                                   _showDialogWithChangeNickname,
-                                  AppLocalizations.of(context)
+                                  AppLocalizations.of(context)!
                                       .changeNicknameTitle,
                                   0.1,
                                   Icons.edit)
@@ -117,10 +121,10 @@ class Settings extends ConsumerWidget {
                       ),
                       SizedBox(height: screenSize.height * 0.2),
                       BasicButton(
-                          _signOut, AppLocalizations.of(context).signOut, 0.6),
+                          _signOut, AppLocalizations.of(context)!.signOut, 0.6),
                       SizedBox(height: screenSize.height * 0.2),
                       WarningButton(_deleteAccount,
-                          AppLocalizations.of(context).deleteAccount, 0.6)
+                          AppLocalizations.of(context)!.deleteAccount, 0.6)
                     ],
                   ),
                 ),

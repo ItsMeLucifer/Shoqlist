@@ -1,10 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
-import 'package:shoqlist/widgets/components/dialogs.dart';
 import 'package:shoqlist/widgets/homeScreen/home_screen_main_view.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_cards_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +25,8 @@ class _HomeScreen extends State<HomeScreen> {
     if (ref.read(firebaseAuthProvider).auth.currentUser != null) {
       fetchData(ref);
     }
+    ref.read(toolsProvider).adBanner.load();
+    ref.read(toolsProvider).printWarning('Ad loaded');
   }
 
   void _whenInternetConnectionIsRestoredCompareDatabasesAgain(WidgetRef ref) {
@@ -49,10 +49,6 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void _navigateToLoyaltyCardsHandler(BuildContext context) async {
-    if (!await ref.read(toolsProvider).adBanner.isLoaded()) {
-      ref.read(toolsProvider).adBanner.load();
-      ref.read(toolsProvider).printWarning('Ad loaded');
-    }
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => LoyaltyCardsHandler()));
   }
@@ -97,7 +93,7 @@ class _HomeScreen extends State<HomeScreen> {
                         .floatingActionButtonTheme
                         .foregroundColor,
                   ),
-                  label: AppLocalizations.of(context).loyaltyCards),
+                  label: AppLocalizations.of(context)!.loyaltyCards),
               SpeedDialChild(
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
@@ -117,7 +113,7 @@ class _HomeScreen extends State<HomeScreen> {
                         .floatingActionButtonTheme
                         .foregroundColor,
                   ),
-                  label: AppLocalizations.of(context).friends),
+                  label: AppLocalizations.of(context)!.friends),
               SpeedDialChild(
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
@@ -137,7 +133,7 @@ class _HomeScreen extends State<HomeScreen> {
                         .floatingActionButtonTheme
                         .foregroundColor,
                   ),
-                  label: AppLocalizations.of(context).settings),
+                  label: AppLocalizations.of(context)!.settings),
             ]),
         body: HomeScreenMainView());
   }

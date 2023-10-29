@@ -13,22 +13,22 @@ class FirebaseRepository {
       FirebaseFirestore.instance.collection("users");
 
   Future<DocumentSnapshot> getUserData({
-    String userId,
+    required String userId,
   }) async {
     return await users.doc(userId).get();
   }
 
   Future<QuerySnapshot> getCollectionDocuments({
-    String userId,
-    String collectionId,
+    required String userId,
+    required String collectionId,
   }) async {
     return await users.doc(userId).collection(collectionId).get();
   }
 
   Future<DocumentSnapshot> getCollectionDocument({
-    String userId,
-    String collectionId,
-    String documentId,
+    required String userId,
+    required String collectionId,
+    required String documentId,
   }) async {
     return await users
         .doc(userId)

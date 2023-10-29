@@ -11,10 +11,10 @@ class Wrapper extends ConsumerWidget {
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final _auth = FirebaseAuth.instance;
     firebaseAuthVM.addListenerToFirebaseAuth();
-    return StreamBuilder<User>(
+    return StreamBuilder<User?>(
       stream: _auth.authStateChanges(),
       builder: (BuildContext context, snapshot) {
-        if (snapshot.hasData && (!snapshot.data.isAnonymous)) {
+        if (snapshot.hasData && (snapshot.data?.isAnonymous != false)) {
           return HomeScreen(ref);
         }
         return Authentication();

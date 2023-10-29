@@ -44,7 +44,7 @@ class ShoppingListDisplay extends ConsumerWidget {
           toolsVM.newItemNameController.text, false, false);
     }
     toolsVM.clearNewItemTextEditingController();
-    FocusManager.instance.primaryFocus.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   void _giveAccessToTheFriendAfterTap(BuildContext context, WidgetRef ref) {
@@ -56,11 +56,11 @@ class ShoppingListDisplay extends ConsumerWidget {
             shoppingListsVM.getUsersWithAccessToCurrentList());
     //GIVE ACCESS
     firebaseVM.giveFriendAccessToYourShoppingList(
-        friendsWithoutAccess[friendsServiceVM.currentUserIndex],
+        friendsWithoutAccess[friendsServiceVM.currentUserIndex!],
         shoppingListsVM
             .shoppingLists[shoppingListsVM.currentListIndex].documentId);
     shoppingListsVM.addUserToUsersWithAccessList(
-        friendsWithoutAccess[friendsServiceVM.currentUserIndex]);
+        friendsWithoutAccess[friendsServiceVM.currentUserIndex!]);
     Navigator.of(context).pop();
     Navigator.of(context).pop();
   }
@@ -73,13 +73,13 @@ class ShoppingListDisplay extends ConsumerWidget {
         .shoppingLists[shoppingListsVM.currentListIndex].usersWithAccess;
 
     firebaseVM.denyFriendAccessToYourShoppingList(
-        usersWithAccess[friendsServiceVM.currentUserIndex],
+        usersWithAccess[friendsServiceVM.currentUserIndex!],
         shoppingListsVM
             .shoppingLists[shoppingListsVM.currentListIndex].documentId,
         usersWithAccess);
 
     shoppingListsVM.removeUserFromUsersWithAccessList(
-        usersWithAccess[friendsServiceVM.currentUserIndex]);
+        usersWithAccess[friendsServiceVM.currentUserIndex!]);
     Navigator.of(context).pop();
     Navigator.of(context).pop();
   }
@@ -124,13 +124,13 @@ class ShoppingListDisplay extends ConsumerWidget {
                     onTap: () {
                       Share.share(
                         shoppingListsVM.getCurrentShoppingListDataInString(),
-                        subject: AppLocalizations.of(context).shareListSubject,
+                        subject: AppLocalizations.of(context)!.shareListSubject,
                       );
                     },
                     backgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
                         .backgroundColor,
-                    label: AppLocalizations.of(context).share),
+                    label: AppLocalizations.of(context)!.share),
                 SpeedDialChild(
                     labelBackgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
@@ -144,22 +144,23 @@ class ShoppingListDisplay extends ConsumerWidget {
                             .foregroundColor),
                     onTap: () {
                       showDialog(
-                          context: context,
-                          builder: (context) => ChooseUser(
-                              _giveAccessToTheFriendAfterTap,
-                              friendsServiceVM
-                                  .getFriendsWithoutAccessToCurrentShoppingList(
-                                      shoppingListsVM
-                                          .getUsersWithAccessToCurrentList()),
-                              AppLocalizations.of(context).giveAccessTitle,
-                              AppLocalizations.of(context).chooseUser,
-                              AppLocalizations.of(context)
-                                  .chooseUserEmptyMessage));
+                        context: context,
+                        builder: (context) => ChooseUser(
+                            _giveAccessToTheFriendAfterTap,
+                            friendsServiceVM
+                                .getFriendsWithoutAccessToCurrentShoppingList(
+                                    shoppingListsVM
+                                        .getUsersWithAccessToCurrentList()),
+                            AppLocalizations.of(context)!.giveAccessTitle,
+                            AppLocalizations.of(context)!.chooseUser,
+                            AppLocalizations.of(context)!
+                                .chooseUserEmptyMessage),
+                      );
                     },
                     backgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
                         .backgroundColor,
-                    label: AppLocalizations.of(context).giveAccess),
+                    label: AppLocalizations.of(context)!.giveAccess),
                 SpeedDialChild(
                   labelBackgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
@@ -179,15 +180,15 @@ class ShoppingListDisplay extends ConsumerWidget {
                             shoppingListsVM
                                 .shoppingLists[shoppingListsVM.currentListIndex]
                                 .usersWithAccess,
-                            AppLocalizations.of(context).removeAccessMsg,
-                            AppLocalizations.of(context).whoHasAccess,
-                            AppLocalizations.of(context)
+                            AppLocalizations.of(context)!.removeAccessMsg,
+                            AppLocalizations.of(context)!.whoHasAccess,
+                            AppLocalizations.of(context)!
                                 .noUsersYouHaveSharedListMsg));
                   },
                   backgroundColor: Theme.of(context)
                       .floatingActionButtonTheme
                       .backgroundColor,
-                  label: AppLocalizations.of(context).whoHasAccess,
+                  label: AppLocalizations.of(context)!.whoHasAccess,
                 ),
               ]
             : [
@@ -206,12 +207,12 @@ class ShoppingListDisplay extends ConsumerWidget {
                       Share.share(
                           shoppingListsVM.getCurrentShoppingListDataInString(),
                           subject:
-                              AppLocalizations.of(context).shareListSubject);
+                              AppLocalizations.of(context)!.shareListSubject);
                     },
                     backgroundColor: Theme.of(context)
                         .floatingActionButtonTheme
                         .backgroundColor,
-                    label: AppLocalizations.of(context).share),
+                    label: AppLocalizations.of(context)!.share),
               ],
       ),
       body: SafeArea(
@@ -228,7 +229,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                         .shoppingLists[shoppingListsVM.currentListIndex].name,
                     style: Theme.of(context)
                         .primaryTextTheme
-                        .headline4
+                        .headline4!
                         .copyWith(color: currentListImportanceColor),
                     textAlign: TextAlign.left,
                   ),
@@ -238,7 +239,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                   width: screenSize.width,
                   padding: const EdgeInsets.only(right: 20.0),
                   child: Text(
-                    AppLocalizations.of(context).owner +
+                    AppLocalizations.of(context)!.owner +
                         ": " +
                         shoppingListsVM
                             .shoppingLists[shoppingListsVM.currentListIndex]
@@ -247,7 +248,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     softWrap: false,
                     maxLines: 1,
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
+                    style: Theme.of(context).textTheme.bodyText2!.copyWith(
                           color: currentListImportanceColor,
                         ),
                   ),
@@ -284,49 +285,50 @@ class ShoppingListDisplay extends ConsumerWidget {
                 child: Row(
                   children: [
                     Container(
-                        padding: const EdgeInsets.all(8.0),
-                        width: screenSize.width * 0.8,
-                        child: BasicForm(
-                          key: toolsVM.addNewItemNameFormFieldKey,
-                          keyboardType: TextInputType.name,
-                          controller: toolsVM.newItemNameController,
-                          decoration: InputDecoration(
-                            suffixIcon: GestureDetector(
-                              onTap: () {
-                                _addNewItemToCurrentShoppingList(context, ref);
-                                toolsVM.clearNewItemTextEditingController();
-                                toolsVM.newItemFocusNode.requestFocus();
-                              },
-                              child: Icon(
-                                Icons.add,
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
-                            ),
-                            fillColor: Colors.grey[600],
-                            hintText: AppLocalizations.of(context).itemNameHint,
-                            hintStyle:
-                                Theme.of(context).primaryTextTheme.bodyText2,
-                            contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 1,
-                                color: Theme.of(context).primaryColorDark,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 1,
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
+                      padding: const EdgeInsets.all(8.0),
+                      width: screenSize.width * 0.8,
+                      child: BasicForm(
+                        key: toolsVM.addNewItemNameFormFieldKey,
+                        keyboardType: TextInputType.name,
+                        controller: toolsVM.newItemNameController,
+                        decoration: InputDecoration(
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              _addNewItemToCurrentShoppingList(context, ref);
+                              toolsVM.clearNewItemTextEditingController();
+                              toolsVM.newItemFocusNode.requestFocus();
+                            },
+                            child: Icon(
+                              Icons.add,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
-                          onSubmitted: (value) {
-                            _addNewItemToCurrentShoppingList(context, ref);
-                            toolsVM.clearNewItemTextEditingController();
-                            toolsVM.newItemFocusNode.requestFocus();
-                          },
-                          style: Theme.of(context).textTheme.bodyText1,
-                        )),
+                          fillColor: Colors.grey[600],
+                          hintText: AppLocalizations.of(context)!.itemNameHint,
+                          hintStyle:
+                              Theme.of(context).primaryTextTheme.bodyText2,
+                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: Theme.of(context).primaryColorDark,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
+                        ),
+                        onSubmitted: (value) {
+                          _addNewItemToCurrentShoppingList(context, ref);
+                          toolsVM.clearNewItemTextEditingController();
+                          toolsVM.newItemFocusNode.requestFocus();
+                        },
+                        style: Theme.of(context).textTheme.bodyText1!,
+                      ),
+                    ),
                     SizedBox(width: 10)
                   ],
                 ),
@@ -367,7 +369,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                 builder: (context) {
                   return YesNoDialog(
                       _onLongPressShoppingListItem,
-                      AppLocalizations.of(context)
+                      AppLocalizations.of(context)!
                           .removeItemMsg(shoppingList.list[index].itemName));
                 });
           },

@@ -12,11 +12,11 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   // FirebaseAuthViewModel.instance() : _auth = FirebaseAuth.instance {
   //   _auth.authStateChanges().listen(_onAuthStateChanged);
   // }
-  FirebaseAuthViewModel();
+  FirebaseAuthViewModel() : _auth = FirebaseAuth.instance;
   //AUTHENTICATION
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth;
   FirebaseAuth get auth => _auth;
-  UserCredential userCredential;
+  UserCredential? userCredential;
   Status _status = Status.Unauthenticated;
   Status get status => _status;
   set status(Status value) {
@@ -38,11 +38,11 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   model.User currentUser = model.User('Nickname', 'Email', 'UserId');
   void setCurrentUserCredentials() async {
     if (_auth.currentUser != null && status == Status.Authenticated) {
-      DocumentSnapshot document;
+      DocumentSnapshot? document;
       try {
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(auth.currentUser.uid)
+            .doc(auth.currentUser!.uid)
             .get()
             .then((DocumentSnapshot doc) {
           if (doc.exists) {
@@ -50,8 +50,11 @@ class FirebaseAuthViewModel extends ChangeNotifier {
           }
         });
         if (document == null) return;
-        currentUser = model.User(document.get('nickname'),
-            document.get('email'), document.get('userId'));
+        currentUser = model.User(
+          document?.get('nickname'),
+          document?.get('email'),
+          document?.get('userId'),
+        );
         notifyListeners();
       } catch (err) {
         print('Couldn\'t fetch current user\'s credentials, error: $err');
@@ -87,11 +90,10 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     checkIfUserDocumentWasCreated();
   }
 
-  Future<void> _onAuthStateChanged(User firebaseUser) async {
-    if (firebaseUser != null) {
-      status = Status.Authenticated;
-      setCurrentUserCredentials();
-    }
+  Future<void> _onAuthStateChanged(User? firebaseUser) async {
+    if (firebaseUser == null) return;
+    status = Status.Authenticated;
+    setCurrentUserCredentials();
   }
 
   Future<void> register(String email, String password) async {
@@ -118,11 +120,18 @@ class FirebaseAuthViewModel extends ChangeNotifier {
 
   Future<void> signInWithGoogle() async {
     status = Status.DuringAuthorization;
-    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) {
+      status = Status.Unauthenticated;
+      print('Google user is null');
+      return;
+    }
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
     try {
       userCredential = await _auth.signInWithCredential(credential);
     } catch (e) {
@@ -148,15 +157,16 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   Future<void> checkIfUserDocumentWasCreated() async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     if (_auth.currentUser == null) return;
-    var doc = await users.doc(_auth.currentUser.uid).get();
+    var doc = await users.doc(_auth.currentUser!.uid).get();
     if (!doc.exists) {
-      String nickname = auth.currentUser.email.split("@")[0];
-      users.doc(_auth.currentUser.uid).set({
-        'email': !_auth.currentUser.isAnonymous
-            ? auth.currentUser.email
+      String nickname = auth.currentUser!.email!.split("@")[0];
+      users.doc(_auth.currentUser!.uid).set({
+        'email': !_auth.currentUser!.isAnonymous
+            ? auth.currentUser!.email
             : 'anonymous',
-        'userId':
-            !_auth.currentUser.isAnonymous ? auth.currentUser.uid : 'anonymous',
+        'userId': !_auth.currentUser!.isAnonymous
+            ? auth.currentUser!.uid
+            : 'anonymous',
         'nickname': nickname[0].toUpperCase() + nickname.substring(1),
         'timestamp': 0
       });
@@ -178,13 +188,13 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     _status = Status.Unauthenticated;
     _exceptionMessageIndex = 10;
     notifyListeners();
-    await _auth.currentUser.delete();
+    await _auth.currentUser!.delete();
   }
 
   void changeNickname(String newNickname) async {
     await FirebaseFirestore.instance
         .collection('users')
-        .doc(auth.currentUser.uid)
+        .doc(auth.currentUser!.uid)
         .update({'nickname': newNickname});
     currentUser =
         model.User(newNickname, currentUser.email, currentUser.userId);

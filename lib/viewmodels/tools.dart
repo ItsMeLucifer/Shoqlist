@@ -4,6 +4,7 @@ import 'package:shoqlist/models/shopping_list.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
+
 enum RefreshStatus { duringRefresh, refreshed }
 
 class Tools extends ChangeNotifier {
@@ -28,10 +29,10 @@ class Tools extends ChangeNotifier {
   String getTranslatedImportanceLabel(
       BuildContext context, Importance importance) {
     List<String> _importances = [
-      AppLocalizations.of(context).low,
-      AppLocalizations.of(context).normal,
-      AppLocalizations.of(context).important,
-      AppLocalizations.of(context).urgent
+      AppLocalizations.of(context)!.low,
+      AppLocalizations.of(context)!.normal,
+      AppLocalizations.of(context)!.important,
+      AppLocalizations.of(context)!.urgent
     ];
     return _importances[importance.index];
   }
@@ -91,19 +92,19 @@ class Tools extends ChangeNotifier {
     notifyListeners();
   }
 
-  Key newListNameFormFieldKey;
+  Key? newListNameFormFieldKey;
   //Add new Item
   FocusNode newItemFocusNode = FocusNode();
   TextEditingController newItemNameController = TextEditingController();
-  Key addNewItemNameFormFieldKey;
+  Key? addNewItemNameFormFieldKey;
   void clearNewItemTextEditingController() {
     newItemNameController.clear();
     notifyListeners();
   }
 
   //Add new Card
-  Key addNewCardNameFormFieldKey;
-  Key addNewCardBarCodeFormFieldKey;
+  Key? addNewCardNameFormFieldKey;
+  Key? addNewCardBarCodeFormFieldKey;
 
   TextEditingController loyaltyCardNameController = TextEditingController();
   TextEditingController loyaltyCardBarCodeController = TextEditingController();
@@ -168,8 +169,9 @@ class Tools extends ChangeNotifier {
 
   //Ad
   final BannerAd adBanner = BannerAd(
-      adUnitId: 'ca-app-pub-6556175768591042/6145501750',
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: AdListener());
+    adUnitId: 'ca-app-pub-6556175768591042/6145501750',
+    size: AdSize.banner,
+    request: AdRequest(),
+    listener: BannerAdListener(),
+  );
 }
