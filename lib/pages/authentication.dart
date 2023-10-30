@@ -12,7 +12,13 @@ class Authentication extends ConsumerWidget {
     ref
         .read(firebaseAuthProvider)
         .register(toolsVM.emailController.text, toolsVM.passwordController.text)
-        .then((_) => toolsVM.clearAuthenticationTextEditingControllers());
+        .then(
+      (_) {
+        if (ref.read(firebaseAuthProvider).status == Status.Authenticated) {
+          toolsVM.clearAuthenticationTextEditingControllers();
+        }
+      },
+    );
   }
 
   void _signInUserFirebase(BuildContext context, WidgetRef ref) {
@@ -20,7 +26,13 @@ class Authentication extends ConsumerWidget {
     ref
         .read(firebaseAuthProvider)
         .signIn(toolsVM.emailController.text, toolsVM.passwordController.text)
-        .then((_) => toolsVM.clearAuthenticationTextEditingControllers());
+        .then(
+      (_) {
+        if (ref.read(firebaseAuthProvider).status == Status.Authenticated) {
+          toolsVM.clearAuthenticationTextEditingControllers();
+        }
+      },
+    );
   }
 
   void _resetExceptionMessage(BuildContext context, WidgetRef ref) {

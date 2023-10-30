@@ -14,7 +14,7 @@ class Wrapper extends ConsumerWidget {
     return StreamBuilder<User?>(
       stream: _auth.authStateChanges(),
       builder: (BuildContext context, snapshot) {
-        if (snapshot.hasData && (snapshot.data?.isAnonymous != false)) {
+        if (snapshot.hasData) {
           return HomeScreen(ref);
         }
         return Authentication();

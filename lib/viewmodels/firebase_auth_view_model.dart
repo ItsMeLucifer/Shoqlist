@@ -9,10 +9,9 @@ import 'package:shoqlist/models/user.dart' as model;
 enum Status { Authenticated, Unauthenticated, DuringAuthorization }
 
 class FirebaseAuthViewModel extends ChangeNotifier {
-  // FirebaseAuthViewModel.instance() : _auth = FirebaseAuth.instance {
-  //   _auth.authStateChanges().listen(_onAuthStateChanged);
-  // }
-  FirebaseAuthViewModel() : _auth = FirebaseAuth.instance;
+  FirebaseAuthViewModel() : _auth = FirebaseAuth.instance {
+    _auth.authStateChanges().listen(_onAuthStateChanged);
+  }
   //AUTHENTICATION
   final FirebaseAuth _auth;
   FirebaseAuth get auth => _auth;
@@ -69,6 +68,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     try {
       userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
+      debugPrint('SIGNED IN');
     } on FirebaseAuthException catch (e) {
       status = Status.Unauthenticated;
       _exceptionMessageIndex = 0;
