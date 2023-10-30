@@ -38,7 +38,7 @@ class FriendsDisplay extends ConsumerWidget {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         floatingActionButton: SpeedDial(
             overlayOpacity: 0,
             animatedIcon: AnimatedIcons.menu_close,
@@ -100,7 +100,7 @@ class FriendsDisplay extends ConsumerWidget {
                     width: screenSize.width,
                     child: Text(
                       AppLocalizations.of(context)!.friends,
-                      style: Theme.of(context).primaryTextTheme.headline4,
+                      style: Theme.of(context).primaryTextTheme.headlineMedium,
                     ),
                   ),
                   Expanded(
@@ -122,7 +122,7 @@ class FriendsDisplay extends ConsumerWidget {
                                     AppLocalizations.of(context)!.noFriendsMsg,
                                     style: Theme.of(context)
                                         .primaryTextTheme
-                                        .bodyText1,
+                                        .bodyLarge,
                                   ),
                                 )
                               ],

@@ -93,7 +93,7 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
                 Text(
                   _buttonName,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).primaryTextTheme.headline6?.copyWith(
+                  style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
                       color: shoppingListsVM.currentlyDisplayedListType ==
                               _shoppingListType
                           ? Theme.of(context).colorScheme.secondary
@@ -142,7 +142,7 @@ class BasicButton extends ConsumerWidget {
               child: _iconData == null
                   ? Text(
                       _buttonName,
-                      style: Theme.of(context).primaryTextTheme.button,
+                      style: Theme.of(context).primaryTextTheme.labelLarge,
                       textAlign: TextAlign.center,
                     )
                   : Icon(
@@ -194,7 +194,7 @@ class WarningButton extends ConsumerWidget {
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
                 fontFamily:
-                    Theme.of(context).primaryTextTheme.button?.fontFamily,
+                    Theme.of(context).primaryTextTheme.labelLarge?.fontFamily,
               ),
               textAlign: TextAlign.center,
             ),
@@ -255,7 +255,7 @@ class ShoppingListButton extends ConsumerWidget {
                         maxLines: 1,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).primaryTextTheme.button,
+                        style: Theme.of(context).primaryTextTheme.labelLarge,
                       ),
                     ),
                   ],

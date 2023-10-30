@@ -22,12 +22,12 @@ class YesNoDialog extends ConsumerWidget {
 
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       content: Padding(
         padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
         child: Container(
             child: Text(_titleToDisplay,
-                style: Theme.of(context).primaryTextTheme.headline6,
+                style: Theme.of(context).primaryTextTheme.titleLarge,
                 textAlign: TextAlign.center)),
       ),
       actions: [
@@ -70,7 +70,7 @@ class PutShoppingListData extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
     return SimpleDialog(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         children: [
           const SizedBox(height: 10.0),
           Container(
@@ -82,7 +82,7 @@ class PutShoppingListData extends ConsumerWidget {
                   _onPressedDelete == null
                       ? AppLocalizations.of(context)!.newListTitle
                       : AppLocalizations.of(context)!.editListTitle,
-                  style: Theme.of(context).primaryTextTheme.headline5,
+                  style: Theme.of(context).primaryTextTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
                 Row(
@@ -104,11 +104,11 @@ class PutShoppingListData extends ConsumerWidget {
                   children: [
                     Text(
                       AppLocalizations.of(context)!.importance + ":",
-                      style: Theme.of(context).primaryTextTheme.headline6,
+                      style: Theme.of(context).primaryTextTheme.titleLarge,
                     ),
                     DropdownButton<Importance>(
                       value: toolsVM.newListImportance,
-                      dropdownColor: Theme.of(context).backgroundColor,
+                      dropdownColor: Theme.of(context).colorScheme.background,
                       focusColor: Theme.of(context).disabledColor,
                       icon:
                           Icon(Icons.keyboard_arrow_down, color: Colors.black),
@@ -135,7 +135,7 @@ class PutShoppingListData extends ConsumerWidget {
                                   context, value),
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodyText2
+                                  .bodyMedium
                                   ?.copyWith(
                                       color: toolsVM.getImportanceColor(value)),
                               textAlign: TextAlign.center),
@@ -168,7 +168,7 @@ class PutShoppingListData extends ConsumerWidget {
                                 AppLocalizations.of(context)!.remove,
                                 style: Theme.of(context)
                                     .primaryTextTheme
-                                    .bodyText1,
+                                    .bodyLarge,
                               ),
                             ),
                           )
@@ -183,7 +183,7 @@ class PutShoppingListData extends ConsumerWidget {
                         },
                         child: Text(AppLocalizations.of(context)!.save,
                             style:
-                                Theme.of(context).primaryTextTheme.bodyText1),
+                                Theme.of(context).primaryTextTheme.bodyLarge),
                       ),
                     ),
                   ],
@@ -213,13 +213,13 @@ class ChooseUser extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     return AlertDialog(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       scrollable: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(_dialogTitle,
-              style: Theme.of(context).primaryTextTheme.headline5,
+              style: Theme.of(context).primaryTextTheme.headlineSmall,
               textAlign: TextAlign.center),
           SizedBox(height: 10),
           _usersList.isNotEmpty
@@ -236,7 +236,7 @@ class ChooseUser extends ConsumerWidget {
                 )
               : Text(
                   _noContentMsg,
-                  style: Theme.of(context).primaryTextTheme.bodyText1,
+                  style: Theme.of(context).primaryTextTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
         ],
@@ -255,7 +255,7 @@ class ChangeName extends ConsumerWidget {
     final toolsVM = ref.watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
     return AlertDialog(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       content: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -266,7 +266,7 @@ class ChangeName extends ConsumerWidget {
               Container(
                 child: Text(
                   _titleToDisplay,
-                  style: Theme.of(context).primaryTextTheme.headline5,
+                  style: Theme.of(context).primaryTextTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -324,7 +324,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
           Icon(Icons.qr_code, color: Theme.of(context).colorScheme.secondary),
     );
     return SimpleDialog(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         children: [
           Padding(
             padding: const EdgeInsets.all(10.0),
@@ -379,7 +379,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                                   AppLocalizations.of(context)!.remove,
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .bodyText1,
+                                      .bodyLarge,
                                 ),
                               ),
                             ),
@@ -396,7 +396,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                             _onDestroy != null
                                 ? AppLocalizations.of(context)!.save
                                 : AppLocalizations.of(context)!.add,
-                            style: Theme.of(context).primaryTextTheme.bodyText1,
+                            style: Theme.of(context).primaryTextTheme.bodyLarge,
                           )),
                     ),
                   ],

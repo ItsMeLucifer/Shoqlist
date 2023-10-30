@@ -45,12 +45,12 @@ class BasicForm extends ConsumerWidget {
         controller: controller,
         onChanged: (value) => onChanged?.call(context, ref),
         onFieldSubmitted: (value) => onSubmitted?.call(ref, value),
-        style: style ?? Theme.of(context).primaryTextTheme.bodyText1,
+        style: style ?? Theme.of(context).primaryTextTheme.bodyLarge,
         textAlignVertical: TextAlignVertical.center,
         decoration: decoration ??
             InputDecoration(
               hintText: hintText,
-              hintStyle: Theme.of(context).primaryTextTheme.bodyText2,
+              hintStyle: Theme.of(context).primaryTextTheme.bodyMedium,
               prefixIcon: prefixIcon != null
                   ? Icon(
                       prefixIcon,

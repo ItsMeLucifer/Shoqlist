@@ -30,7 +30,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: SafeArea(
           child: Stack(
             children: [
@@ -41,7 +41,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
                     padding: const EdgeInsets.all(20.0),
                     width: screenSize.width,
                     child: Text(AppLocalizations.of(context)!.searchFriends,
-                        style: Theme.of(context).primaryTextTheme.headline4),
+                        style: Theme.of(context).primaryTextTheme.headlineMedium),
                   ),
                   BasicForm(
                     keyboardType: TextInputType.emailAddress,
@@ -65,7 +65,7 @@ class FriendsSearchDisplay extends ConsumerWidget {
                                   AppLocalizations.of(context)!.cantFindUserMsg,
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .bodyText1,
+                                      .bodyLarge,
                                   textAlign: TextAlign.center,
                                 ),
                               )),

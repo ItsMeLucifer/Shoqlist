@@ -56,7 +56,7 @@ class Authentication extends ConsumerWidget {
           color: Colors.grey),
     );
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: Center(
           child: SingleChildScrollView(
             child: SafeArea(
@@ -75,7 +75,7 @@ class Authentication extends ConsumerWidget {
                       SizedBox(width: 5),
                       Text(
                         AppLocalizations.of(context)!.appName,
-                        style: Theme.of(context).primaryTextTheme.headline3,
+                        style: Theme.of(context).primaryTextTheme.displaySmall,
                       ),
                     ],
                   ),

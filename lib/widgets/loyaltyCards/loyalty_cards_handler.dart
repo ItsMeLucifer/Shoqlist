@@ -77,7 +77,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
     final screenSize = MediaQuery.of(context).size;
     final toolsVM = ref.watch(toolsProvider);
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -88,7 +88,7 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                   width: screenSize.width,
                   child: Text(
                     AppLocalizations.of(context)!.loyaltyCards,
-                    style: Theme.of(context).primaryTextTheme.headline4,
+                    style: Theme.of(context).primaryTextTheme.headlineMedium,
                   ),
                 ),
                 Expanded(

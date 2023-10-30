@@ -81,7 +81,7 @@ class UsersList extends ConsumerWidget {
                               maxLines: 1,
                               softWrap: false,
                               style:
-                                  Theme.of(context).primaryTextTheme.headline6,
+                                  Theme.of(context).primaryTextTheme.titleLarge,
                             ),
                           ),
                           Container(
@@ -93,7 +93,7 @@ class UsersList extends ConsumerWidget {
                               maxLines: 1,
                               softWrap: false,
                               style:
-                                  Theme.of(context).primaryTextTheme.bodyText2,
+                                  Theme.of(context).primaryTextTheme.bodyMedium,
                             ),
                           ),
                         ],

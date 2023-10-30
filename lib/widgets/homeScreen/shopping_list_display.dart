@@ -98,7 +98,7 @@ class ShoppingListDisplay extends ConsumerWidget {
         shoppingListsVM
             .shoppingLists[shoppingListsVM.currentListIndex].importance);
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       floatingActionButton: SpeedDial(
         overlayOpacity: 0,
         animatedIcon: AnimatedIcons.menu_close,
@@ -229,7 +229,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                         .shoppingLists[shoppingListsVM.currentListIndex].name,
                     style: Theme.of(context)
                         .primaryTextTheme
-                        .headline4!
+                        .headlineMedium!
                         .copyWith(color: currentListImportanceColor),
                     textAlign: TextAlign.left,
                   ),
@@ -248,7 +248,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     softWrap: false,
                     maxLines: 1,
-                    style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: currentListImportanceColor,
                         ),
                   ),
@@ -281,7 +281,7 @@ class ShoppingListDisplay extends ConsumerWidget {
               alignment: Alignment.bottomCenter,
               child: Container(
                 height: 65,
-                color: Theme.of(context).backgroundColor,
+                color: Theme.of(context).colorScheme.background,
                 child: Row(
                   children: [
                     Container(
@@ -306,7 +306,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                           fillColor: Colors.grey[600],
                           hintText: AppLocalizations.of(context)!.itemNameHint,
                           hintStyle:
-                              Theme.of(context).primaryTextTheme.bodyText2,
+                              Theme.of(context).primaryTextTheme.bodyMedium,
                           contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -326,7 +326,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                           toolsVM.clearNewItemTextEditingController();
                           toolsVM.newItemFocusNode.requestFocus();
                         },
-                        style: Theme.of(context).textTheme.bodyText1!,
+                        style: Theme.of(context).textTheme.bodyLarge!,
                       ),
                     ),
                     SizedBox(width: 10)

@@ -77,14 +77,13 @@ class MyApp extends StatelessWidget {
           tileColor: Color.fromRGBO(237, 236, 242, 1),
           iconColor: Color.fromRGBO(187, 191, 201, 1),
         ),
-        backgroundColor: Colors.white,
         textTheme: ThemeData.dark().textTheme.copyWith(
-              bodyText2: TextStyle(
+              bodyMedium: TextStyle(
                 fontFamily: 'Epilogue',
                 color: Color.fromRGBO(242, 102, 116, 1),
                 fontSize: 18,
               ),
-              bodyText1: TextStyle(
+              bodyLarge: TextStyle(
                 fontFamily: 'Epilogue',
                 color: Color.fromRGBO(242, 102, 116, 1),
                 fontWeight: FontWeight.bold,
@@ -92,44 +91,40 @@ class MyApp extends StatelessWidget {
               ),
             ),
         primaryTextTheme: TextTheme(
-            bodyText2: TextStyle(
+            bodyMedium: TextStyle(
               color: Colors.grey[500],
               fontWeight: FontWeight.bold,
               fontFamily: 'Epilogue',
             ),
-            headline3: TextStyle(
+            displaySmall: TextStyle(
               color: Color.fromRGBO(242, 102, 116, 1),
               fontWeight: FontWeight.bold,
               fontSize: 50,
               fontFamily: 'Epilogue',
             ),
-            headline4: TextStyle(
+            headlineMedium: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 40,
               color: Color.fromRGBO(242, 102, 116, 1),
               fontFamily: 'Epilogue',
             ),
-            headline5: TextStyle(
+            headlineSmall: TextStyle(
               fontFamily: 'Epilogue',
               color: Colors.black,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
-            headline6: TextStyle(
+            titleLarge: TextStyle(
               fontFamily: 'Epilogue',
               color: Colors.black,
               fontSize: 18,
             ),
-            button: TextStyle(
+            labelLarge: TextStyle(
               fontFamily: 'Epilogue',
               color: Colors.black,
               fontSize: 18,
             )),
         primaryColor: Colors.white,
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.grey,
-          accentColor: Color.fromRGBO(242, 102, 116, 1),
-        ),
         buttonTheme: ButtonThemeData(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.grey,
@@ -138,7 +133,6 @@ class MyApp extends StatelessWidget {
         ),
         disabledColor: Colors.grey[400],
         primaryColorDark: Colors.grey[600],
-        primarySwatch: Colors.grey,
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: Color.fromRGBO(242, 102, 116, 1),
           foregroundColor: Colors.white,
@@ -148,6 +142,10 @@ class MyApp extends StatelessWidget {
             fontSize: 15,
           ),
         ),
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.grey,
+          accentColor: Color.fromRGBO(242, 102, 116, 1),
+        ).copyWith(primary: Colors.grey, background: Colors.white),
       ),
       themeMode: ThemeMode.light,
       supportedLocales: L10n.all,

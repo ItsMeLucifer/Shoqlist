@@ -39,7 +39,7 @@ class Settings extends ConsumerWidget {
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: SingleChildScrollView(
           child: SafeArea(
             child: Column(
@@ -52,7 +52,7 @@ class Settings extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
                     AppLocalizations.of(context)!.settings,
-                    style: Theme.of(context).primaryTextTheme.headline3,
+                    style: Theme.of(context).primaryTextTheme.displaySmall,
                   ),
                 ),
                 Container(
@@ -91,7 +91,7 @@ class Settings extends ConsumerWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: Theme.of(context)
                                           .primaryTextTheme
-                                          .headline5,
+                                          .headlineSmall,
                                     ),
                                   ),
                                   Container(
@@ -103,7 +103,7 @@ class Settings extends ConsumerWidget {
                                       maxLines: 1,
                                       style: Theme.of(context)
                                           .primaryTextTheme
-                                          .bodyText2,
+                                          .bodyMedium,
                                     ),
                                   )
                                 ],

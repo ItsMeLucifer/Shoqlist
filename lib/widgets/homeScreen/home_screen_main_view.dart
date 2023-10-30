@@ -79,7 +79,7 @@ class HomeScreenMainView extends ConsumerWidget {
             children: [
               SizedBox(height: 5),
               Text(AppLocalizations.of(context)!.appName,
-                  style: Theme.of(context).primaryTextTheme.headline3),
+                  style: Theme.of(context).primaryTextTheme.displaySmall),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
@@ -144,7 +144,7 @@ class HomeScreenMainView extends ConsumerWidget {
                                                     .noSharedListsMsg,
                                             style: Theme.of(context)
                                                 .primaryTextTheme
-                                                .bodyText1,
+                                                .bodyLarge,
                                           ),
                                         ),
                                       )
@@ -177,7 +177,7 @@ class HomeScreenMainView extends ConsumerWidget {
                       },
                       child: Text(
                         AppLocalizations.of(context)!.newList,
-                        style: Theme.of(context).textTheme.bodyText2,
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     )
                   ],

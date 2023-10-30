@@ -31,7 +31,7 @@ class FriendRequestsDisplay extends ConsumerWidget {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: SafeArea(
           child: Stack(
             children: [
@@ -43,7 +43,7 @@ class FriendRequestsDisplay extends ConsumerWidget {
                     width: screenSize.width,
                     child: Text(
                       AppLocalizations.of(context)!.friendRequests,
-                      style: Theme.of(context).primaryTextTheme.headline4,
+                      style: Theme.of(context).primaryTextTheme.headlineMedium,
                     ),
                   ),
                   Expanded(
@@ -66,7 +66,7 @@ class FriendRequestsDisplay extends ConsumerWidget {
                                         .noFriendRequestsMsg,
                                     style: Theme.of(context)
                                         .primaryTextTheme
-                                        .bodyText1,
+                                        .bodyLarge,
                                   ),
                                 )
                               ],
