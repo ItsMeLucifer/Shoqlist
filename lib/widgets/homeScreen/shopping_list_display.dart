@@ -291,6 +291,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                         key: toolsVM.addNewItemNameFormFieldKey,
                         keyboardType: TextInputType.name,
                         controller: toolsVM.newItemNameController,
+                        focusNode: toolsVM.newItemFocusNode,
                         decoration: InputDecoration(
                           suffixIcon: GestureDetector(
                             onTap: () {
@@ -321,7 +322,7 @@ class ShoppingListDisplay extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        onSubmitted: (value) {
+                        onSubmitted: (ref, value) {
                           _addNewItemToCurrentShoppingList(context, ref);
                           toolsVM.clearNewItemTextEditingController();
                           toolsVM.newItemFocusNode.requestFocus();

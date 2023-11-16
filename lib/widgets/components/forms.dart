@@ -5,16 +5,17 @@ class BasicForm extends ConsumerWidget {
   final TextInputType? keyboardType;
   final TextEditingController? controller;
   final String? hintText;
-  final Function? onChanged;
+  final void Function(BuildContext, WidgetRef)? onChanged;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
-  final Function? onSubmitted;
+  final void Function(WidgetRef, String)? onSubmitted;
   final bool enableBorder;
   final bool focusedBorder;
   final double? width;
   final InputDecoration? decoration;
   final TextStyle? style;
+  final FocusNode? focusNode;
 
   BasicForm({
     this.keyboardType,
@@ -30,6 +31,7 @@ class BasicForm extends ConsumerWidget {
     this.width,
     this.decoration,
     this.style,
+    this.focusNode,
     Key? key,
   }) : super(key: key);
 
@@ -47,6 +49,7 @@ class BasicForm extends ConsumerWidget {
         onFieldSubmitted: (value) => onSubmitted?.call(ref, value),
         style: style ?? Theme.of(context).primaryTextTheme.bodyLarge,
         textAlignVertical: TextAlignVertical.center,
+        focusNode: focusNode,
         decoration: decoration ??
             InputDecoration(
               hintText: hintText,
