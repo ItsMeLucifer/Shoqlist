@@ -6,5 +6,5 @@
         "/Users/patrykbozek/Documents/flutter/3.13.4"
     ],
     "dart.flutterSdkPath": "~/Documents/flutter/3.13.4",
-    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.configuration.updateBuildConfiguration": "automatic",
 }
