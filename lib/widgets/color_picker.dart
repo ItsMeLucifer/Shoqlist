@@ -5,12 +5,13 @@ import 'package:shoqlist/main.dart';
 class ColorPicker extends ConsumerWidget {
   final double _colorPickerWidth;
   final double _colorPickerHeight;
-  ColorPicker(this._colorPickerWidth, this._colorPickerHeight);
+  const ColorPicker(this._colorPickerWidth, this._colorPickerHeight, {super.key});
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loyaltyCardsVM = ref.watch(loyaltyCardsProvider);
     final toolsVM = ref.watch(toolsProvider);
-    return Container(
+    return SizedBox(
       height: _colorPickerHeight,
       width: _colorPickerWidth,
       child: GridView.builder(

@@ -123,6 +123,27 @@
     "@editListTitle":{
         "description": "Title of dialog, when editing an existing shopping list"
     },
+    "editItemTitle": "Edit item",
+    "@editItemTitle":{
+        "description": "Title of dialog, when editing a shopping list item"
+    },
+    "ok": "OK",
+    "@ok":{
+        "description": "'OK' word"
+    },
+    "copiedToClipboard": "Copied to clipboard",
+    "@copiedToClipboard":{
+        "description": "Toast message after copying list text to clipboard"
+    },
+    "unshareListTitle": "Unshare {name}?",
+    "@unshareListTitle":{
+        "description": "Confirmation when user unshares themselves from a shared list",
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "decline": "Decline",
     "@decline":{
         "description": "'Decline' word"

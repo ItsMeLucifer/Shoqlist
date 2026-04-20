@@ -45,7 +45,7 @@ class LoyaltyCardsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Color> _loyaltyCardsColorsToPick = [
+  final List<Color> _loyaltyCardsColorsToPick = [
     Colors.red[300]!,
     Colors.blue[300]!,
     Colors.white,

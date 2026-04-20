@@ -1,5 +1,5 @@
 import 'package:shoqlist/models/shopping_list_item.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:shoqlist/models/user.dart';
 part 'shopping_list.g.dart';
 

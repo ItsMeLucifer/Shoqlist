@@ -1,17 +1,18 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
+import 'package:shoqlist/widgets/components/native_ad_banner.dart';
 import 'package:shoqlist/widgets/loyaltyCards/loyalty_card_info.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shoqlist/l10n/l10n_extension.dart';
 
 import '../../main.dart';
 
 class LoyaltyCardsHandler extends ConsumerWidget {
+  const LoyaltyCardsHandler({super.key});
+
   void _removeLoyaltyCard(BuildContext context, WidgetRef ref) {
     //DELETE LIST ON FIREBASE
     ref.read(firebaseProvider).deleteLoyaltyCardOnFirebase(ref
@@ -38,13 +39,13 @@ class LoyaltyCardsHandler extends ConsumerWidget {
           toolsVM.loyaltyCardNameController.text,
           toolsVM.loyaltyCardBarCodeController.text,
           id,
-          toolsVM.newLoyaltyCardColor.value);
+          toolsVM.newLoyaltyCardColor.toARGB32());
       //ADD LOYALTY CARD LOCALLY
       loyaltyCardsVM.addNewLoyaltyCardLocally(
           toolsVM.loyaltyCardNameController.text,
           toolsVM.loyaltyCardBarCodeController.text,
           id,
-          toolsVM.newLoyaltyCardColor.value);
+          toolsVM.newLoyaltyCardColor.toARGB32());
     }
     Navigator.of(context).pop();
   }
@@ -60,12 +61,12 @@ class LoyaltyCardsHandler extends ConsumerWidget {
         loyaltyCardsVM
             .loyaltyCardsList[loyaltyCardsVM.currentLoyaltyCardsListIndex]
             .documentId,
-        toolsVM.newLoyaltyCardColor.value);
+        toolsVM.newLoyaltyCardColor.toARGB32());
     //View
     loyaltyCardsVM.updateLoyaltyCard(
         toolsVM.loyaltyCardNameController.text,
         toolsVM.loyaltyCardBarCodeController.text,
-        toolsVM.newLoyaltyCardColor.value);
+        toolsVM.newLoyaltyCardColor.toARGB32());
     Navigator.of(context).pop();
   }
 
@@ -73,52 +74,37 @@ class LoyaltyCardsHandler extends ConsumerWidget {
     ref.read(firebaseProvider).getLoyaltyCardsFromFirebase(true);
   }
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
-    final toolsVM = ref.watch(toolsProvider);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20.0),
-                  width: screenSize.width,
-                  child: Text(
-                    AppLocalizations.of(context)!.loyaltyCards,
-                    style: Theme.of(context).primaryTextTheme.headlineMedium,
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 50.0),
-                    child: LiquidPullToRefresh(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                        color: Theme.of(context).primaryColor,
-                        height: 50,
-                        animSpeedFactor: 5,
-                        showChildOpacityTransition: false,
-                        onRefresh: () async {
-                          _onRefresh(ref);
-                        },
-                        child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: loyaltyCardsList(ref))),
-                  ),
-                ),
-              ],
+            Container(
+              padding: const EdgeInsets.all(20.0),
+              width: screenSize.width,
+              child: Text(
+                context.l10n.loyaltyCards,
+                style: Theme.of(context).primaryTextTheme.headlineMedium,
+              ),
             ),
-            Positioned(
-                bottom: 0,
-                child: Container(
-                    height: 50,
-                    width: screenSize.width,
-                    child: !kDebugMode
-                        ? AdWidget(ad: toolsVM.adBanner)
-                        : Container()))
+            Expanded(
+              child: LiquidPullToRefresh(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).primaryColor,
+                  height: 50,
+                  animSpeedFactor: 5,
+                  showChildOpacityTransition: false,
+                  onRefresh: () async {
+                    _onRefresh(ref);
+                  },
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: loyaltyCardsList(ref))),
+            ),
+            const NativeAdBanner(),
           ],
         ),
       ),
@@ -142,12 +128,12 @@ class LoyaltyCardsHandler extends ConsumerWidget {
                   context: context,
                   builder: (context) => PutLoyaltyCardsData(
                     _addNewLoyaltyCard,
-                    AppLocalizations.of(context)!.newCardTitle,
+                    context.l10n.newCardTitle,
                   ),
                 );
               },
               child: Card(
-                color: Theme.of(context).disabledColor.withOpacity(0.5),
+                color: Theme.of(context).disabledColor.withValues(alpha: 0.5),
                 child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
@@ -168,10 +154,10 @@ class LoyaltyCardsHandler extends ConsumerWidget {
               },
               onLongPress: () {
                 loyaltyCardsVM.currentLoyaltyCardsListIndex = fixedIndex;
-                String removeTitle = AppLocalizations.of(context)!
+                String removeTitle = context.l10n
                     .removeCardTitle(
                         loyaltyCardsVM.loyaltyCardsList[fixedIndex].name);
-                String title = AppLocalizations.of(context)!.editCardTitle(
+                String title = context.l10n.editCardTitle(
                     loyaltyCardsVM.loyaltyCardsList[fixedIndex].name);
                 toolsVM.setLoyaltyCardControllers(
                     loyaltyCardsVM.loyaltyCardsList[fixedIndex].name,

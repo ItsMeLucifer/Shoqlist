@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.gms.ads.nativead.NativeAdView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="85dp"
+    android:background="@drawable/shoqlist_native_ad_bg">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/ad_icon"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/ad_attribution"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/ad_icon"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/shoqlist_native_ad_badge"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:includeFontPadding="false"
+            android:text="Ad"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/ad_call_to_action"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:minWidth="80dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/shoqlist_native_ad_cta"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/ad_headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ad_attribution"
+            android:layout_toEndOf="@id/ad_icon"
+            android:layout_toStartOf="@id/ad_call_to_action"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="2dp"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#F26674"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/ad_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ad_headline"
+            android:layout_toEndOf="@id/ad_icon"
+            android:layout_toStartOf="@id/ad_call_to_action"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="1dp"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+    </RelativeLayout>
+</com.google.android.gms.ads.nativead.NativeAdView>

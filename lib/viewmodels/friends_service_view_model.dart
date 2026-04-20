@@ -71,18 +71,14 @@ class FriendsServiceViewModel extends ChangeNotifier {
 
   List<User> getFriendsWithoutAccessToCurrentShoppingList(
       List<User> usersWithAccess) {
-    List<User> result = List.from(_friendsList);
-    usersWithAccess.forEach((userWA) {
-      _friendsList.forEach((friend) {
-        if (userWA.userId == friend.userId) result.remove(friend);
-      });
-    });
-    return result;
+    return _friendsList
+        .where((friend) => !usersWithAccess.any((u) => u.userId == friend.userId))
+        .toList();
   }
-  // List<User> getFriendsWithoutAccessToCurrentShoppingList(
-  //     List<User> usersWithAccess) {
-  //   List<User> result =
-  //       _friendsList.where((user) => !usersWithAccess.contains(user)).toList();
-  //   return result;
-  // }
+
+  @override
+  void dispose() {
+    searchFriendTextController.dispose();
+    super.dispose();
+  }
 }

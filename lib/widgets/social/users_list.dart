@@ -12,14 +12,16 @@ class UsersList extends ConsumerWidget {
   final Function? _declineAction;
   final double _elementWidth;
 
-  UsersList(
+  const UsersList(
     this._acceptAction,
     this._usersList, [
     this._dialogTitle,
     this._declineAction,
     this._elementWidth = 0.7,
-  ]);
+    Key? key,
+  ]) : super(key: key);
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final friendsServiceVM = ref.watch(friendsServiceProvider);
     final screenSize = MediaQuery.of(context).size;
@@ -38,14 +40,15 @@ class UsersList extends ConsumerWidget {
               onTap: () {
                 friendsServiceVM.currentUserIndex = index;
                 if (_dialogTitle == null) {
-                  return _acceptAction(context);
+                  _acceptAction(context);
+                  return;
                 }
                 showDialog(
                   context: context,
                   builder: (context) {
                     return YesNoDialog(
                       _acceptAction,
-                      _dialogTitle!,
+                      _dialogTitle,
                       _declineAction,
                     );
                   },
@@ -72,7 +75,7 @@ class UsersList extends ConsumerWidget {
                       SizedBox(width: screenSize.width * 0.05 * _elementWidth),
                       Column(
                         children: [
-                          Container(
+                          SizedBox(
                             width: screenSize.width * _elementWidth -
                                 arrowIcon.size! / 5,
                             child: Text(
@@ -84,7 +87,7 @@ class UsersList extends ConsumerWidget {
                                   Theme.of(context).primaryTextTheme.titleLarge,
                             ),
                           ),
-                          Container(
+                          SizedBox(
                             width: screenSize.width * _elementWidth -
                                 arrowIcon.size! / 5,
                             child: Text(

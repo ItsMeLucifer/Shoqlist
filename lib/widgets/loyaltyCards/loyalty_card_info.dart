@@ -4,6 +4,9 @@ import 'package:shoqlist/main.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class LoyaltyCardInfo extends ConsumerWidget {
+  const LoyaltyCardInfo({super.key});
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loyaltyCardsVM = ref.watch(loyaltyCardsProvider);
     return AlertDialog(
@@ -60,7 +63,7 @@ class LoyaltyCardInfo extends ConsumerWidget {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 10),
-          Container(
+          SizedBox(
             height: 150,
             width: 300,
             child: SfBarcodeGenerator(

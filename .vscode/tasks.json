@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "dart_generate",
+            "type": "shell",
+            "command": "dart run build_runner build --delete-conflicting-outputs",
+            "problemMatcher": []
+        },
+        {
+            "label": "clean_project",
+            "type": "shell",
+            "command": "flutter clean && flutter pub get && cd ios && pod repo update && pod install"
+        },
+        {
+            "label": "flutter_build_android",
+            "type": "shell",
+            "command": "flutter build appbundle"
+        },
+        {
+            "label": "flutter_build_ios",
+            "type": "shell",
+            "command": "flutter build ipa"
+        }
+    ]
+}

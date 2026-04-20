@@ -8,7 +8,7 @@ part of 'shopping_list.dart';
 
 class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   ShoppingList read(BinaryReader reader) {
@@ -23,7 +23,7 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
       fields[3] as String,
       fields[5] as String,
       fields[6] as String,
-      (fields[7] as List).cast<User>(),
+      fields[7] == null ? const [] : (fields[7] as List).cast<User>(),
     );
   }
 
@@ -60,7 +60,7 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
 
 class ImportanceAdapter extends TypeAdapter<Importance> {
   @override
-  final int typeId = 2;
+  final typeId = 2;
 
   @override
   Importance read(BinaryReader reader) {
@@ -83,16 +83,12 @@ class ImportanceAdapter extends TypeAdapter<Importance> {
     switch (obj) {
       case Importance.low:
         writer.writeByte(0);
-        break;
       case Importance.normal:
         writer.writeByte(1);
-        break;
       case Importance.important:
         writer.writeByte(2);
-        break;
       case Importance.urgent:
         writer.writeByte(3);
-        break;
     }
   }
 

@@ -11,13 +11,14 @@ import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:shoqlist/l10n/l10n.dart';
-import 'models/shopping_list.dart';
-import 'models/shopping_list_item.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shoqlist/models/shopping_list.dart';
+import 'package:shoqlist/models/shopping_list_item.dart';
+import 'package:shoqlist/l10n/app_localizations.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:shoqlist/constants/app_colors.dart';
 
 final ChangeNotifierProvider<ShoppingListsViewModel> shoppingListsProvider =
     ChangeNotifierProvider((_) => ShoppingListsViewModel());
@@ -26,17 +27,15 @@ final loyaltyCardsProvider =
 final toolsProvider = ChangeNotifierProvider((_) => Tools());
 final firebaseAuthProvider =
     ChangeNotifierProvider((_) => FirebaseAuthViewModel());
-// final firebaseAuthDataProvider =
-//     ChangeNotifierProvider((_) => FirebaseAuthViewModel.instance());
 final friendsServiceProvider =
     ChangeNotifierProvider((_) => FriendsServiceViewModel());
 final ChangeNotifierProvider<FirebaseViewModel> firebaseProvider =
-    ChangeNotifierProvider((_) {
-  final shoppingLists = _.watch(shoppingListsProvider);
-  final loyaltyCards = _.watch(loyaltyCardsProvider);
-  final tools = _.watch(toolsProvider);
-  final auth = _.watch(firebaseAuthProvider);
-  final friends = _.watch(friendsServiceProvider);
+    ChangeNotifierProvider((ref) {
+  final shoppingLists = ref.watch(shoppingListsProvider);
+  final loyaltyCards = ref.watch(loyaltyCardsProvider);
+  final tools = ref.watch(toolsProvider);
+  final auth = ref.watch(firebaseAuthProvider);
+  final friends = ref.watch(friendsServiceProvider);
   return FirebaseViewModel(shoppingLists, loyaltyCards, tools, auth, friends);
 });
 
@@ -57,7 +56,7 @@ void main() async {
   await Hive.openBox<int>('data_variables');
 
   //Admob
-  MobileAds.instance.initialize();
+  await MobileAds.instance.initialize();
 
   //Orientation
   SystemChrome.setPreferredOrientations(
@@ -67,6 +66,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -74,18 +75,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         listTileTheme: ListTileThemeData(
-          tileColor: Color.fromRGBO(237, 236, 242, 1),
-          iconColor: Color.fromRGBO(187, 191, 201, 1),
+          tileColor: AppColors.surfaceGray,
+          iconColor: AppColors.neutralIcon,
         ),
         textTheme: ThemeData.dark().textTheme.copyWith(
               bodyMedium: TextStyle(
                 fontFamily: 'Epilogue',
-                color: Color.fromRGBO(242, 102, 116, 1),
+                color: AppColors.brandPink,
                 fontSize: 18,
               ),
               bodyLarge: TextStyle(
                 fontFamily: 'Epilogue',
-                color: Color.fromRGBO(242, 102, 116, 1),
+                color: AppColors.brandPink,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
@@ -97,7 +98,7 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Epilogue',
             ),
             displaySmall: TextStyle(
-              color: Color.fromRGBO(242, 102, 116, 1),
+              color: AppColors.brandPink,
               fontWeight: FontWeight.bold,
               fontSize: 50,
               fontFamily: 'Epilogue',
@@ -105,7 +106,7 @@ class MyApp extends StatelessWidget {
             headlineMedium: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 40,
-              color: Color.fromRGBO(242, 102, 116, 1),
+              color: AppColors.brandPink,
               fontFamily: 'Epilogue',
             ),
             headlineSmall: TextStyle(
@@ -128,13 +129,13 @@ class MyApp extends StatelessWidget {
         buttonTheme: ButtonThemeData(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.grey,
-            backgroundColor: Color.fromRGBO(237, 236, 242, 1),
+            backgroundColor: AppColors.surfaceGray,
           ),
         ),
         disabledColor: Colors.grey[400],
         primaryColorDark: Colors.grey[600],
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Color.fromRGBO(242, 102, 116, 1),
+          backgroundColor: AppColors.brandPink,
           foregroundColor: Colors.white,
           extendedTextStyle: TextStyle(
             fontFamily: 'Epilogue',
@@ -142,10 +143,11 @@ class MyApp extends StatelessWidget {
             fontSize: 15,
           ),
         ),
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.grey,
-          accentColor: Color.fromRGBO(242, 102, 116, 1),
-        ).copyWith(primary: Colors.grey, background: Colors.white),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey).copyWith(
+          primary: Colors.grey,
+          secondary: AppColors.brandPink,
+          surface: Colors.white,
+        ),
       ),
       themeMode: ThemeMode.light,
       supportedLocales: L10n.all,

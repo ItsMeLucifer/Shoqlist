@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/models/shopping_list.dart';
-import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/forms.dart';
-import 'package:shoqlist/widgets/social/users_list.dart';
 import '../../main.dart';
 import '../color_picker.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shoqlist/widgets/components/barcode_scanner_page.dart';
+import 'package:shoqlist/l10n/l10n_extension.dart';
 
 class YesNoDialog extends ConsumerWidget {
   final Function _onAccepted;
   final String _titleToDisplay;
   final Function? _onDeclined;
-  YesNoDialog(
+  const YesNoDialog(
     this._onAccepted,
     this._titleToDisplay, [
     this._onDeclined,
-  ]);
+    Key? key,
+  ]) : super(key: key);
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       content: Padding(
         padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-        child: Container(
-            child: Text(_titleToDisplay,
-                style: Theme.of(context).primaryTextTheme.titleLarge,
-                textAlign: TextAlign.center)),
+        child: Text(_titleToDisplay,
+            style: Theme.of(context).primaryTextTheme.titleLarge,
+            textAlign: TextAlign.center),
       ),
       actions: [
         TextButton(
@@ -36,19 +35,19 @@ class YesNoDialog extends ConsumerWidget {
             if (_onDeclined == null) {
               return Navigator.of(context).pop();
             }
-            _onDeclined!(context, ref);
+            _onDeclined(context, ref);
           },
           child: Text(_onDeclined == null
-              ? AppLocalizations.of(context)!.no
-              : AppLocalizations.of(context)!.decline),
+              ? context.l10n.no
+              : context.l10n.decline),
         ),
         TextButton(
           onPressed: () {
             _onAccepted(context, ref);
           },
           child: Text(_onDeclined == null
-              ? AppLocalizations.of(context)!.yes
-              : AppLocalizations.of(context)!.accept),
+              ? context.l10n.yes
+              : context.l10n.accept),
         ),
       ],
     );
@@ -60,41 +59,43 @@ class PutShoppingListData extends ConsumerWidget {
   final Function? _onPressedDelete;
   final BuildContext context;
   final String _deleteNotificationTitle;
-  PutShoppingListData(
+  const PutShoppingListData(
     this._onPressedSave,
     this.context, [
     this._deleteNotificationTitle = '',
     this._onPressedDelete,
-  ]);
+    Key? key,
+  ]) : super(key: key);
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
     return SimpleDialog(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         children: [
           const SizedBox(height: 10.0),
-          Container(
+          SizedBox(
             height: 250,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   _onPressedDelete == null
-                      ? AppLocalizations.of(context)!.newListTitle
-                      : AppLocalizations.of(context)!.editListTitle,
+                      ? context.l10n.newListTitle
+                      : context.l10n.editListTitle,
                   style: Theme.of(context).primaryTextTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 210,
                       child: BasicForm(
                         key: toolsVM.newListNameFormFieldKey,
                         keyboardType: TextInputType.name,
                         controller: toolsVM.newListNameController,
-                        hintText: AppLocalizations.of(context)!.listName,
+                        hintText: context.l10n.listName,
                       ),
                     ),
                   ],
@@ -103,12 +104,12 @@ class PutShoppingListData extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      AppLocalizations.of(context)!.importance + ":",
+                      "${context.l10n.importance}:",
                       style: Theme.of(context).primaryTextTheme.titleLarge,
                     ),
                     DropdownButton<Importance>(
                       value: toolsVM.newListImportance,
-                      dropdownColor: Theme.of(context).colorScheme.background,
+                      dropdownColor: Theme.of(context).colorScheme.surface,
                       focusColor: Theme.of(context).disabledColor,
                       icon:
                           Icon(Icons.keyboard_arrow_down, color: Colors.black),
@@ -154,18 +155,18 @@ class PutShoppingListData extends ConsumerWidget {
                             color: Theme.of(context)
                                 .buttonTheme
                                 .colorScheme
-                                ?.background,
+                                ?.surface,
                             child: TextButton(
                               onPressed: () {
                                 showDialog(
                                     context: context,
                                     builder: (context) {
-                                      return YesNoDialog(_onPressedDelete!,
+                                      return YesNoDialog(_onPressedDelete,
                                           _deleteNotificationTitle);
                                     });
                               },
                               child: Text(
-                                AppLocalizations.of(context)!.remove,
+                                context.l10n.remove,
                                 style: Theme.of(context)
                                     .primaryTextTheme
                                     .bodyLarge,
@@ -175,13 +176,13 @@ class PutShoppingListData extends ConsumerWidget {
                         : SizedBox(),
                     Card(
                       color:
-                          Theme.of(context).buttonTheme.colorScheme!.background,
+                          Theme.of(context).buttonTheme.colorScheme!.surface,
                       child: TextButton(
                         onPressed: () {
                           _onPressedSave(context, ref);
                           Navigator.of(context).pop();
                         },
-                        child: Text(AppLocalizations.of(context)!.save,
+                        child: Text(context.l10n.save,
                             style:
                                 Theme.of(context).primaryTextTheme.bodyLarge),
                       ),
@@ -195,85 +196,34 @@ class PutShoppingListData extends ConsumerWidget {
   }
 }
 
-class ChooseUser extends ConsumerWidget {
-  final Function _actionAfterTapUser;
-  final List<User> _usersList;
-  final String _titleToDisplayAfterTapUser;
-  final String _dialogTitle;
-  final String _noContentMsg;
-
-  ChooseUser(
-    this._actionAfterTapUser,
-    this._usersList,
-    this._titleToDisplayAfterTapUser,
-    this._dialogTitle,
-    this._noContentMsg,
-  );
-
-  Widget build(BuildContext context, WidgetRef ref) {
-    var size = MediaQuery.of(context).size;
-    return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      scrollable: true,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(_dialogTitle,
-              style: Theme.of(context).primaryTextTheme.headlineSmall,
-              textAlign: TextAlign.center),
-          SizedBox(height: 10),
-          _usersList.isNotEmpty
-              ? Container(
-                  height: size.height * 0.6,
-                  width: size.width * 0.9,
-                  child: UsersList(
-                    _actionAfterTapUser,
-                    _usersList,
-                    _titleToDisplayAfterTapUser,
-                    null,
-                    0.4,
-                  ),
-                )
-              : Text(
-                  _noContentMsg,
-                  style: Theme.of(context).primaryTextTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-        ],
-      ),
-    );
-  }
-}
-
 class ChangeName extends ConsumerWidget {
   final Function _onAccepted;
   final String _titleToDisplay;
 
-  ChangeName(this._onAccepted, this._titleToDisplay);
+  const ChangeName(this._onAccepted, this._titleToDisplay, {super.key});
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       content: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
+        child: SizedBox(
           height: screenSize.height * 0.15,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                child: Text(
-                  _titleToDisplay,
-                  style: Theme.of(context).primaryTextTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
+              Text(
+                _titleToDisplay,
+                style: Theme.of(context).primaryTextTheme.headlineSmall,
+                textAlign: TextAlign.center,
               ),
               BasicForm(
                 keyboardType: TextInputType.name,
                 controller: toolsVM.newNicknameController,
-                hintText: AppLocalizations.of(context)!.nickname,
+                hintText: context.l10n.nickname,
                 onChanged: (BuildContext context, WidgetRef ref) => {},
                 prefixIcon: Icons.person,
               )
@@ -285,7 +235,7 @@ class ChangeName extends ConsumerWidget {
         Padding(
             padding: const EdgeInsets.only(bottom: 8.0, right: 8),
             child: BasicButton(
-                _onAccepted, AppLocalizations.of(context)!.save, .2)),
+                _onAccepted, context.l10n.save, .2)),
       ],
     );
   }
@@ -297,34 +247,33 @@ class PutLoyaltyCardsData extends ConsumerWidget {
   final Function? _onDestroy;
   final String? _removeTitle;
 
-  PutLoyaltyCardsData(
+  const PutLoyaltyCardsData(
     this._onPressed,
     this._title, [
     this._onDestroy,
     this._removeTitle,
-  ]);
+    Key? key,
+  ]) : super(key: key);
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
-    const double _alertDialogWidth = 250;
-    const double _dividerHeight = 15;
-    Widget _suffixIcon = GestureDetector(
+    const double alertDialogWidth = 250;
+    const double dividerHeight = 15;
+    Widget suffixIcon = GestureDetector(
       onTap: () async {
-        toolsVM.loyaltyCardBarCodeController.text =
-            await FlutterBarcodeScanner.scanBarcode(
-          "#ff6666",
-          AppLocalizations.of(context)!.cancel,
-          true,
-          ScanMode.DEFAULT,
+        final scanned = await Navigator.of(context).push<String>(
+          MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
         );
-        if (toolsVM.loyaltyCardBarCodeController.text == '-1')
-          toolsVM.loyaltyCardBarCodeController.text = '';
+        if (scanned != null && scanned.isNotEmpty) {
+          toolsVM.loyaltyCardBarCodeController.text = scanned;
+        }
       },
       child:
           Icon(Icons.qr_code, color: Theme.of(context).colorScheme.secondary),
     );
     return SimpleDialog(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         children: [
           Padding(
             padding: const EdgeInsets.all(10.0),
@@ -337,22 +286,22 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: _dividerHeight * 2),
+                SizedBox(height: dividerHeight * 2),
                 BasicForm(
                   keyboardType: TextInputType.name,
                   controller: toolsVM.loyaltyCardNameController,
-                  hintText: AppLocalizations.of(context)!.cardName,
+                  hintText: context.l10n.cardName,
                 ),
-                SizedBox(height: _dividerHeight),
-                ColorPicker(_alertDialogWidth, 100),
-                SizedBox(height: _dividerHeight),
+                SizedBox(height: dividerHeight),
+                ColorPicker(alertDialogWidth, 100),
+                SizedBox(height: dividerHeight),
                 BasicForm(
                   keyboardType: TextInputType.text,
                   controller: toolsVM.loyaltyCardBarCodeController,
-                  hintText: AppLocalizations.of(context)!.cardCode,
-                  suffixIcon: _suffixIcon,
+                  hintText: context.l10n.cardCode,
+                  suffixIcon: suffixIcon,
                 ),
-                SizedBox(height: _dividerHeight),
+                SizedBox(height: dividerHeight),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -363,20 +312,20 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                               color: Theme.of(context)
                                   .buttonTheme
                                   .colorScheme
-                                  ?.background,
+                                  ?.surface,
                               child: TextButton(
                                 onPressed: () {
                                   showDialog(
                                       context: context,
                                       builder: (context) {
                                         return YesNoDialog(
-                                          _onDestroy!,
+                                          _onDestroy,
                                           _removeTitle!,
                                         );
                                       });
                                 },
                                 child: Text(
-                                  AppLocalizations.of(context)!.remove,
+                                  context.l10n.remove,
                                   style: Theme.of(context)
                                       .primaryTextTheme
                                       .bodyLarge,
@@ -387,15 +336,15 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                         : Container(),
                     Card(
                       color:
-                          Theme.of(context).buttonTheme.colorScheme?.background,
+                          Theme.of(context).buttonTheme.colorScheme?.surface,
                       child: TextButton(
                           onPressed: () {
                             _onPressed(context, ref);
                           },
                           child: Text(
                             _onDestroy != null
-                                ? AppLocalizations.of(context)!.save
-                                : AppLocalizations.of(context)!.add,
+                                ? context.l10n.save
+                                : context.l10n.add,
                             style: Theme.of(context).primaryTextTheme.bodyLarge,
                           )),
                     ),

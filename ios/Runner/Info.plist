@@ -4,6 +4,8 @@
 	<dict>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleDisplayName</key>
+		<string>Shoqlist</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -11,7 +13,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>Shoqlist</string>
+		<string>shoqlist</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -41,11 +43,22 @@
 		</array>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>NSCameraUsageDescription</key>
+		<string>This app uses the camera to scan barcodes on loyalty cards.</string>
+		<key>GADApplicationIdentifier</key>
+		<string>ca-app-pub-6556175768591042~1138242915</string>
+		<key>SKAdNetworkItems</key>
+		<array>
+			<dict>
+				<key>SKAdNetworkIdentifier</key>
+				<string>cstr6suwn9.skadnetwork</string>
+			</dict>
+		</array>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true/>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
-		<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-</dict>
+	</dict>
 </plist>

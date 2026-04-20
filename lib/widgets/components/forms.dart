@@ -17,7 +17,7 @@ class BasicForm extends ConsumerWidget {
   final TextStyle? style;
   final FocusNode? focusNode;
 
-  BasicForm({
+  const BasicForm({
     this.keyboardType,
     this.controller,
     this.hintText,
@@ -32,12 +32,13 @@ class BasicForm extends ConsumerWidget {
     this.decoration,
     this.style,
     this.focusNode,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
-    return Container(
+    return SizedBox(
       width: width ?? screenSize.width * 0.6,
       height: 50,
       child: TextFormField(

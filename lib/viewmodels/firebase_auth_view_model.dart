@@ -1,22 +1,25 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/models/user.dart' as model;
 
-enum Status { Authenticated, Unauthenticated, DuringAuthorization }
+enum Status { authenticated, unauthenticated, duringAuthorization }
 
 class FirebaseAuthViewModel extends ChangeNotifier {
   FirebaseAuthViewModel() : _auth = FirebaseAuth.instance {
-    _auth.authStateChanges().listen(_onAuthStateChanged);
+    _authSubscription = _auth.authStateChanges().listen(_onAuthStateChanged);
   }
   //AUTHENTICATION
   final FirebaseAuth _auth;
+  late final StreamSubscription<User?> _authSubscription;
   FirebaseAuth get auth => _auth;
   UserCredential? userCredential;
-  Status _status = Status.Unauthenticated;
+  Status _status = Status.unauthenticated;
   Status get status => _status;
   set status(Status value) {
     _status = value;
@@ -30,13 +33,9 @@ class FirebaseAuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addListenerToFirebaseAuth() {
-    _auth.authStateChanges().listen(_onAuthStateChanged);
-  }
-
   model.User currentUser = model.User('Nickname', 'Email', 'UserId');
   void setCurrentUserCredentials() async {
-    if (_auth.currentUser != null && status == Status.Authenticated) {
+    if (_auth.currentUser != null && status == Status.authenticated) {
       DocumentSnapshot? document;
       try {
         await FirebaseFirestore.instance
@@ -56,21 +55,19 @@ class FirebaseAuthViewModel extends ChangeNotifier {
         );
         notifyListeners();
       } catch (err) {
-        print('Couldn\'t fetch current user\'s credentials, error: $err');
+        debugPrint('Couldn\'t fetch current user\'s credentials, error: $err');
       }
     }
   }
 
-  void setExceptionMessagesTranslations(BuildContext context) {}
-
   Future<void> signIn(String email, String password) async {
-    status = Status.DuringAuthorization;
+    status = Status.duringAuthorization;
     try {
       userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       debugPrint('SIGNED IN');
     } on FirebaseAuthException catch (e) {
-      status = Status.Unauthenticated;
+      status = Status.unauthenticated;
       _exceptionMessageIndex = 0;
       if (e.code == 'user-not-found') {
         _exceptionMessageIndex = 1;
@@ -82,7 +79,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
         _exceptionMessageIndex = 4;
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     if (email == "" || password == "") {
       _exceptionMessageIndex = 5;
@@ -92,17 +89,17 @@ class FirebaseAuthViewModel extends ChangeNotifier {
 
   Future<void> _onAuthStateChanged(User? firebaseUser) async {
     if (firebaseUser == null) return;
-    status = Status.Authenticated;
+    status = Status.authenticated;
     setCurrentUserCredentials();
   }
 
   Future<void> register(String email, String password) async {
-    status = Status.DuringAuthorization;
+    status = Status.duringAuthorization;
     try {
       userCredential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      status = Status.Unauthenticated;
+      status = Status.unauthenticated;
       _exceptionMessageIndex = 0;
       if (e.code == 'weak-password') {
         _exceptionMessageIndex = 6;
@@ -110,7 +107,7 @@ class FirebaseAuthViewModel extends ChangeNotifier {
         _exceptionMessageIndex = 7;
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     if (email == "" || password == "") {
       _exceptionMessageIndex = 5;
@@ -119,37 +116,40 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   }
 
   Future<void> signInWithGoogle() async {
-    status = Status.DuringAuthorization;
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    if (googleUser == null) {
-      status = Status.Unauthenticated;
-      print('Google user is null');
-      return;
+    status = Status.duringAuthorization;
+    final googleSignIn = GoogleSignIn.instance;
+    await googleSignIn.initialize();
+    
+    final GoogleSignInAccount? googleUser;
+    if (googleSignIn.supportsAuthenticate()) {
+      googleUser = await googleSignIn.authenticate();
+    } else {
+      throw UnsupportedError('Platform not supported for authentication');
     }
+    
     final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+        googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
     try {
       userCredential = await _auth.signInWithCredential(credential);
     } catch (e) {
-      status = Status.Unauthenticated;
+      status = Status.unauthenticated;
       _exceptionMessageIndex = 8;
-      print(e);
+      debugPrint(e.toString());
     }
     checkIfUserDocumentWasCreated();
   }
 
   Future<void> signInAnonymously() async {
-    status = Status.DuringAuthorization;
+    status = Status.duringAuthorization;
     try {
       userCredential = await _auth.signInAnonymously();
     } catch (e) {
-      status = Status.Unauthenticated;
+      status = Status.unauthenticated;
       _exceptionMessageIndex = 9;
-      print(e);
+      debugPrint(e.toString());
     }
     checkIfUserDocumentWasCreated();
   }
@@ -171,12 +171,12 @@ class FirebaseAuthViewModel extends ChangeNotifier {
         'timestamp': 0
       });
     }
-    status = Status.Authenticated;
+    status = Status.authenticated;
     setCurrentUserCredentials();
   }
 
   Future<void> signOut() async {
-    _status = Status.Unauthenticated;
+    _status = Status.unauthenticated;
     _exceptionMessageIndex = 10;
     Hive.box<ShoppingList>('shopping_lists').clear();
     Hive.box<int>('data_variables').clear();
@@ -185,19 +185,27 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   }
 
   Future<void> deleteAccount() async {
-    _status = Status.Unauthenticated;
+    _status = Status.unauthenticated;
     _exceptionMessageIndex = 10;
     notifyListeners();
     await _auth.currentUser!.delete();
   }
 
-  void changeNickname(String newNickname) async {
+  Future<void> changeNickname(String newNickname) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
     await FirebaseFirestore.instance
         .collection('users')
-        .doc(auth.currentUser!.uid)
+        .doc(uid)
         .update({'nickname': newNickname});
     currentUser =
         model.User(newNickname, currentUser.email, currentUser.userId);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _authSubscription.cancel();
+    super.dispose();
   }
 }

@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 part 'shopping_list_item.g.dart';
 
 @HiveType(typeId: 1)

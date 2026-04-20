@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shoqlist/constants/app_colors.dart';
 import 'package:shoqlist/models/shopping_list.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shoqlist/l10n/l10n_extension.dart';
 
 enum FetchStatus { unfetched, fetched, duringFetching }
 
@@ -11,13 +11,13 @@ class Tools extends ChangeNotifier {
   Color getImportanceColor(Importance importance) {
     switch (importance) {
       case Importance.important:
-        return Color.fromRGBO(253, 202, 64, 1);
+        return AppColors.importanceImportant;
       case Importance.urgent:
-        return Color.fromRGBO(242, 102, 116, 1);
+        return AppColors.importanceUrgent;
       case Importance.low:
-        return Color.fromRGBO(66, 129, 164, 1);
+        return AppColors.importanceLow;
       default: //Importance.normal
-        return Color.fromRGBO(67, 197, 158, 1);
+        return AppColors.importanceNormal;
     }
   }
 
@@ -28,19 +28,20 @@ class Tools extends ChangeNotifier {
 
   String getTranslatedImportanceLabel(
       BuildContext context, Importance importance) {
-    List<String> _importances = [
-      AppLocalizations.of(context)!.low,
-      AppLocalizations.of(context)!.normal,
-      AppLocalizations.of(context)!.important,
-      AppLocalizations.of(context)!.urgent
+    List<String> importances = [
+      context.l10n.low,
+      context.l10n.normal,
+      context.l10n.important,
+      context.l10n.urgent
     ];
-    return _importances[importance.index];
+    return importances[importance.index];
   }
 
   Importance getImportanceValueFromLabel(String label) {
     for (int i = 0; i < Importance.values.length; i++) {
-      if (getImportanceLabel(Importance.values[i]) == label)
+      if (getImportanceLabel(Importance.values[i]) == label) {
         return Importance.values[i];
+      }
     }
     return Importance.normal;
   }
@@ -54,7 +55,7 @@ class Tools extends ChangeNotifier {
   }
 
   void printWarning(String text) {
-    print('\x1B[33m$text\x1B[0m');
+    debugPrint('\x1B[33m$text\x1B[0m');
   }
 
   //Home Page
@@ -167,11 +168,16 @@ class Tools extends ChangeNotifier {
     notifyListeners();
   }
 
-  //Ad
-  final BannerAd adBanner = BannerAd(
-    adUnitId: 'ca-app-pub-6556175768591042/6145501750',
-    size: AdSize.banner,
-    request: AdRequest(),
-    listener: BannerAdListener(),
-  );
+  @override
+  void dispose() {
+    newNicknameController.dispose();
+    newListNameController.dispose();
+    newItemFocusNode.dispose();
+    newItemNameController.dispose();
+    loyaltyCardNameController.dispose();
+    loyaltyCardBarCodeController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 }

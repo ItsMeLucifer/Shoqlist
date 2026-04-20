@@ -38,7 +38,16 @@ class ShoppingListsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isValidListIndex(int index) =>
+      index >= 0 && index < shoppingLists.length;
+
+  bool _isValidItemIndex(int listIndex, int itemIndex) =>
+      _isValidListIndex(listIndex) &&
+      itemIndex >= 0 &&
+      itemIndex < shoppingLists[listIndex].list.length;
+
   void updateCurrentShoppingList(ShoppingList newList) {
+    if (!_isValidListIndex(_currentListIndex)) return;
     shoppingLists[_currentListIndex] = newList;
     sortShoppingListItemsDisplay();
     notifyListeners();
@@ -89,8 +98,8 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void toggleItemStateLocally(int listIndex, int itemIndex) {
+    if (!_isValidItemIndex(listIndex, itemIndex)) return;
     shoppingLists[listIndex].list[itemIndex].toggleGotItem();
-    //HIVE
     shoppingLists[listIndex].save();
     updateLocalTimestamp();
     sortShoppingListItemsDisplay();
@@ -98,11 +107,27 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void toggleItemFavoriteLocally(int listIndex, int itemIndex) {
+    if (!_isValidItemIndex(listIndex, itemIndex)) return;
     shoppingLists[listIndex].list[itemIndex].toggleIsFavorite();
-    //HIVE
     shoppingLists[listIndex].save();
     updateLocalTimestamp();
     sortShoppingListItemsDisplay();
+    notifyListeners();
+  }
+
+  void updateShoppingListItemNameLocally(
+      int listIndex, int itemIndex, String newName) {
+    if (!_isValidItemIndex(listIndex, itemIndex)) return;
+    shoppingLists[listIndex].list[itemIndex].itemName = newName;
+    shoppingLists[listIndex].save();
+    updateLocalTimestamp();
+    notifyListeners();
+  }
+
+  void removeSharedListLocally(String documentId) {
+    _shoppingLists.removeWhere((l) => l.documentId == documentId);
+    filterDisplayedShoppingLists();
+    updateLocalTimestamp();
     notifyListeners();
   }
 
@@ -153,16 +178,18 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   void deleteItemFromShoppingListLocally(int itemIndex) {
+    if (!_isValidItemIndex(_currentListIndex, itemIndex)) return;
     shoppingLists[_currentListIndex].list.removeAt(itemIndex);
-    //HIVE
     shoppingLists[_currentListIndex].save();
     updateLocalTimestamp();
     notifyListeners();
   }
 
   void deleteShoppingListLocally(int index) {
+    if (!_isValidListIndex(index)) return;
     int fixedIndex =
         _shoppingLists.indexWhere((element) => element == shoppingLists[index]);
+    if (fixedIndex < 0) return;
     _box.deleteAt(fixedIndex);
     _shoppingLists.removeAt(fixedIndex);
     updateLocalTimestamp();
@@ -188,40 +215,38 @@ class ShoppingListsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  static const _strikeCombiner = '\u{0336}';
+
+  String _formatItem(ShoppingListItem item) {
+    final capitalized =
+        item.itemName.isEmpty ? '' : item.itemName[0].toUpperCase() + item.itemName.substring(1);
+    final name = item.gotItem
+        ? capitalized.split('').join(_strikeCombiner) + _strikeCombiner
+        : item.itemName;
+    final prefix = item.gotItem ? '▣ ' : '▢ ';
+    final star = item.isFavorite ? ' ★' : '';
+    return '$prefix$name$star';
+  }
+
   String getCurrentShoppingListDataInString() {
-    String result = "";
-    ShoppingList currentShoppingList = shoppingLists[_currentListIndex];
-    result += "🛒 " + currentShoppingList.name + " list:\n";
-    result += "__________\n";
-    for (int i = 0; i < currentShoppingList.list.length; i++) {
-      String item = "";
-      if (currentShoppingList.list[i].gotItem) {
-        item += "▣ ";
-        for (int j = 0; j < currentShoppingList.list[i].itemName.length; j++) {
-          item += (j == 0
-                  ? currentShoppingList.list[i].itemName[j].toUpperCase()
-                  : currentShoppingList.list[i].itemName[j]) +
-              '\u{0336}';
-        }
-      } else {
-        item = "▢ " + currentShoppingList.list[i].itemName;
-      }
-      result +=
-          item + (currentShoppingList.list[i].isFavorite ? " ★" : "") + "\n";
+    if (!_isValidListIndex(_currentListIndex)) return '';
+    final list = shoppingLists[_currentListIndex];
+    final buffer = StringBuffer()
+      ..writeln('🛒 ${list.name} list:')
+      ..writeln('__________');
+    for (final item in list.list) {
+      buffer.writeln(_formatItem(item));
     }
-    return result;
+    return buffer.toString();
   }
 
   void sortShoppingListItemsDisplay() {
+    if (!_isValidListIndex(_currentListIndex)) return;
     shoppingLists[_currentListIndex].list.sort((a, b) {
       if (a.gotItem) return 1;
       if (b.gotItem) return -1;
-      if (a.isFavorite && !b.isFavorite) {
-        return -1;
-      }
-      if (!a.isFavorite && b.isFavorite) {
-        return 1;
-      }
+      if (a.isFavorite && !b.isFavorite) return -1;
+      if (!a.isFavorite && b.isFavorite) return 1;
       return 0;
     });
   }
@@ -239,17 +264,20 @@ class ShoppingListsViewModel extends ChangeNotifier {
   }
 
   List<User> getUsersWithAccessToCurrentList() {
+    if (!_isValidListIndex(_currentListIndex)) return const [];
     return shoppingLists[_currentListIndex].usersWithAccess;
   }
 
   void addUserToUsersWithAccessList(User user) {
     if (user.userId == currentUserId) return;
+    if (!_isValidListIndex(_currentListIndex)) return;
     shoppingLists[_currentListIndex].usersWithAccess.add(user);
     notifyListeners();
   }
 
   void removeUserFromUsersWithAccessList(User user) {
     if (user.userId == currentUserId) return;
+    if (!_isValidListIndex(_currentListIndex)) return;
     shoppingLists[_currentListIndex].usersWithAccess.remove(user);
     notifyListeners();
   }

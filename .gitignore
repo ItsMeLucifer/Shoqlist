@@ -5,9 +5,12 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
+migrate_working_dir/
 
 # IntelliJ related
 *.iml
@@ -31,17 +34,31 @@
 .pub/
 /build/
 
-# Web related
-lib/generated_plugin_registrant.dart
-
 # Symbolication related
 app.*.symbols
 
 # Obfuscation related
 app.*.map.json
 
-#keystore
-/android/app/upload-keystore.jks
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
 
-#settings
-.vscode/settings.json
+# Claude Code local config / transcripts
+.claude/
+
+# iOS / CocoaPods
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcodeproj/project.xcworkspace/xcuserdata/
+
+# macOS
+**/.DS_Store

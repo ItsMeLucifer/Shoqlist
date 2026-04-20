@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:shoqlist/constants/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shoqlist/l10n/l10n_extension.dart';
 
 class LoyaltyCardButton extends ConsumerWidget {
   final String cardName;
   final bool isFavorite;
   final Color color;
-  LoyaltyCardButton(this.cardName, this.isFavorite, this.color);
+  const LoyaltyCardButton(this.cardName, this.isFavorite, this.color, {super.key});
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       color: color,
@@ -51,12 +53,14 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
   final ShoppingListType _shoppingListType;
   final IconData _icon;
 
-  ShoppingListTypeChangeButton(
+  const ShoppingListTypeChangeButton(
     this._buttonName,
     this._shoppingListType,
-    this._icon,
-  );
+    this._icon, {
+    super.key,
+  });
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final screenSize = MediaQuery.of(context).size;
@@ -116,13 +120,15 @@ class BasicButton extends ConsumerWidget {
   final double _percentageOfScreenWidth;
   final IconData? _iconData;
 
-  BasicButton(
+  const BasicButton(
     this._onTap,
     this._buttonName,
     this._percentageOfScreenWidth, [
     this._iconData,
-  ]);
+    Key? key,
+  ]) : super(key: key);
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
@@ -133,7 +139,7 @@ class BasicButton extends ConsumerWidget {
           width: screenSize.width * _percentageOfScreenWidth,
           height: 40,
           decoration: BoxDecoration(
-            color: Theme.of(context).buttonTheme.colorScheme?.background,
+            color: Theme.of(context).buttonTheme.colorScheme?.surface,
             borderRadius: BorderRadius.circular(25),
           ),
           child: Padding(
@@ -160,12 +166,14 @@ class WarningButton extends ConsumerWidget {
   final String _buttonName;
   final double _percentageOfScreenWidth;
 
-  WarningButton(
+  const WarningButton(
     this._onTap,
     this._buttonName,
-    this._percentageOfScreenWidth,
-  );
+    this._percentageOfScreenWidth, {
+    super.key,
+  });
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
     return GestureDetector(
@@ -174,7 +182,7 @@ class WarningButton extends ConsumerWidget {
           context: context,
           builder: (context) {
             return YesNoDialog(
-                _onTap, AppLocalizations.of(context)!.deleteAccountMsg);
+                _onTap, context.l10n.deleteAccountMsg);
           },
         );
       },
@@ -182,7 +190,7 @@ class WarningButton extends ConsumerWidget {
         width: screenSize.width * _percentageOfScreenWidth,
         height: 40,
         decoration: BoxDecoration(
-            color: Theme.of(context).buttonTheme.colorScheme?.background,
+            color: Theme.of(context).buttonTheme.colorScheme?.surface,
             borderRadius: BorderRadius.circular(5),
             border: Border.all(color: Colors.red, width: 2)),
         child: Padding(
@@ -207,15 +215,15 @@ class WarningButton extends ConsumerWidget {
 
 class ShoppingListButton extends ConsumerWidget {
   final Function() _onTap;
-  final Function() _onLongPress;
   final int _index;
 
-  ShoppingListButton(
+  const ShoppingListButton(
     this._onTap,
-    this._onLongPress,
-    this._index,
-  );
+    this._index, {
+    super.key,
+  });
 
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
@@ -223,12 +231,10 @@ class ShoppingListButton extends ConsumerWidget {
 
     return GestureDetector(
       onTap: _onTap,
-      onLongPress: _onLongPress,
-      child: Container(
+      child: SizedBox(
         height: 60,
-        key: UniqueKey(),
         child: Card(
-          color: Color.fromRGBO(237, 236, 243, 1),
+          color: AppColors.surfaceGrayWarm,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -248,7 +254,7 @@ class ShoppingListButton extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Container(
+                    SizedBox(
                       width: screenSize.width * 0.65,
                       child: Text(
                         shoppingListsVM.shoppingLists[_index].name,
