@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,18 +21,16 @@ class ShoppingListDisplay extends ConsumerWidget {
     final toolsVM = ref.read(toolsProvider);
     final firebaseVM = ref.read(firebaseProvider);
     final shoppingListsVM = ref.read(shoppingListsProvider);
-    if (toolsVM.newItemNameController.text != "") {
-      firebaseVM.addNewItemToShoppingListOnFirebase(
-          toolsVM.newItemNameController.text,
-          shoppingListsVM
-              .shoppingLists[shoppingListsVM.currentListIndex].documentId,
-          shoppingListsVM
-              .shoppingLists[shoppingListsVM.currentListIndex].ownerId);
-      shoppingListsVM.addNewItemToShoppingListLocally(
-          toolsVM.newItemNameController.text, false, false);
-    }
+    final text = toolsVM.newItemNameController.text.trim();
+    // Clear pola od razu — nawet jeśli którakolwiek z dalszych operacji
+    // rzuci wyjątkiem, input jest czysty i user nie musi ręcznie kasować.
     toolsVM.clearNewItemTextEditingController();
-    FocusManager.instance.primaryFocus?.unfocus();
+    if (text.isEmpty) return;
+    final list = shoppingListsVM
+        .shoppingLists[shoppingListsVM.currentListIndex];
+    firebaseVM.addNewItemToShoppingListOnFirebase(
+        text, list.documentId, list.ownerId);
+    shoppingListsVM.addNewItemToShoppingListLocally(text, false, false);
   }
 
   void _onRefresh(WidgetRef ref, String documentId, String ownerId) {
@@ -229,22 +228,25 @@ class ShoppingListDisplay extends ConsumerWidget {
           // AutomaticKeepAliveClientMixin w NativeAdBanner — dzięki temu
           // banner pozostaje mounted po scroll poza viewport i nie ładuje
           // reklamy ponownie.
-          SliverList.list(
-            children: [
-              Padding(
-                key: const ValueKey('__native_ad_banner_tile__'),
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Card(
-                  color: Theme.of(context).listTileTheme.tileColor,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+          // Debug builds: całkiem pomijamy kafelek (żeby pusty Card nie
+          // wisiał na liście podczas screenshotów / developmentu).
+          if (!kDebugMode)
+            SliverList.list(
+              children: [
+                Padding(
+                  key: const ValueKey('__native_ad_banner_tile__'),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Card(
+                    color: Theme.of(context).listTileTheme.tileColor,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const NativeAdBanner(inFeedStyle: true),
                   ),
-                  child: const NativeAdBanner(inFeedStyle: true),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );
@@ -406,7 +408,6 @@ class _NewItemInput extends ConsumerWidget {
           suffixIcon: GestureDetector(
             onTap: () {
               onAdd();
-              toolsVM.clearNewItemTextEditingController();
               toolsVM.newItemFocusNode.requestFocus();
             },
             child: Icon(
@@ -433,7 +434,6 @@ class _NewItemInput extends ConsumerWidget {
         ),
         onSubmitted: (ref, value) {
           onAdd();
-          toolsVM.clearNewItemTextEditingController();
           toolsVM.newItemFocusNode.requestFocus();
         },
         style: Theme.of(context).textTheme.bodyLarge!,

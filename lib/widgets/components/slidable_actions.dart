@@ -47,10 +47,12 @@ class SlidableActions {
     );
   }
 
-  /// End pane (swipe left) → delete. Dane usuwane w [onDelete]; widget
-  /// znika razem z ListView rebuildem.
-  /// [confirm] opcjonalny dialog potwierdzenia — gdy zwróci `false`, swipe
-  /// jest cofany.
+  /// End pane (swipe left) → delete. `confirmDismiss` TYLKO potwierdza akcję
+  /// (opcjonalny dialog); samo usunięcie danych odpala się w `onDismissed` —
+  /// wywoływane po zakończonej animacji dismiss. Gdybyśmy usuwali dane w
+  /// `confirmDismiss`, `notifyListeners()` rebuildowałby ListView w trakcie
+  /// animacji flutter_slidable, co psuje index neighborów (bug: sąsiedni
+  /// element znikał razem z dismissed).
   static ActionPane deletePane({
     required VoidCallback onDelete,
     Future<bool> Function()? confirm,
@@ -64,13 +66,12 @@ class SlidableActions {
       extentRatio: extentRatio,
       openThreshold: 0.99,
       dismissible: DismissiblePane(
-        onDismissed: () {},
+        onDismissed: onDelete,
         confirmDismiss: () async {
           if (confirm != null) {
             final ok = await confirm();
             if (!ok) return false;
           }
-          onDelete();
           return true;
         },
         dismissThreshold: dismissThreshold,

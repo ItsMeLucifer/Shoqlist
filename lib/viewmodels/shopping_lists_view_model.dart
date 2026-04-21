@@ -155,24 +155,25 @@ class ShoppingListsViewModel extends ChangeNotifier {
 
   void addNewItemToShoppingListLocally(
       String itemName, bool itemGot, bool isFavorited) {
-    ShoppingListItem? firstGotItem = shoppingLists[_currentListIndex]
-        .list
-        .firstWhereOrNull((element) => element.gotItem);
-    int? firstDoneItemIndex = firstGotItem != null
-        ? shoppingLists[_currentListIndex].list.indexOf(firstGotItem)
-        : null;
-    if (firstDoneItemIndex != null) {
-      shoppingLists[_currentListIndex].list.insert(
-          firstDoneItemIndex, ShoppingListItem(itemName, itemGot, isFavorited));
+    if (!_isValidListIndex(_currentListIndex)) return;
+    final target = shoppingLists[_currentListIndex];
+    final firstGotItem =
+        target.list.firstWhereOrNull((element) => element.gotItem);
+    final newItem = ShoppingListItem(itemName, itemGot, isFavorited);
+    if (firstGotItem != null) {
+      target.list.insert(target.list.indexOf(firstGotItem), newItem);
     } else {
-      shoppingLists[_currentListIndex]
-          .list
-          .add(ShoppingListItem(itemName, itemGot, isFavorited));
+      target.list.add(newItem);
     }
-    //HIVE
-    int index = _shoppingLists
-        .indexWhere((element) => element == shoppingLists[_currentListIndex]);
-    _box.putAt(index, shoppingLists[_currentListIndex]);
+    // HIVE persistence: best-effort. Gdy `_box` desync'uje się z
+    // `_shoppingLists` (race z async `overrideShoppingListsLocally`), wcześniej
+    // rzucało RangeError i blokowało UI update. Teraz bounds-check, a przy
+    // niepowodzeniu state w pamięci i tak już wyszedł z `notifyListeners()`.
+    final boxIndex =
+        _shoppingLists.indexWhere((element) => identical(element, target));
+    if (boxIndex >= 0 && boxIndex < _box.length) {
+      _box.putAt(boxIndex, target);
+    }
     updateLocalTimestamp();
     notifyListeners();
   }

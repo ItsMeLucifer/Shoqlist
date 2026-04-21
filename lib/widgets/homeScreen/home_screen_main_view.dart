@@ -9,7 +9,6 @@ import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
-import 'package:shoqlist/widgets/components/native_ad_banner.dart';
 import 'package:shoqlist/widgets/components/slidable_actions.dart';
 import 'package:shoqlist/widgets/homeScreen/shopping_list_display.dart';
 import 'package:shoqlist/l10n/l10n_extension.dart';
@@ -181,7 +180,17 @@ class HomeScreenMainView extends ConsumerWidget {
                                           .bodyLarge,
                                     ),
                                   ),
-                                )
+                                ),
+                                if (shoppingListsVM.currentlyDisplayedListType ==
+                                    ShoppingListType.ownShoppingLists)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 8.0),
+                                    child: _AddShoppingListTile(
+                                      onTap: () =>
+                                          _openCreateListDialog(context, ref),
+                                    ),
+                                  ),
                               ],
                             ),
                     )
@@ -195,7 +204,6 @@ class HomeScreenMainView extends ConsumerWidget {
                     ),
             ),
           ),
-          const NativeAdBanner(),
         ],
       ),
     );

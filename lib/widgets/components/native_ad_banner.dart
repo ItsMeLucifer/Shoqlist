@@ -78,6 +78,11 @@ class _NativeAdBannerState extends State<NativeAdBanner>
   @override
   Widget build(BuildContext context) {
     super.build(context); // required przez AutomaticKeepAliveClientMixin
+    // Debug builds nie pokazują banerów (screenshoty / development UX bez
+    // rozpraszacza). Release buildy serwują reklamy normalnie.
+    if (kDebugMode) {
+      return const SizedBox.shrink();
+    }
     if (_state == _AdState.failed) {
       return const SizedBox.shrink();
     }

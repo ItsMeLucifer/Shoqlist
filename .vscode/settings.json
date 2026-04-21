@@ -1,0 +1,7 @@
+{
+    "dart.debugExternalPackageLibraries": false,
+    "dart.debugSdkLibraries": false,
+    "dart.flutterHotReloadOnSave": "manual",
+    "dart.previewFlutterUiGuides": true,
+    "dart.showInspectorNotificationsForWidgetErrors": true
+}

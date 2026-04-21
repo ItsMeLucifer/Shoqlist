@@ -2,26 +2,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "shoqlist",
+            "name": "shoqlist (debug)",
             "request": "launch",
             "type": "dart",
             "cwd": "/Users/patrykbozek/Projects/shoqlist",
             "program": "lib/main.dart",
-            "flutterMode": "debug"
+            "flutterMode": "debug",
+            "console": "debugConsole"
         },
         {
             "name": "shoqlist (profile mode)",
             "request": "launch",
             "type": "dart",
             "cwd": "/Users/patrykbozek/Projects/shoqlist",
-            "flutterMode": "profile"
+            "program": "lib/main.dart",
+            "flutterMode": "profile",
+            "console": "debugConsole"
         },
         {
             "name": "shoqlist (release mode)",
             "request": "launch",
             "type": "dart",
             "cwd": "/Users/patrykbozek/Projects/shoqlist",
-            "flutterMode": "release"
+            "program": "lib/main.dart",
+            "flutterMode": "release",
+            "console": "debugConsole"
         }
     ]
 }
