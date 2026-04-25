@@ -38,6 +38,14 @@ final friendsServiceProvider =
     ChangeNotifierProvider((_) => FriendsServiceViewModel());
 final pendingWritesTrackerProvider =
     Provider((_) => PendingWritesTracker());
+
+/// Globalny accent color używany jako podświetlenie navbara (i opcjonalnie
+/// innych elementów cross-screen). Default = `AppColors.brandPink`.
+/// `_ShoppingListDisplayState` nadpisuje go w `initState` na importance
+/// color aktualnej listy i resetuje w `dispose`. Dzięki temu cała apka
+/// chwilowo "ubiera się" w kolor otwartej listy.
+final accentColorProvider =
+    StateProvider<Color>((_) => AppColors.brandPink);
 // Shadow-write v1 mirrors: ON przez jedno okno release, żeby stare wersje
 // apki shared userów nie wysypały się przy czytaniu cudzej (zmigrowanej)
 // listy. Flipnij na false po upgrade wszystkich klientów.

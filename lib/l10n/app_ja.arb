@@ -97,6 +97,8 @@
     "noFriendRequestsMsg": "友達申請がありません",
     "acceptFriendRequestTitle": "友達申請を承認しますか",
     "cantFindUserMsg": "そのユーザーが見つかりません、もう一度試してください",
+    "userAlreadyFriendMsg": "このユーザーは既に友達リストにいます",
+    "friendRequestAlreadyPendingMsg": "このユーザーとの友達申請は既に保留中です",
     "sendFriendRequestTitle": "友達申請を確認しますか",
 
 

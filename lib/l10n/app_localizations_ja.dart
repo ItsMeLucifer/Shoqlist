@@ -220,6 +220,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cantFindUserMsg => 'そのユーザーが見つかりません、もう一度試してください';
 
   @override
+  String get userAlreadyFriendMsg => 'このユーザーは既に友達リストにいます';
+
+  @override
+  String get friendRequestAlreadyPendingMsg => 'このユーザーとの友達申請は既に保留中です';
+
+  @override
   String get sendFriendRequestTitle => '友達申請を確認しますか';
 
   @override

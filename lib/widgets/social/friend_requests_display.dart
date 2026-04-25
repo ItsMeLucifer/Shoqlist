@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:shoqlist/widgets/components/empty_state.dart';
 import 'package:shoqlist/widgets/components/screen_header.dart';
 import 'package:shoqlist/widgets/social/users_list.dart';
 import 'package:shoqlist/l10n/l10n_extension.dart';
@@ -54,17 +55,20 @@ class FriendRequestsDisplay extends ConsumerWidget {
                     _onRefresh(ref);
                   },
                   child: friendsServiceVM.friendRequestsList.isEmpty
+                      // ListView opakowuje EmptyState żeby pull-to-refresh
+                      // działało nawet przy pustym contencie (gesture
+                      // wymaga scrollable child).
                       ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           children: [
-                            const SizedBox(height: 10),
-                            Center(
-                              child: Text(
-                                context.l10n.noFriendRequestsMsg,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .bodyLarge,
+                            SizedBox(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.6,
+                              child: EmptyState(
+                                icon: Icons.notifications_none_outlined,
+                                message: context.l10n.noFriendRequestsMsg,
                               ),
-                            )
+                            ),
                           ],
                         )
                       : UsersList(

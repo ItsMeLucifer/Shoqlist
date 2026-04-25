@@ -226,6 +226,14 @@ class AppLocalizationsPl extends AppLocalizations {
       'Nie znaleziono użytkownika z podanym adresem e-mail, spróbuj ponownie';
 
   @override
+  String get userAlreadyFriendMsg =>
+      'Ten użytkownik jest już na liście Twoich znajomych';
+
+  @override
+  String get friendRequestAlreadyPendingMsg =>
+      'Zaproszenie z tym użytkownikiem już oczekuje';
+
+  @override
   String get sendFriendRequestTitle => 'Wysłać zaproszenie do znajomych?';
 
   @override

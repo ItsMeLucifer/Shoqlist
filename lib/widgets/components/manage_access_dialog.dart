@@ -23,7 +23,9 @@ class ManageAccessDialog extends ConsumerWidget {
     final friends = friendsServiceVM.friendsList;
 
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: AppColors.surfaceGrayWarm,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         context.l10n.whoHasAccess,
         style: Theme.of(context).primaryTextTheme.headlineSmall,
@@ -103,7 +105,7 @@ class _FriendAccessTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-      tileColor: Theme.of(context).colorScheme.surface,
+      tileColor: AppColors.surfaceGrayWarm,
       title: Text(
         friend.nickname,
         maxLines: 1,

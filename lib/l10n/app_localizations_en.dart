@@ -222,6 +222,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cantFindUserMsg => 'Can\'t find that user, try again';
 
   @override
+  String get userAlreadyFriendMsg =>
+      'This user is already in your friends list';
+
+  @override
+  String get friendRequestAlreadyPendingMsg =>
+      'Friend request with this user is already pending';
+
+  @override
   String get sendFriendRequestTitle => 'Send friend request?';
 
   @override

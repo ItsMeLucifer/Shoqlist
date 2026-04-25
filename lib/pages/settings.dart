@@ -85,17 +85,17 @@ class Settings extends ConsumerWidget {
                     const SizedBox(height: 24),
                     _SectionLabel(
                       label: context.l10n.deleteAccount,
-                      color: Colors.red.shade400,
+                      color: AppColors.dangerSoft,
                     ),
                     const SizedBox(height: 8),
                     _SettingsCard(
-                      borderColor: Colors.red.shade200,
+                      borderColor: AppColors.dangerSoftBorder,
                       children: [
                         _SettingsTile(
                           icon: Icons.delete_forever,
-                          iconColor: Colors.red.shade400,
+                          iconColor: AppColors.dangerSoft,
                           label: context.l10n.deleteAccount,
-                          labelColor: Colors.red.shade400,
+                          labelColor: AppColors.dangerSoft,
                           onTap: () => _confirmDeleteAccount(context, ref),
                         ),
                       ],
@@ -250,7 +250,7 @@ class _SettingsCard extends StatelessWidget {
         rows.add(Divider(
           height: 1,
           thickness: 1,
-          color: Colors.grey.shade200,
+          color: AppColors.dividerSoft,
           indent: 56,
         ));
       }

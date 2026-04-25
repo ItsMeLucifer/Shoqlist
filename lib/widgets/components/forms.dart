@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoqlist/constants/app_colors.dart';
 
 class BasicForm extends ConsumerWidget {
   final TextInputType? keyboardType;
@@ -63,15 +64,19 @@ class BasicForm extends ConsumerWidget {
                   : null,
               suffixIcon: suffixIcon,
               focusColor: Theme.of(context).colorScheme.secondary,
+              filled: true,
+              fillColor: AppColors.inputFill,
               enabledBorder: enableBorder
                   ? OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                          width: 1, color: Theme.of(context).primaryColorDark))
+                          width: 1, color: AppColors.dividerSoft))
                   : null,
               focusedBorder: focusedBorder
                   ? OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                          width: 1,
+                          width: 1.5,
                           color: Theme.of(context).colorScheme.secondary))
                   : null,
               contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),

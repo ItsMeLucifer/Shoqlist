@@ -502,6 +502,18 @@ abstract class AppLocalizations {
   /// **'Can\'t find that user, try again'**
   String get cantFindUserMsg;
 
+  /// Message displayed when searched user is already on the friends list
+  ///
+  /// In en, this message translates to:
+  /// **'This user is already in your friends list'**
+  String get userAlreadyFriendMsg;
+
+  /// Message displayed when there is already a pending friend request with this user (sent or received)
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request with this user is already pending'**
+  String get friendRequestAlreadyPendingMsg;
+
   /// Message displayed when you want to send a friend request
   ///
   /// In en, this message translates to:

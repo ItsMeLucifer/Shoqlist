@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoqlist/constants/app_colors.dart';
 import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/widgets/components/buttons.dart';
 import 'package:shoqlist/widgets/components/forms.dart';
@@ -7,6 +8,12 @@ import '../../main.dart';
 import '../color_picker.dart';
 import 'package:shoqlist/widgets/components/barcode_scanner_page.dart';
 import 'package:shoqlist/l10n/l10n_extension.dart';
+
+/// Spójny shape + flat tło dla wszystkich dialogów aplikacji. Material default
+/// daje subtle elevation shadow który "wypycha" dialog z tła — niespójne
+/// z flat designem. Plus 16px corners zamiast Material default 4px.
+RoundedRectangleBorder get _dialogShape =>
+    RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
 
 class YesNoDialog extends ConsumerWidget {
   final Function _onAccepted;
@@ -22,7 +29,9 @@ class YesNoDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: AppColors.surfaceGrayWarm,
+      elevation: 0,
+      shape: _dialogShape,
       content: Padding(
         padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
         child: Text(_titleToDisplay,
@@ -70,126 +79,133 @@ class PutShoppingListData extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
+    // Domyślnie SimpleDialog używa `insetPadding: EdgeInsets.symmetric(h:40,v:24)`
+    // → karta zajmuje ~85% szerokości. Zwężamy do 80% przez explicit insetPadding,
+    // a wewnątrz wszystkie kontrolki rozciągamy do 100% (text field, save button).
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dialogHorizontalInset = screenWidth * 0.10; // 10% z każdej strony = 80%
     return SimpleDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: AppColors.surfaceGrayWarm,
+        elevation: 0,
+        shape: _dialogShape,
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: dialogHorizontalInset,
+          vertical: 24,
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
         children: [
-          const SizedBox(height: 10.0),
+          Text(
+            _onPressedDelete == null
+                ? context.l10n.newListTitle
+                : context.l10n.editListTitle,
+            style: Theme.of(context).primaryTextTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          // Pole listName 100% szerokości — BasicForm respektuje `width`,
+          // więc null pozwala mu rozciągnąć się do parent'a (LayoutBuilder
+          // / SizedBox.expand). Wrap'ujemy w SizedBox.expand-like pattern.
+          BasicForm(
+            key: toolsVM.newListNameFormFieldKey,
+            keyboardType: TextInputType.name,
+            controller: toolsVM.newListNameController,
+            hintText: context.l10n.listName,
+            width: double.infinity,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "${context.l10n.importance}:",
+                style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              DropdownButton<Importance>(
+                value: toolsVM.newListImportance,
+                dropdownColor: AppColors.surfaceGrayWarm,
+                focusColor: Theme.of(context).disabledColor,
+                icon: Icon(Icons.keyboard_arrow_down,
+                    color: toolsVM.getImportanceColor(toolsVM.newListImportance)),
+                iconSize: 24,
+                elevation: 0,
+                // Underline:0 zamiast białego container'a — czysto, flat.
+                underline: const SizedBox.shrink(),
+                onChanged: (Importance? imp) {
+                  if (imp == null) return;
+                  toolsVM.newListImportance = imp;
+                },
+                items: <Importance>[
+                  Importance.low,
+                  Importance.normal,
+                  Importance.important,
+                  Importance.urgent
+                ].map<DropdownMenuItem<Importance>>((Importance value) {
+                  return DropdownMenuItem<Importance>(
+                    value: value,
+                    child: Text(
+                        toolsVM.getTranslatedImportanceLabel(context, value),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: toolsVM.getImportanceColor(value)),
+                        textAlign: TextAlign.center),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (_onPressedDelete != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppColors.surfaceGray,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (_) => YesNoDialog(
+                            _onPressedDelete, _deleteNotificationTitle));
+                  },
+                  child: Text(
+                    context.l10n.remove,
+                    style: Theme.of(context)
+                        .primaryTextTheme
+                        .bodyLarge
+                        ?.copyWith(color: AppColors.dangerSoft),
+                  ),
+                ),
+              ),
+            ),
           SizedBox(
-            height: 250,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _onPressedDelete == null
-                      ? context.l10n.newListTitle
-                      : context.l10n.editListTitle,
-                  style: Theme.of(context).primaryTextTheme.headlineSmall,
-                  textAlign: TextAlign.center,
+            width: double.infinity,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: AppColors.surfaceGray,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 210,
-                      child: BasicForm(
-                        key: toolsVM.newListNameFormFieldKey,
-                        keyboardType: TextInputType.name,
-                        controller: toolsVM.newListNameController,
-                        hintText: context.l10n.listName,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      "${context.l10n.importance}:",
-                      style: Theme.of(context).primaryTextTheme.titleLarge,
-                    ),
-                    DropdownButton<Importance>(
-                      value: toolsVM.newListImportance,
-                      dropdownColor: Theme.of(context).colorScheme.surface,
-                      focusColor: Theme.of(context).disabledColor,
-                      icon:
-                          Icon(Icons.keyboard_arrow_down, color: Colors.black),
-                      iconSize: 24,
-                      elevation: 16,
-                      underline: Container(
-                        height: 2,
-                        color: Colors.white,
-                      ),
-                      onChanged: (Importance? imp) {
-                        if (imp == null) return;
-                        toolsVM.newListImportance = imp;
-                      },
-                      items: <Importance>[
-                        Importance.low,
-                        Importance.normal,
-                        Importance.important,
-                        Importance.urgent
-                      ].map<DropdownMenuItem<Importance>>((Importance value) {
-                        return DropdownMenuItem<Importance>(
-                          value: value,
-                          child: Text(
-                              toolsVM.getTranslatedImportanceLabel(
-                                  context, value),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                      color: toolsVM.getImportanceColor(value)),
-                              textAlign: TextAlign.center),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: _onPressedDelete != null
-                      ? MainAxisAlignment.spaceEvenly
-                      : MainAxisAlignment.center,
-                  children: [
-                    _onPressedDelete != null
-                        ? Card(
-                            color: Theme.of(context)
-                                .buttonTheme
-                                .colorScheme
-                                ?.surface,
-                            child: TextButton(
-                              onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return YesNoDialog(_onPressedDelete,
-                                          _deleteNotificationTitle);
-                                    });
-                              },
-                              child: Text(
-                                context.l10n.remove,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .bodyLarge,
-                              ),
-                            ),
-                          )
-                        : SizedBox(),
-                    Card(
-                      color:
-                          Theme.of(context).buttonTheme.colorScheme!.surface,
-                      child: TextButton(
-                        onPressed: () {
-                          _onPressedSave(context, ref);
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(context.l10n.save,
-                            style:
-                                Theme.of(context).primaryTextTheme.bodyLarge),
-                      ),
-                    ),
-                  ],
-                )
-              ],
+              ),
+              onPressed: () {
+                _onPressedSave(context, ref);
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                context.l10n.save,
+                style: Theme.of(context).primaryTextTheme.bodyLarge,
+              ),
             ),
           ),
         ]);
@@ -207,7 +223,9 @@ class ChangeName extends ConsumerWidget {
     final toolsVM = ref.watch(toolsProvider);
     final screenSize = MediaQuery.of(context).size;
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: AppColors.surfaceGrayWarm,
+      elevation: 0,
+      shape: _dialogShape,
       content: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SizedBox(
@@ -273,7 +291,9 @@ class PutLoyaltyCardsData extends ConsumerWidget {
           Icon(Icons.qr_code, color: Theme.of(context).colorScheme.secondary),
     );
     return SimpleDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: AppColors.surfaceGrayWarm,
+        elevation: 0,
+        shape: _dialogShape,
         children: [
           Padding(
             padding: const EdgeInsets.all(10.0),
@@ -309,6 +329,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                         ? Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: Card(
+                              elevation: 0,
                               color: Theme.of(context)
                                   .buttonTheme
                                   .colorScheme
@@ -335,6 +356,7 @@ class PutLoyaltyCardsData extends ConsumerWidget {
                           )
                         : Container(),
                     Card(
+                      elevation: 0,
                       color:
                           Theme.of(context).buttonTheme.colorScheme?.surface,
                       child: TextButton(

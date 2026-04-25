@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shoqlist/constants/app_colors.dart';
 import 'package:shoqlist/l10n/l10n_extension.dart';
 import 'package:shoqlist/main.dart';
 import 'package:shoqlist/pages/settings.dart';
@@ -112,6 +111,11 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    // Dynamic accent — w detail listy dostaje importance color tej listy,
+    // poza detail wraca do brandPink. `TweenAnimationBuilder` interpoluje
+    // RGB między starą a nową wartością przez 320ms easeOutCubic — dzięki
+    // temu push/pop detail nie skacze, tylko płynnie cross-fade'uje navbar.
+    final accent = ref.watch(accentColorProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
@@ -132,24 +136,28 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
             _buildTabNavigator(3, const Settings()),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onTabTapped,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: AppColors.brandPink,
-          unselectedItemColor: Colors.grey[500],
-          selectedLabelStyle: const TextStyle(
-            fontFamily: 'Epilogue',
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontFamily: 'Epilogue',
-            fontSize: 12,
-          ),
-          elevation: 8,
-          items: [
+        bottomNavigationBar: TweenAnimationBuilder<Color?>(
+          tween: ColorTween(end: accent),
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOutCubic,
+          builder: (context, animatedAccent, _) => BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onTabTapped,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            selectedItemColor: animatedAccent ?? accent,
+            unselectedItemColor: Colors.grey[500],
+            selectedLabelStyle: const TextStyle(
+              fontFamily: 'Epilogue',
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontFamily: 'Epilogue',
+              fontSize: 12,
+            ),
+            elevation: 8,
+            items: [
             BottomNavigationBarItem(
               icon: const Icon(Icons.list_alt_outlined),
               activeIcon: const Icon(Icons.list_alt),
@@ -171,6 +179,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               label: context.l10n.settings,
             ),
           ],
+          ),
         ),
       ),
     );

@@ -10,36 +10,48 @@ class LoyaltyCardButton extends ConsumerWidget {
   final String cardName;
   final bool isFavorite;
   final Color color;
-  const LoyaltyCardButton(this.cardName, this.isFavorite, this.color, {super.key});
+  const LoyaltyCardButton(
+    this.cardName,
+    this.isFavorite,
+    this.color, {
+    super.key,
+  });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       color: color,
+      elevation: 0,
+      shadowColor: null,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Center(
           child: Stack(
             children: <Widget>[
-              Text(cardName,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
-                  maxLines: 1,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17,
-                      foreground: Paint()
-                        ..style = PaintingStyle.stroke
-                        ..strokeWidth = 2
-                        ..color = Colors.black)),
-              Text(cardName,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: isFavorite ? Colors.yellow : Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                  )),
+              Text(
+                cardName,
+                overflow: TextOverflow.fade,
+                softWrap: false,
+                maxLines: 1,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 2
+                    ..color = Colors.black,
+                ),
+              ),
+              Text(
+                cardName,
+                overflow: TextOverflow.fade,
+                softWrap: false,
+                maxLines: 1,
+                style: TextStyle(
+                  color: isFavorite ? Colors.yellow : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                ),
+              ),
             ],
           ),
         ),
@@ -69,44 +81,52 @@ class ShoppingListTypeChangeButton extends ConsumerWidget {
         shoppingListsVM.currentlyDisplayedListType = _shoppingListType;
       },
       child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: shoppingListsVM.currentlyDisplayedListType ==
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color:
+                  shoppingListsVM.currentlyDisplayedListType ==
+                      _shoppingListType
+                  ? Theme.of(context).colorScheme.secondary
+                  : Theme.of(context).disabledColor,
+              width:
+                  shoppingListsVM.currentlyDisplayedListType ==
+                      _shoppingListType
+                  ? 2
+                  : 1,
+            ),
+          ),
+        ),
+        width: screenSize.width * 0.5,
+        child: Center(
+          child: Column(
+            children: [
+              Icon(
+                _icon,
+                size: 30,
+                color:
+                    shoppingListsVM.currentlyDisplayedListType ==
                         _shoppingListType
                     ? Theme.of(context).colorScheme.secondary
                     : Theme.of(context).disabledColor,
-                width: shoppingListsVM.currentlyDisplayedListType ==
-                        _shoppingListType
-                    ? 2
-                    : 1,
               ),
-            ),
-          ),
-          width: screenSize.width * 0.5,
-          child: Center(
-            child: Column(
-              children: [
-                Icon(_icon,
-                    size: 30,
-                    color: shoppingListsVM.currentlyDisplayedListType ==
-                            _shoppingListType
-                        ? Theme.of(context).colorScheme.secondary
-                        : Theme.of(context).disabledColor),
-                SizedBox(height: 5),
-                Text(
-                  _buttonName,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-                      color: shoppingListsVM.currentlyDisplayedListType ==
-                              _shoppingListType
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).disabledColor),
+              SizedBox(height: 5),
+              Text(
+                _buttonName,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
+                  color:
+                      shoppingListsVM.currentlyDisplayedListType ==
+                          _shoppingListType
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).disabledColor,
                 ),
-                SizedBox(height: 8),
-              ],
-            ),
-          )),
+              ),
+              SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -136,27 +156,28 @@ class BasicButton extends ConsumerWidget {
         _onTap(context, ref);
       },
       child: Container(
-          width: screenSize.width * _percentageOfScreenWidth,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Theme.of(context).buttonTheme.colorScheme?.surface,
-            borderRadius: BorderRadius.circular(25),
+        width: screenSize.width * _percentageOfScreenWidth,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Theme.of(context).buttonTheme.colorScheme?.surface,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Center(
+            child: _iconData == null
+                ? Text(
+                    _buttonName,
+                    style: Theme.of(context).primaryTextTheme.labelLarge,
+                    textAlign: TextAlign.center,
+                  )
+                : Icon(
+                    _iconData,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Center(
-              child: _iconData == null
-                  ? Text(
-                      _buttonName,
-                      style: Theme.of(context).primaryTextTheme.labelLarge,
-                      textAlign: TextAlign.center,
-                    )
-                  : Icon(
-                      _iconData,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-            ),
-          )),
+        ),
+      ),
     );
   }
 }
@@ -181,8 +202,7 @@ class WarningButton extends ConsumerWidget {
         showDialog(
           context: context,
           builder: (context) {
-            return YesNoDialog(
-                _onTap, context.l10n.deleteAccountMsg);
+            return YesNoDialog(_onTap, context.l10n.deleteAccountMsg);
           },
         );
       },
@@ -190,9 +210,10 @@ class WarningButton extends ConsumerWidget {
         width: screenSize.width * _percentageOfScreenWidth,
         height: 40,
         decoration: BoxDecoration(
-            color: Theme.of(context).buttonTheme.colorScheme?.surface,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.red, width: 2)),
+          color: Theme.of(context).buttonTheme.colorScheme?.surface,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: Colors.red, width: 2),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: Center(
@@ -201,8 +222,9 @@ class WarningButton extends ConsumerWidget {
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
-                fontFamily:
-                    Theme.of(context).primaryTextTheme.labelLarge?.fontFamily,
+                fontFamily: Theme.of(
+                  context,
+                ).primaryTextTheme.labelLarge?.fontFamily,
               ),
               textAlign: TextAlign.center,
             ),
@@ -217,11 +239,7 @@ class ShoppingListButton extends ConsumerWidget {
   final Function() _onTap;
   final int _index;
 
-  const ShoppingListButton(
-    this._onTap,
-    this._index, {
-    super.key,
-  });
+  const ShoppingListButton(this._onTap, this._index, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -235,6 +253,8 @@ class ShoppingListButton extends ConsumerWidget {
         height: 60,
         child: Card(
           color: AppColors.surfaceGrayWarm,
+          shadowColor: null,
+          elevation: 0,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -246,11 +266,10 @@ class ShoppingListButton extends ConsumerWidget {
                       width: screenSize.width * 0.1,
                       child: CircleAvatar(
                         backgroundColor: toolsVM.getImportanceColor(
-                            shoppingListsVM.shoppingLists[_index].importance),
-                        foregroundColor: Colors.white,
-                        child: Icon(
-                          Icons.list,
+                          shoppingListsVM.shoppingLists[_index].importance,
                         ),
+                        foregroundColor: Colors.white,
+                        child: Icon(Icons.list),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -275,12 +294,16 @@ class ShoppingListButton extends ConsumerWidget {
                         shoppingListsVM.shoppingLists[_index].list.length
                             .toString(),
                         style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15),
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
-                      Icon(Icons.arrow_forward_ios,
-                          color: Theme.of(context).disabledColor, size: 12)
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        color: Theme.of(context).disabledColor,
+                        size: 12,
+                      ),
                     ],
                   ),
                 ),

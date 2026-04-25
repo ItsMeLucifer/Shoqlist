@@ -326,6 +326,14 @@
     "@cantFindUserMsg":{
         "description": "Message displayed when there is no user with provided email"
     },
+    "userAlreadyFriendMsg": "This user is already in your friends list",
+    "@userAlreadyFriendMsg":{
+        "description": "Message displayed when searched user is already on the friends list"
+    },
+    "friendRequestAlreadyPendingMsg": "Friend request with this user is already pending",
+    "@friendRequestAlreadyPendingMsg":{
+        "description": "Message displayed when there is already a pending friend request with this user (sent or received)"
+    },
     "sendFriendRequestTitle": "Send friend request?",
     "@sendFriendRequestTitle":{
         "description": "Message displayed when you want to send a friend request"

@@ -21,30 +21,42 @@ class ShoppingListDisplay extends ConsumerStatefulWidget {
 }
 
 class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
-  // Capture'ujemy service raz w initState. Używanie `ref.read` w dispose()
-  // jest podatne na error gdy widget jest unmount'owany w trakcie buildu
-  // drzewa rodzica — captured ref jest stabilny przez całe życie widgetu.
+  // Capture'ujemy service / notifier raz w initState. Używanie `ref.read`
+  // w dispose() jest podatne na error gdy widget jest unmount'owany
+  // w trakcie buildu drzewa rodzica — captured ref jest stabilny przez
+  // całe życie widgetu.
   late final _syncService = ref.read(listSyncServiceProvider);
+  late final _accentNotifier = ref.read(accentColorProvider.notifier);
 
   @override
   void initState() {
     super.initState();
-    // Real-time sub na aktualnie wyświetlaną listę. PostFrame żeby
-    // provider tree był gotowy (currentListIndex już ustawione przez
-    // _onTapShoppingListButton w HomeScreenMainView).
+    // Real-time sub na aktualnie wyświetlaną listę + ustawienie accent.
+    // PostFrame żeby provider tree był gotowy i żeby uniknąć
+    // "modify provider during build" — accent state musi być ustawiony
+    // PO zakończeniu pierwszego buildu MainScaffolda który go obserwuje.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final vm = ref.read(shoppingListsProvider);
+      final toolsVM = ref.read(toolsProvider);
       final idx = vm.currentListIndex;
       if (idx < 0 || idx >= vm.shoppingLists.length) return;
       final list = vm.shoppingLists[idx];
       _syncService.startDetail(list.ownerId, list.documentId);
+      _accentNotifier.state = toolsVM.getImportanceColor(list.importance);
     });
   }
 
   @override
   void dispose() {
     _syncService.stopDetail();
+    // Reset accent na default — ALE poza widget tree teardown. Riverpod
+    // blokuje modyfikacje providerów w dispose (tak samo jak w initState/build);
+    // zmiana state'u w trakcie `_unmount` rzucała StateNotifierListenerError.
+    // Microtask odracza to o jeden tick → MainScaffold listener dostanie
+    // update'a po zakończeniu cleanup'u.
+    final notifier = _accentNotifier;
+    Future.microtask(() => notifier.state = AppColors.brandPink);
     super.dispose();
   }
 
@@ -256,35 +268,65 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
     final currentListImportanceColor =
         toolsVM.getImportanceColor(currentList.importance);
     final isOwner = currentList.ownerId == firebaseAuthVM.currentUser.userId;
-    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 12),
-            // Tytuł samotny, max 2 linie, ellipsis — wraca do poprzedniego designu
-            Container(
-              width: screenSize.width,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                currentList.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .primaryTextTheme
-                    .headlineMedium!
-                    .copyWith(color: currentListImportanceColor),
+            // Compact inline header — tytuł + akcje w jednym rzędzie.
+            // Wcześniej był osobny rząd (40pt headline 2-line + osobny
+            // rząd action ikon + 2 SizedBoxy), co dawało ~96pt+ pustej
+            // przestrzeni u góry. Teraz konsoliduje to w 1 rzędzie i daje
+            // od razu więcej itemów w viewporcie.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 8, 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          currentList.name,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: 'Epilogue',
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: currentListImportanceColor,
+                            height: 1.1,
+                          ),
+                        ),
+                        if (!isOwner && currentList.ownerName.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              "${context.l10n.owner}: ${currentList.ownerName}",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: 'Epilogue',
+                                fontSize: 13,
+                                color: currentListImportanceColor
+                                    .withValues(alpha: 0.75),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  _HeaderActions(
+                    isOwner: isOwner,
+                    accent: currentListImportanceColor,
+                    onCopy: () => _copyListToClipboard(context, ref),
+                    onManageAccess: () => _openManageAccessDialog(context),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 4),
-            _HeaderActionsRow(
-              isOwner: isOwner,
-              importanceColor: currentListImportanceColor,
-              ownerName: currentList.ownerName,
-              onCopy: () => _copyListToClipboard(context, ref),
-              onManageAccess: () => _openManageAccessDialog(context),
             ),
             Expanded(
               child: LiquidPullToRefresh(
@@ -296,12 +338,13 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
                 onRefresh: () =>
                     _onRefresh(ref, currentList.documentId, currentList.ownerId),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: shoppingList(context, ref, isOwner),
                 ),
               ),
             ),
             _NewItemInput(
+              accent: currentListImportanceColor,
               onAdd: () => _addNewItemToCurrentShoppingList(context, ref),
             ),
           ],
@@ -356,74 +399,42 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
   }
 }
 
-class _HeaderActionsRow extends StatelessWidget {
-  const _HeaderActionsRow({
+/// Inline akcje obok tytułu (copy zawsze, manage_access tylko dla ownera).
+/// Owner badge dla shared list jest wyświetlany pod tytułem (w build() głównym).
+class _HeaderActions extends StatelessWidget {
+  const _HeaderActions({
     required this.isOwner,
-    required this.importanceColor,
-    required this.ownerName,
+    required this.accent,
     required this.onCopy,
     required this.onManageAccess,
   });
 
   final bool isOwner;
-  final Color importanceColor;
-  final String ownerName;
+  final Color accent;
   final VoidCallback onCopy;
   final VoidCallback onManageAccess;
 
   @override
   Widget build(BuildContext context) {
-    if (isOwner) {
-      // Własna lista — brak info o ownerze (wiadomo że nasza), ikonki po prawej.
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.copy_outlined),
-              color: AppColors.brandPink,
-              tooltip: context.l10n.copiedToClipboard,
-              onPressed: onCopy,
-            ),
-            IconButton(
-              icon: const Icon(Icons.people_outline),
-              color: AppColors.brandPink,
-              tooltip: context.l10n.whoHasAccess,
-              onPressed: onManageAccess,
-            ),
-          ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.copy_outlined),
+          color: accent,
+          tooltip: context.l10n.copiedToClipboard,
+          onPressed: onCopy,
+          visualDensity: VisualDensity.compact,
         ),
-      );
-    }
-    // Shared list — copy po lewej, Owner: X po prawej (spaceBetween).
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+        if (isOwner)
           IconButton(
-            icon: const Icon(Icons.copy_outlined),
-            color: AppColors.brandPink,
-            tooltip: context.l10n.copiedToClipboard,
-            onPressed: onCopy,
+            icon: const Icon(Icons.people_outline),
+            color: accent,
+            tooltip: context.l10n.whoHasAccess,
+            onPressed: onManageAccess,
+            visualDensity: VisualDensity.compact,
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8, right: 12),
-              child: Text(
-                "${context.l10n.owner}: $ownerName",
-                textAlign: TextAlign.end,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: importanceColor,
-                    ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -490,14 +501,22 @@ class _ShoppingListItemTile extends StatelessWidget {
 }
 
 class _NewItemInput extends ConsumerWidget {
-  const _NewItemInput({required this.onAdd});
+  const _NewItemInput({required this.onAdd, required this.accent});
 
   final VoidCallback onAdd;
+  final Color accent;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.watch(toolsProvider);
     final screenWidth = MediaQuery.of(context).size.width;
+    // Wpisywany tekst też powinien być w accent color — primary palette dla
+    // wprowadzania w detail listy. `bodyLarge` z theme jest pinkowy domyślnie;
+    // copyWith podmienia kolor na importance accent.
+    final inputStyle = Theme.of(context)
+        .textTheme
+        .bodyLarge!
+        .copyWith(color: accent);
     return Container(
       color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
@@ -513,33 +532,30 @@ class _NewItemInput extends ConsumerWidget {
               onAdd();
               toolsVM.newItemFocusNode.requestFocus();
             },
-            child: Icon(
-              Icons.add,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
+            child: Icon(Icons.add, color: accent),
           ),
-          fillColor: Colors.grey[600],
+          filled: true,
+          fillColor: AppColors.inputFill,
           hintText: context.l10n.itemNameHint,
           hintStyle: Theme.of(context).primaryTextTheme.bodyMedium,
           contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
               width: 1,
-              color: Theme.of(context).primaryColorDark,
+              color: AppColors.dividerSoft,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 1,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(width: 1.5, color: accent),
           ),
         ),
         onSubmitted: (ref, value) {
           onAdd();
           toolsVM.newItemFocusNode.requestFocus();
         },
-        style: Theme.of(context).textTheme.bodyLarge!,
+        style: inputStyle,
       ),
     );
   }

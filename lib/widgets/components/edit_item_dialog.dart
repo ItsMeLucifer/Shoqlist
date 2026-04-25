@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoqlist/constants/app_colors.dart';
 import 'package:shoqlist/l10n/l10n_extension.dart';
 
 /// Prosty dialog edycji nazwy itemu w shopping list. Prefilled TextField +
@@ -46,7 +47,9 @@ class _EditItemDialogState extends ConsumerState<EditItemDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: AppColors.surfaceGrayWarm,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         context.l10n.editItemTitle,
         style: Theme.of(context).primaryTextTheme.headlineSmall,
@@ -59,9 +62,16 @@ class _EditItemDialogState extends ConsumerState<EditItemDialog> {
         style: Theme.of(context).textTheme.bodyLarge,
         decoration: InputDecoration(
           hintText: context.l10n.itemNameHint,
-          enabledBorder: const OutlineInputBorder(),
+          filled: true,
+          fillColor: AppColors.inputFill,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: AppColors.dividerSoft),
+          ),
           focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
+              width: 1.5,
               color: Theme.of(context).colorScheme.secondary,
             ),
           ),

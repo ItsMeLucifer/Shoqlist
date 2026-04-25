@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:shoqlist/constants/app_colors.dart';
 import 'package:shoqlist/widgets/components/dialogs.dart';
 
 /// Helpery budujące spójne ActionPane dla edit (start, niebieski) i delete
@@ -38,10 +39,10 @@ class SlidableActions {
       children: [
         SlidableAction(
           onPressed: (_) => onEdit(),
-          backgroundColor: const Color(0xFF3B82F6),
+          backgroundColor: AppColors.editTone,
           foregroundColor: Colors.white,
           icon: Icons.edit,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(8),
         ),
       ],
     );
@@ -86,11 +87,11 @@ class SlidableActions {
             }
             onDelete();
           },
-          backgroundColor: const Color(0xFFDC2626),
+          backgroundColor: AppColors.deleteTone,
           foregroundColor: Colors.white,
           icon: icon,
           label: label,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(8),
         ),
       ],
     );

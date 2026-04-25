@@ -96,6 +96,8 @@
     "noFriendRequestsMsg": "Nie masz żadnych zaproszeń do znajomych",
     "acceptFriendRequestTitle": "Zaakceptować zaproszenie do znajomych?",
     "cantFindUserMsg": "Nie znaleziono użytkownika z podanym adresem e-mail, spróbuj ponownie",
+    "userAlreadyFriendMsg": "Ten użytkownik jest już na liście Twoich znajomych",
+    "friendRequestAlreadyPendingMsg": "Zaproszenie z tym użytkownikiem już oczekuje",
     "sendFriendRequestTitle": "Wysłać zaproszenie do znajomych?",
 
 
