@@ -69,11 +69,14 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
     // rzuci wyjątkiem, input jest czysty i user nie musi ręcznie kasować.
     toolsVM.clearNewItemTextEditingController();
     if (text.isEmpty) return;
-    final list = shoppingListsVM
-        .shoppingLists[shoppingListsVM.currentListIndex];
+    final list =
+        shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
     final onSyncFail = _captureSyncFailureReporter(context);
-    final newItem =
-        shoppingListsVM.addNewItemToShoppingListLocally(text, false, false);
+    final newItem = shoppingListsVM.addNewItemToShoppingListLocally(
+      text,
+      false,
+      false,
+    );
     if (newItem == null) return;
     firebaseVM
         .addNewItemToShoppingListOnFirebase(
@@ -85,7 +88,10 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
   }
 
   Future<void> _onRefresh(
-      WidgetRef ref, String documentId, String ownerId) async {
+    WidgetRef ref,
+    String documentId,
+    String ownerId,
+  ) async {
     // Czekamy na rozliczenie pending Firestore transactions PRZED fetch.
     // Bez tego: klikasz szybko 5 itemów → pull-to-refresh → read widzi stan
     // sprzed Twoich transakcji → updateCurrentShoppingList nadpisuje lokalne
@@ -95,8 +101,7 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
     await firebaseVM.fetchOneShoppingList(documentId, ownerId);
   }
 
-  Future<void> _copyListToClipboard(
-      BuildContext context, WidgetRef ref) async {
+  Future<void> _copyListToClipboard(BuildContext context, WidgetRef ref) async {
     final shoppingListsVM = ref.read(shoppingListsProvider);
     await Clipboard.setData(
       ClipboardData(text: shoppingListsVM.getCurrentShoppingListDataInString()),
@@ -112,18 +117,17 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
   }
 
   void _openManageAccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => const ManageAccessDialog(),
-    );
+    showDialog(context: context, builder: (_) => const ManageAccessDialog());
   }
 
-  void _openEditItemDialog(
-      BuildContext context, WidgetRef ref, String itemId) {
+  void _openEditItemDialog(BuildContext context, WidgetRef ref, String itemId) {
     final shoppingListsVM = ref.read(shoppingListsProvider);
-    final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    final itemIndex =
-        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    final list =
+        shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
+    final itemIndex = shoppingListsVM.indexOfItemById(
+      shoppingListsVM.currentListIndex,
+      itemId,
+    );
     if (itemIndex < 0) return;
     final currentName = list.list[itemIndex].itemName;
     final onSyncFail = _captureSyncFailureReporter(context);
@@ -135,7 +139,9 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
           // Resolve index ponownie — mógł się zmienić podczas otwartego dialogu
           // (inny tap, sort, snapshot). Identity zostaje spójna przez id.
           final idxNow = shoppingListsVM.indexOfItemById(
-              shoppingListsVM.currentListIndex, itemId);
+            shoppingListsVM.currentListIndex,
+            itemId,
+          );
           if (idxNow < 0) return;
           shoppingListsVM.updateShoppingListItemNameLocally(
             shoppingListsVM.currentListIndex,
@@ -159,9 +165,12 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
   void _deleteItemInstant(BuildContext context, WidgetRef ref, String itemId) {
     final shoppingListsVM = ref.read(shoppingListsProvider);
     final firebaseVM = ref.read(firebaseProvider);
-    final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    final itemIndex =
-        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    final list =
+        shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
+    final itemIndex = shoppingListsVM.indexOfItemById(
+      shoppingListsVM.currentListIndex,
+      itemId,
+    );
     if (itemIndex < 0) return;
     final onSyncFail = _captureSyncFailureReporter(context);
     shoppingListsVM.deleteItemFromShoppingListLocally(itemIndex);
@@ -177,19 +186,25 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
   void _toggleItemGot(BuildContext context, WidgetRef ref, String itemId) {
     final shoppingListsVM = ref.read(shoppingListsProvider);
     final firebaseVM = ref.read(firebaseProvider);
-    final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    final itemIndex =
-        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    final list =
+        shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
+    final itemIndex = shoppingListsVM.indexOfItemById(
+      shoppingListsVM.currentListIndex,
+      itemId,
+    );
     if (itemIndex < 0) return;
     final onSyncFail = _captureSyncFailureReporter(context);
     shoppingListsVM.toggleItemStateLocally(
-        shoppingListsVM.currentListIndex, itemIndex);
+      shoppingListsVM.currentListIndex,
+      itemIndex,
+    );
     // Lokalna mutacja ustawiła już nowy stan — odczyt po id (po sorcie).
-    final idxAfter =
-        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    final idxAfter = shoppingListsVM.indexOfItemById(
+      shoppingListsVM.currentListIndex,
+      itemId,
+    );
     if (idxAfter < 0) return;
-    final newState =
-        list.list[idxAfter].gotItem;
+    final newState = list.list[idxAfter].gotItem;
     firebaseVM
         .toggleStateOfShoppingListItemOnFirebase(
           itemId: itemId,
@@ -198,29 +213,40 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
           ownerId: list.ownerId,
         )
         .catchError((_) {
-      // Rollback po itemId (po sorcie index mógł się zmienić).
-      final idxNow = shoppingListsVM.indexOfItemById(
-          shoppingListsVM.currentListIndex, itemId);
-      if (idxNow >= 0) {
-        shoppingListsVM.toggleItemStateLocally(
-            shoppingListsVM.currentListIndex, idxNow);
-      }
-      onSyncFail();
-    });
+          // Rollback po itemId (po sorcie index mógł się zmienić).
+          final idxNow = shoppingListsVM.indexOfItemById(
+            shoppingListsVM.currentListIndex,
+            itemId,
+          );
+          if (idxNow >= 0) {
+            shoppingListsVM.toggleItemStateLocally(
+              shoppingListsVM.currentListIndex,
+              idxNow,
+            );
+          }
+          onSyncFail();
+        });
   }
 
   void _toggleItemFavorite(BuildContext context, WidgetRef ref, String itemId) {
     final shoppingListsVM = ref.read(shoppingListsProvider);
     final firebaseVM = ref.read(firebaseProvider);
-    final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    final itemIndex =
-        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    final list =
+        shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
+    final itemIndex = shoppingListsVM.indexOfItemById(
+      shoppingListsVM.currentListIndex,
+      itemId,
+    );
     if (itemIndex < 0) return;
     final onSyncFail = _captureSyncFailureReporter(context);
     shoppingListsVM.toggleItemFavoriteLocally(
-        shoppingListsVM.currentListIndex, itemIndex);
-    final idxAfter =
-        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+      shoppingListsVM.currentListIndex,
+      itemIndex,
+    );
+    final idxAfter = shoppingListsVM.indexOfItemById(
+      shoppingListsVM.currentListIndex,
+      itemId,
+    );
     if (idxAfter < 0) return;
     final newFavorite = list.list[idxAfter].isFavorite;
     firebaseVM
@@ -231,14 +257,18 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
           ownerId: list.ownerId,
         )
         .catchError((_) {
-      final idxNow = shoppingListsVM.indexOfItemById(
-          shoppingListsVM.currentListIndex, itemId);
-      if (idxNow >= 0) {
-        shoppingListsVM.toggleItemFavoriteLocally(
-            shoppingListsVM.currentListIndex, idxNow);
-      }
-      onSyncFail();
-    });
+          final idxNow = shoppingListsVM.indexOfItemById(
+            shoppingListsVM.currentListIndex,
+            itemId,
+          );
+          if (idxNow >= 0) {
+            shoppingListsVM.toggleItemFavoriteLocally(
+              shoppingListsVM.currentListIndex,
+              idxNow,
+            );
+          }
+          onSyncFail();
+        });
   }
 
   // Przed asynchronicznym wywołaniem capture'ujemy ScaffoldMessenger i tekst —
@@ -265,8 +295,9 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
     final currentList =
         shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    final currentListImportanceColor =
-        toolsVM.getImportanceColor(currentList.importance);
+    final currentListImportanceColor = toolsVM.getImportanceColor(
+      currentList.importance,
+    );
     final isOwner = currentList.ownerId == firebaseAuthVM.currentUser.userId;
 
     return Scaffold(
@@ -311,8 +342,9 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
                               style: TextStyle(
                                 fontFamily: 'Epilogue',
                                 fontSize: 13,
-                                color: currentListImportanceColor
-                                    .withValues(alpha: 0.75),
+                                color: currentListImportanceColor.withValues(
+                                  alpha: 0.75,
+                                ),
                               ),
                             ),
                           ),
@@ -335,10 +367,16 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
                 height: 50,
                 animSpeedFactor: 5,
                 showChildOpacityTransition: false,
-                onRefresh: () =>
-                    _onRefresh(ref, currentList.documentId, currentList.ownerId),
+                onRefresh: () => _onRefresh(
+                  ref,
+                  currentList.documentId,
+                  currentList.ownerId,
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: shoppingList(context, ref, isOwner),
                 ),
               ),
@@ -368,9 +406,8 @@ class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
               // zachowuje mapping widget→item, więc gwiazdka/strikethrough
               // faktycznie pojawia się pod palcem a nie "niby nic się nie stało".
               final itemKey = item.id ?? '__noid-$index';
-              return Padding(
+              return SizedBox(
                 key: ValueKey('item-$itemKey'),
-                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Slidable(
                   key: ValueKey('slidable-$itemKey'),
                   startActionPane: SlidableActions.editPane(
@@ -461,9 +498,7 @@ class _ShoppingListItemTile extends StatelessWidget {
       child: Card(
         color: Theme.of(context).listTileTheme.tileColor,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Container(
           constraints: const BoxConstraints(minHeight: 50),
           padding: const EdgeInsets.all(10),
@@ -513,10 +548,9 @@ class _NewItemInput extends ConsumerWidget {
     // Wpisywany tekst też powinien być w accent color — primary palette dla
     // wprowadzania w detail listy. `bodyLarge` z theme jest pinkowy domyślnie;
     // copyWith podmienia kolor na importance accent.
-    final inputStyle = Theme.of(context)
-        .textTheme
-        .bodyLarge!
-        .copyWith(color: accent);
+    final inputStyle = Theme.of(
+      context,
+    ).textTheme.bodyLarge!.copyWith(color: accent);
     return Container(
       color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
@@ -541,10 +575,7 @@ class _NewItemInput extends ConsumerWidget {
           contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              width: 1,
-              color: AppColors.dividerSoft,
-            ),
+            borderSide: BorderSide(width: 1, color: AppColors.dividerSoft),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
