@@ -102,6 +102,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get copiedToClipboard => 'クリップボードにコピーしました';
 
   @override
+  String get syncFailed => '同期に失敗しました';
+
+  @override
   String unshareListTitle(String name) {
     return '$name の共有を解除しますか？';
   }

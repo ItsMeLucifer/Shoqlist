@@ -29,6 +29,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
+  // Captured service ref — używanie ref.read w dispose() podczas teardown
+  // drzewa może rzucić "modify provider while widget tree was building".
+  late final _syncService = ref.read(listSyncServiceProvider);
+
   @override
   void initState() {
     super.initState();
@@ -40,17 +44,38 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   @override
   void dispose() {
     _connectivitySubscription?.cancel();
+    // Teardown realtime subscriptions — bez tego StreamSubscriptions zostają
+    // i dalej firują applyMergedSnapshot na wyautoryzowanym VM.
+    _syncService.shutdown();
     super.dispose();
   }
 
   void _fetchData() {
-    final firebaseVM = ref.read(firebaseProvider);
-    ref.read(firebaseAuthProvider).setCurrentUserCredentials();
-    firebaseVM.getShoppingListsFromFirebase(true);
-    firebaseVM.getLoyaltyCardsFromFirebase(true);
-    firebaseVM.fetchFriendsList();
-    firebaseVM.fetchFriendRequestsList();
-    _listenForConnectivityRestore();
+    // Cała inicjalizacja odpalana w mikrotasku — wywołania na providers
+    // w środku initState lecą podczas buildu drzewa, a nasze hydrate /
+    // fetch'e robią notifyListeners (Riverpod by then panicuje). Future
+    // odracza wszystko o jeden tick poza lifecycle.
+    Future.microtask(() {
+      if (!mounted) return;
+      final firebaseVM = ref.read(firebaseProvider);
+      final shoppingListsVM = ref.read(shoppingListsProvider);
+      final uid = ref.read(firebaseAuthProvider).auth.currentUser?.uid;
+      ref.read(firebaseAuthProvider).setCurrentUserCredentials();
+      // Hydrate-from-cache: ładujemy Hive lokalnie (+ setujemy currentUserId),
+      // żeby przy cold start user zobaczył listy natychmiast, zanim dojdzie
+      // pierwszy snapshot / fetch z Firestore. Merge potem łączy per-field.
+      if (uid != null) {
+        shoppingListsVM.displayLocalShoppingLists(uid);
+      }
+      firebaseVM.getShoppingListsFromFirebase(true);
+      firebaseVM.getLoyaltyCardsFromFirebase(true);
+      firebaseVM.fetchFriendsList();
+      firebaseVM.fetchFriendRequestsList();
+      // Włącz realtime listenery — startHome to idempotent, więc bezpieczne
+      // nawet przy rekonnekcji z connectivity listener.
+      ref.read(listSyncServiceProvider).startHome();
+      _listenForConnectivityRestore();
+    });
   }
 
   void _listenForConnectivityRestore() {

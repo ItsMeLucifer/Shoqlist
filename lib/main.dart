@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +12,10 @@ import 'package:shoqlist/viewmodels/firebase_view_model.dart';
 import 'package:shoqlist/viewmodels/friends_service_view_model.dart';
 import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
+import 'package:shoqlist/viewmodels/sync/firestore_migrator.dart';
+import 'package:shoqlist/viewmodels/sync/list_sync_service.dart';
+import 'package:shoqlist/viewmodels/sync/list_writer.dart';
+import 'package:shoqlist/viewmodels/sync/pending_writes_tracker.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 import 'package:shoqlist/widgets/wrapper.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
@@ -29,6 +36,15 @@ final firebaseAuthProvider =
     ChangeNotifierProvider((_) => FirebaseAuthViewModel());
 final friendsServiceProvider =
     ChangeNotifierProvider((_) => FriendsServiceViewModel());
+final pendingWritesTrackerProvider =
+    Provider((_) => PendingWritesTracker());
+// Shadow-write v1 mirrors: ON przez jedno okno release, żeby stare wersje
+// apki shared userów nie wysypały się przy czytaniu cudzej (zmigrowanej)
+// listy. Flipnij na false po upgrade wszystkich klientów.
+final listWriterProvider =
+    Provider((_) => ListWriter(shadowWriteV1Mirrors: true));
+final firestoreMigratorProvider =
+    Provider((_) => FirestoreMigrator(shadowWriteV1Mirrors: true));
 final ChangeNotifierProvider<FirebaseViewModel> firebaseProvider =
     ChangeNotifierProvider((ref) {
   final shoppingLists = ref.watch(shoppingListsProvider);
@@ -36,7 +52,17 @@ final ChangeNotifierProvider<FirebaseViewModel> firebaseProvider =
   final tools = ref.watch(toolsProvider);
   final auth = ref.watch(firebaseAuthProvider);
   final friends = ref.watch(friendsServiceProvider);
-  return FirebaseViewModel(shoppingLists, loyaltyCards, tools, auth, friends);
+  final tracker = ref.watch(pendingWritesTrackerProvider);
+  final writer = ref.watch(listWriterProvider);
+  final migrator = ref.watch(firestoreMigratorProvider);
+  return FirebaseViewModel(shoppingLists, loyaltyCards, tools, auth, friends,
+      tracker, writer, migrator);
+});
+final listSyncServiceProvider = Provider<ListSyncService>((ref) {
+  final firebaseVM = ref.watch(firebaseProvider);
+  final auth = ref.watch(firebaseAuthProvider);
+  final shoppingLists = ref.watch(shoppingListsProvider);
+  return ListSyncService(firebaseVM, auth, shoppingLists);
 });
 
 void main() async {
@@ -44,7 +70,35 @@ void main() async {
 
   //Firebase
   await Firebase.initializeApp();
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  // W debug chcemy widzieć błędy zarówno w VSCode debug console (czerwony
+  // dump z Flutter) jak i w Crashlytics. Bezpośrednie podstawienie handlera
+  // pożerało wszystko do Crashlytics i konsola była głucha. iOS dodatkowo
+  // czasem filtruje `print` — `developer.log` jest niezawodny.
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      FlutterError.presentError(details);
+      developer.log(
+        'FlutterError: ${details.exceptionAsString()}',
+        name: 'shoqlist',
+        error: details.exception,
+        stackTrace: details.stack,
+      );
+    }
+    FirebaseCrashlytics.instance.recordFlutterError(details);
+  };
+  // Errors poza Flutter framework (np. async leak'i, Future bez catch).
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (kDebugMode) {
+      developer.log(
+        'PlatformError: $error',
+        name: 'shoqlist',
+        error: error,
+        stackTrace: stack,
+      );
+    }
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
+    return true;
+  };
 
   //HIVE - Local NoSQL database
   await Hive.initFlutter();

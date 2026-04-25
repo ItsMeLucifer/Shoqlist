@@ -32,7 +32,20 @@ class ShoppingList extends HiveObject {
   @HiveField(6)
   final String ownerName;
   @HiveField(7)
-  List<User> usersWithAccess = [];
+  List<User> usersWithAccess;
+  // Per-field timestamps + schema marker. Null traktowany jak 0 przy merge.
+  @HiveField(8)
+  int? nameUpdatedAt;
+  @HiveField(9)
+  int? importanceUpdatedAt;
+  @HiveField(10)
+  int? usersWithAccessUpdatedAt;
+  @HiveField(11)
+  int? createdAt;
+  @HiveField(12)
+  int? updatedAt;
+  @HiveField(13)
+  int? schemaVersion;
 
   ShoppingList(
     this.name,
@@ -41,6 +54,16 @@ class ShoppingList extends HiveObject {
     this.documentId,
     this.ownerId,
     this.ownerName, [
-    this.usersWithAccess = const [],
-  ]);
+    List<User>? usersWithAccess,
+    this.nameUpdatedAt,
+    this.importanceUpdatedAt,
+    this.usersWithAccessUpdatedAt,
+    this.createdAt,
+    this.updatedAt,
+    this.schemaVersion,
+  ]) : usersWithAccess = usersWithAccess ?? <User>[];
+
+  void bumpUpdatedAt() {
+    updatedAt = DateTime.now().millisecondsSinceEpoch;
+  }
 }

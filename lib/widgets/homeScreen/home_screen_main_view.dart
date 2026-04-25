@@ -21,9 +21,14 @@ class HomeScreenMainView extends ConsumerWidget {
         MaterialPageRoute(builder: (context) => const ShoppingListDisplay()));
   }
 
-  void _onRefresh(BuildContext context, WidgetRef ref) {
+  Future<void> _onRefresh(BuildContext context, WidgetRef ref) async {
+    final firebaseVM = ref.read(firebaseProvider);
     ref.read(toolsProvider).refreshStatus = RefreshStatus.duringRefresh;
-    ref.read(firebaseProvider).getShoppingListsFromFirebase(true);
+    // Najpierw rozlicz wszystkie pending item-mutacje — inaczej refresh może
+    // nadpisać lokalny stan serwerowym snapshotem sprzed niezcommitowanych
+    // transakcji. Dotyczy wszystkich aktywnych list.
+    await firebaseVM.pendingWritesTracker.flushAll();
+    await firebaseVM.getShoppingListsFromFirebase(true);
     ref.read(firebaseAuthProvider).setCurrentUserCredentials();
   }
 
@@ -159,9 +164,7 @@ class HomeScreenMainView extends ConsumerWidget {
                       height: 50,
                       animSpeedFactor: 5,
                       showChildOpacityTransition: false,
-                      onRefresh: () async {
-                        _onRefresh(context, ref);
-                      },
+                      onRefresh: () => _onRefresh(context, ref),
                       child: shoppingListsVM.shoppingLists.isNotEmpty
                           ? shoppingLists(context, ref)
                           : ListView(

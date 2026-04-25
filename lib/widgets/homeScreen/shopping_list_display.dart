@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,11 +10,43 @@ import 'package:shoqlist/models/shopping_list.dart';
 import 'package:shoqlist/widgets/components/edit_item_dialog.dart';
 import 'package:shoqlist/widgets/components/forms.dart';
 import 'package:shoqlist/widgets/components/manage_access_dialog.dart';
-import 'package:shoqlist/widgets/components/native_ad_banner.dart';
 import 'package:shoqlist/widgets/components/slidable_actions.dart';
 
-class ShoppingListDisplay extends ConsumerWidget {
+class ShoppingListDisplay extends ConsumerStatefulWidget {
   const ShoppingListDisplay({super.key});
+
+  @override
+  ConsumerState<ShoppingListDisplay> createState() =>
+      _ShoppingListDisplayState();
+}
+
+class _ShoppingListDisplayState extends ConsumerState<ShoppingListDisplay> {
+  // Capture'ujemy service raz w initState. Używanie `ref.read` w dispose()
+  // jest podatne na error gdy widget jest unmount'owany w trakcie buildu
+  // drzewa rodzica — captured ref jest stabilny przez całe życie widgetu.
+  late final _syncService = ref.read(listSyncServiceProvider);
+
+  @override
+  void initState() {
+    super.initState();
+    // Real-time sub na aktualnie wyświetlaną listę. PostFrame żeby
+    // provider tree był gotowy (currentListIndex już ustawione przez
+    // _onTapShoppingListButton w HomeScreenMainView).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final vm = ref.read(shoppingListsProvider);
+      final idx = vm.currentListIndex;
+      if (idx < 0 || idx >= vm.shoppingLists.length) return;
+      final list = vm.shoppingLists[idx];
+      _syncService.startDetail(list.ownerId, list.documentId);
+    });
+  }
+
+  @override
+  void dispose() {
+    _syncService.stopDetail();
+    super.dispose();
+  }
 
   void _addNewItemToCurrentShoppingList(BuildContext context, WidgetRef ref) {
     final toolsVM = ref.read(toolsProvider);
@@ -28,13 +59,28 @@ class ShoppingListDisplay extends ConsumerWidget {
     if (text.isEmpty) return;
     final list = shoppingListsVM
         .shoppingLists[shoppingListsVM.currentListIndex];
-    firebaseVM.addNewItemToShoppingListOnFirebase(
-        text, list.documentId, list.ownerId);
-    shoppingListsVM.addNewItemToShoppingListLocally(text, false, false);
+    final onSyncFail = _captureSyncFailureReporter(context);
+    final newItem =
+        shoppingListsVM.addNewItemToShoppingListLocally(text, false, false);
+    if (newItem == null) return;
+    firebaseVM
+        .addNewItemToShoppingListOnFirebase(
+          item: newItem,
+          documentId: list.documentId,
+          ownerId: list.ownerId,
+        )
+        .catchError((_) => onSyncFail());
   }
 
-  void _onRefresh(WidgetRef ref, String documentId, String ownerId) {
-    ref.read(firebaseProvider).fetchOneShoppingList(documentId, ownerId);
+  Future<void> _onRefresh(
+      WidgetRef ref, String documentId, String ownerId) async {
+    // Czekamy na rozliczenie pending Firestore transactions PRZED fetch.
+    // Bez tego: klikasz szybko 5 itemów → pull-to-refresh → read widzi stan
+    // sprzed Twoich transakcji → updateCurrentShoppingList nadpisuje lokalne
+    // taps. Tracker zapewnia że refresh zawsze widzi już-skommitowany stan.
+    final firebaseVM = ref.read(firebaseProvider);
+    await firebaseVM.pendingWritesTracker.flushList(documentId);
+    await firebaseVM.fetchOneShoppingList(documentId, ownerId);
   }
 
   Future<void> _copyListToClipboard(
@@ -61,46 +107,147 @@ class ShoppingListDisplay extends ConsumerWidget {
   }
 
   void _openEditItemDialog(
-      BuildContext context, WidgetRef ref, int itemIndex) {
+      BuildContext context, WidgetRef ref, String itemId) {
     final shoppingListsVM = ref.read(shoppingListsProvider);
     final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    if (itemIndex < 0 || itemIndex >= list.list.length) return;
+    final itemIndex =
+        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    if (itemIndex < 0) return;
     final currentName = list.list[itemIndex].itemName;
+    final onSyncFail = _captureSyncFailureReporter(context);
     showDialog(
       context: context,
       builder: (_) => EditItemDialog(
         initialName: currentName,
         onSave: (newName) {
-          ref.read(firebaseProvider).updateShoppingListItemNameOnFirebase(
-                newName,
-                itemIndex,
-                list.documentId,
-                list.ownerId,
-              );
+          // Resolve index ponownie — mógł się zmienić podczas otwartego dialogu
+          // (inny tap, sort, snapshot). Identity zostaje spójna przez id.
+          final idxNow = shoppingListsVM.indexOfItemById(
+              shoppingListsVM.currentListIndex, itemId);
+          if (idxNow < 0) return;
           shoppingListsVM.updateShoppingListItemNameLocally(
             shoppingListsVM.currentListIndex,
-            itemIndex,
+            idxNow,
             newName,
           );
+          ref
+              .read(firebaseProvider)
+              .updateShoppingListItemNameOnFirebase(
+                itemId: itemId,
+                newName: newName,
+                documentId: list.documentId,
+                ownerId: list.ownerId,
+              )
+              .catchError((_) => onSyncFail());
         },
       ),
     );
   }
 
-  void _deleteItemInstant(WidgetRef ref, int itemIndex) {
+  void _deleteItemInstant(BuildContext context, WidgetRef ref, String itemId) {
     final shoppingListsVM = ref.read(shoppingListsProvider);
     final firebaseVM = ref.read(firebaseProvider);
     final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    firebaseVM.deleteShoppingListItemOnFirebase(
-      itemIndex,
-      list.documentId,
-      list.ownerId,
-    );
+    final itemIndex =
+        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    if (itemIndex < 0) return;
+    final onSyncFail = _captureSyncFailureReporter(context);
     shoppingListsVM.deleteItemFromShoppingListLocally(itemIndex);
+    firebaseVM
+        .deleteShoppingListItemOnFirebase(
+          itemId: itemId,
+          documentId: list.documentId,
+          ownerId: list.ownerId,
+        )
+        .catchError((_) => onSyncFail());
+  }
+
+  void _toggleItemGot(BuildContext context, WidgetRef ref, String itemId) {
+    final shoppingListsVM = ref.read(shoppingListsProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
+    final itemIndex =
+        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    if (itemIndex < 0) return;
+    final onSyncFail = _captureSyncFailureReporter(context);
+    shoppingListsVM.toggleItemStateLocally(
+        shoppingListsVM.currentListIndex, itemIndex);
+    // Lokalna mutacja ustawiła już nowy stan — odczyt po id (po sorcie).
+    final idxAfter =
+        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    if (idxAfter < 0) return;
+    final newState =
+        list.list[idxAfter].gotItem;
+    firebaseVM
+        .toggleStateOfShoppingListItemOnFirebase(
+          itemId: itemId,
+          newState: newState,
+          documentId: list.documentId,
+          ownerId: list.ownerId,
+        )
+        .catchError((_) {
+      // Rollback po itemId (po sorcie index mógł się zmienić).
+      final idxNow = shoppingListsVM.indexOfItemById(
+          shoppingListsVM.currentListIndex, itemId);
+      if (idxNow >= 0) {
+        shoppingListsVM.toggleItemStateLocally(
+            shoppingListsVM.currentListIndex, idxNow);
+      }
+      onSyncFail();
+    });
+  }
+
+  void _toggleItemFavorite(BuildContext context, WidgetRef ref, String itemId) {
+    final shoppingListsVM = ref.read(shoppingListsProvider);
+    final firebaseVM = ref.read(firebaseProvider);
+    final list = shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
+    final itemIndex =
+        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    if (itemIndex < 0) return;
+    final onSyncFail = _captureSyncFailureReporter(context);
+    shoppingListsVM.toggleItemFavoriteLocally(
+        shoppingListsVM.currentListIndex, itemIndex);
+    final idxAfter =
+        shoppingListsVM.indexOfItemById(shoppingListsVM.currentListIndex, itemId);
+    if (idxAfter < 0) return;
+    final newFavorite = list.list[idxAfter].isFavorite;
+    firebaseVM
+        .toggleFavoriteOfShoppingListItemOnFirebase(
+          itemId: itemId,
+          newFavorite: newFavorite,
+          documentId: list.documentId,
+          ownerId: list.ownerId,
+        )
+        .catchError((_) {
+      final idxNow = shoppingListsVM.indexOfItemById(
+          shoppingListsVM.currentListIndex, itemId);
+      if (idxNow >= 0) {
+        shoppingListsVM.toggleItemFavoriteLocally(
+            shoppingListsVM.currentListIndex, idxNow);
+      }
+      onSyncFail();
+    });
+  }
+
+  // Przed asynchronicznym wywołaniem capture'ujemy ScaffoldMessenger i tekst —
+  // po async nie mamy już prawa dotknąć `context`, a analyzer (słusznie)
+  // blokuje context-after-await. Messenger jest stabilny nawet gdy tree zmieni.
+  VoidCallback _captureSyncFailureReporter(BuildContext context) {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final message = context.l10n.syncFailed;
+    return () {
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    };
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
     final toolsVM = ref.watch(toolsProvider);
     final firebaseAuthVM = ref.watch(firebaseAuthProvider);
@@ -146,9 +293,8 @@ class ShoppingListDisplay extends ConsumerWidget {
                 height: 50,
                 animSpeedFactor: 5,
                 showChildOpacityTransition: false,
-                onRefresh: () async {
-                  _onRefresh(ref, currentList.documentId, currentList.ownerId);
-                },
+                onRefresh: () =>
+                    _onRefresh(ref, currentList.documentId, currentList.ownerId),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   child: shoppingList(context, ref, isOwner),
@@ -166,13 +312,8 @@ class ShoppingListDisplay extends ConsumerWidget {
 
   Widget shoppingList(BuildContext context, WidgetRef ref, bool isOwner) {
     final shoppingListsVM = ref.watch(shoppingListsProvider);
-    final firebaseVM = ref.watch(firebaseProvider);
     ShoppingList shoppingList =
         shoppingListsVM.shoppingLists[shoppingListsVM.currentListIndex];
-    // CustomScrollView + SliverList + SliverToBoxAdapter: banner jako sibling
-    // (nie lazy item ListView.builder) — SliverToBoxAdapter renderuje widget
-    // raz i nie mountuje go ponownie przy scrollu. NativeAdBanner zachowuje
-    // state i nie wielokrotnie ładuje reklamy.
     return SlidableAutoCloseBehavior(
       child: CustomScrollView(
         slivers: [
@@ -180,73 +321,35 @@ class ShoppingListDisplay extends ConsumerWidget {
             itemCount: shoppingList.list.length,
             itemBuilder: (context, index) {
               final item = shoppingList.list[index];
-              // Stable key oparty tylko o documentId + index (bez itemName),
-              // żeby nie rekonstruować tile przy edycji nazwy.
+              // Key po stabilnym id itemu — po in-place sorcie Flutter
+              // zachowuje mapping widget→item, więc gwiazdka/strikethrough
+              // faktycznie pojawia się pod palcem a nie "niby nic się nie stało".
+              final itemKey = item.id ?? '__noid-$index';
               return Padding(
-                key: ValueKey('${shoppingList.documentId}-item-$index'),
+                key: ValueKey('item-$itemKey'),
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Slidable(
-                  key: ValueKey(
-                      '${shoppingList.documentId}-slidable-$index'),
+                  key: ValueKey('slidable-$itemKey'),
                   startActionPane: SlidableActions.editPane(
-                    onEdit: () => _openEditItemDialog(context, ref, index),
+                    onEdit: () => _openEditItemDialog(context, ref, itemKey),
                     dismissThreshold: 0.3,
                   ),
                   endActionPane: SlidableActions.deletePane(
-                    onDelete: () => _deleteItemInstant(ref, index),
+                    onDelete: () => _deleteItemInstant(context, ref, itemKey),
                     dismissThreshold: 0.3,
                   ),
                   child: _ShoppingListItemTile(
                     itemName: item.itemName,
                     gotItem: item.gotItem,
                     isFavorite: item.isFavorite,
-                    onToggleGot: () {
-                      shoppingListsVM.pickedListItemIndex = index;
-                      firebaseVM.toggleStateOfShoppingListItemOnFirebase(
-                        shoppingList.documentId,
-                        index,
-                        shoppingList.ownerId,
-                      );
-                      shoppingListsVM.toggleItemStateLocally(
-                          shoppingListsVM.currentListIndex, index);
-                    },
-                    onToggleFavorite: () {
-                      firebaseVM.toggleFavoriteOfShoppingListItemOnFirebase(
-                        shoppingList.documentId,
-                        index,
-                        shoppingList.ownerId,
-                      );
-                      shoppingListsVM.toggleItemFavoriteLocally(
-                          shoppingListsVM.currentListIndex, index);
-                    },
+                    onToggleGot: () => _toggleItemGot(context, ref, itemKey),
+                    onToggleFavorite: () =>
+                        _toggleItemFavorite(context, ref, itemKey),
                   ),
                 ),
               );
             },
           ),
-          // SliverList (a nie SliverToBoxAdapter) szanuje
-          // AutomaticKeepAliveClientMixin w NativeAdBanner — dzięki temu
-          // banner pozostaje mounted po scroll poza viewport i nie ładuje
-          // reklamy ponownie.
-          // Debug builds: całkiem pomijamy kafelek (żeby pusty Card nie
-          // wisiał na liście podczas screenshotów / developmentu).
-          if (!kDebugMode)
-            SliverList.list(
-              children: [
-                Padding(
-                  key: const ValueKey('__native_ad_banner_tile__'),
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Card(
-                    color: Theme.of(context).listTileTheme.tileColor,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const NativeAdBanner(inFeedStyle: true),
-                  ),
-                ),
-              ],
-            ),
         ],
       ),
     );

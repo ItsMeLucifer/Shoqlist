@@ -42,6 +42,7 @@
     "editItemTitle": "Edytuj element",
     "ok": "OK",
     "copiedToClipboard": "Skopiowano do schowka",
+    "syncFailed": "Nie udało się zsynchronizować",
     "unshareListTitle": "Odpiąć się od {name}?",
     "decline": "Odrzuć",
     "yes": "Tak",

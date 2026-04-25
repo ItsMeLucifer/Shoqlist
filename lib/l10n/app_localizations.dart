@@ -286,6 +286,12 @@ abstract class AppLocalizations {
   /// **'Copied to clipboard'**
   String get copiedToClipboard;
 
+  /// SnackBar shown when a write to Firestore fails and local state had to be reverted
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t sync — try again'**
+  String get syncFailed;
+
   /// Confirmation when user unshares themselves from a shared list
   ///
   /// In en, this message translates to:

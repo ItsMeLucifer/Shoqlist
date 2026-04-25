@@ -103,6 +103,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copiedToClipboard => 'Copied to clipboard';
 
   @override
+  String get syncFailed => 'Couldn\'t sync — try again';
+
+  @override
   String unshareListTitle(String name) {
     return 'Unshare $name?';
   }

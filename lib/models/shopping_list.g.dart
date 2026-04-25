@@ -23,14 +23,20 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
       fields[3] as String,
       fields[5] as String,
       fields[6] as String,
-      fields[7] == null ? const [] : (fields[7] as List).cast<User>(),
+      (fields[7] as List?)?.cast<User>(),
+      (fields[8] as num?)?.toInt(),
+      (fields[9] as num?)?.toInt(),
+      (fields[10] as num?)?.toInt(),
+      (fields[11] as num?)?.toInt(),
+      (fields[12] as num?)?.toInt(),
+      (fields[13] as num?)?.toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, ShoppingList obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -44,7 +50,19 @@ class ShoppingListAdapter extends TypeAdapter<ShoppingList> {
       ..writeByte(6)
       ..write(obj.ownerName)
       ..writeByte(7)
-      ..write(obj.usersWithAccess);
+      ..write(obj.usersWithAccess)
+      ..writeByte(8)
+      ..write(obj.nameUpdatedAt)
+      ..writeByte(9)
+      ..write(obj.importanceUpdatedAt)
+      ..writeByte(10)
+      ..write(obj.usersWithAccessUpdatedAt)
+      ..writeByte(11)
+      ..write(obj.createdAt)
+      ..writeByte(12)
+      ..write(obj.updatedAt)
+      ..writeByte(13)
+      ..write(obj.schemaVersion);
   }
 
   @override

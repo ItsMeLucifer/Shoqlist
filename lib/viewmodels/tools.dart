@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:shoqlist/constants/app_colors.dart';
 import 'package:shoqlist/models/shopping_list.dart';
@@ -55,7 +57,10 @@ class Tools extends ChangeNotifier {
   }
 
   void printWarning(String text) {
-    debugPrint('\x1B[33m$text\x1B[0m');
+    // `developer.log` jest niezawodne na iOS (debugPrint czasem nie dochodzi
+    // do VSCode debug console na fizycznym device / niektórych symulatorach).
+    // Level 900 = WARNING — pokazuje się żółty w VSCode.
+    developer.log(text, name: 'shoqlist', level: 900);
   }
 
   //Home Page

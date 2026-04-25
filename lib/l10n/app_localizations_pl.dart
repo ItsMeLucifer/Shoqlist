@@ -103,6 +103,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get copiedToClipboard => 'Skopiowano do schowka';
 
   @override
+  String get syncFailed => 'Nie udało się zsynchronizować';
+
+  @override
   String unshareListTitle(String name) {
     return 'Odpiąć się od $name?';
   }

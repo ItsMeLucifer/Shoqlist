@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:shoqlist/constants/firestore_keys.dart';
 import 'package:shoqlist/models/user.dart';
 import 'package:shoqlist/models/loyalty_card.dart';
 import 'package:shoqlist/models/shopping_list.dart';
@@ -10,6 +11,10 @@ import 'package:shoqlist/viewmodels/firebase_auth_view_model.dart';
 import 'package:shoqlist/viewmodels/friends_service_view_model.dart';
 import 'package:shoqlist/viewmodels/loyalty_cards_view_model.dart';
 import 'package:shoqlist/viewmodels/shopping_lists_view_model.dart';
+import 'package:shoqlist/viewmodels/sync/firestore_migrator.dart';
+import 'package:shoqlist/viewmodels/sync/list_writer.dart';
+import 'package:shoqlist/viewmodels/sync/pending_writes_tracker.dart';
+import 'package:shoqlist/viewmodels/sync/shopping_list_doc.dart';
 import 'package:shoqlist/viewmodels/tools.dart';
 
 class FirebaseViewModel extends ChangeNotifier {
@@ -18,388 +23,241 @@ class FirebaseViewModel extends ChangeNotifier {
   final Tools _toolsVM;
   final FirebaseAuthViewModel _firebaseAuth;
   final FriendsServiceViewModel _friendsServiceVM;
-  FirebaseViewModel(this._shoppingListsVM, this._loyaltyCardsVM, this._toolsVM,
-      this._firebaseAuth, this._friendsServiceVM);
+  final PendingWritesTracker _tracker;
+  final ListWriter _writer;
+  final FirestoreMigrator _migrator;
+  FirebaseViewModel(
+    this._shoppingListsVM,
+    this._loyaltyCardsVM,
+    this._toolsVM,
+    this._firebaseAuth,
+    this._friendsServiceVM,
+    this._tracker,
+    this._writer,
+    this._migrator,
+  );
+
+  PendingWritesTracker get pendingWritesTracker => _tracker;
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-  //SYNCHRONIZATION
-  int _cloudTimestamp = 0;
+  // -- SHOPPING LISTS ---------------------------------------------------------
+  //
+  // Porzuciliśmy timestamp-based conflict resolution + buffer arrays z v1.
+  // Nowy model: parser `ShoppingListDoc.fromSnapshot` czyta v1 lub v2, a
+  // `ShoppingListsViewModel.applyMergedSnapshot` robi per-field merge (pod
+  // tarczą `PendingWritesTracker`). Zapisy idą przez `ListWriter` (per-pole,
+  // dot-notation) po obowiązkowym `migrator.migrateIfNeeded` dla ownera.
 
-  Future<void> compareDiscrepanciesBetweenCloudAndLocalData() async {
-    int? localTimestamp = _shoppingListsVM.getLocalTimestamp();
-    if (localTimestamp == null || _cloudTimestamp >= localTimestamp) {
-      await addFetchedShoppingListsDataToLocalList();
-      return;
-    }
-    _toolsVM.fetchStatus = FetchStatus.fetched;
-    putLocalShoppingListsDataToFirebase();
-  }
-
-  // -- SHOPPING LISTS
-  final List<QueryDocumentSnapshot> _shoppingListsFetchedFromFirebase = [];
-  final List<DocumentSnapshot> _sharedShoppingListsFetchedFromFirebase = [];
-  // Re-entrancy guard. fetchData() z MainScaffold + connectivity listener +
-  // pull-to-refresh mogą wywoływać `getShoppingListsFromFirebase` równolegle.
-  // Każdy call modyfikuje te same buffer listy — bez guarda duplikujemy.
   bool _fetchingShoppingLists = false;
 
+  /// Bootstrap fetch — używany przy starcie i przez connectivity/refresh.
+  /// Czyta wszystkie własne listy + shared pointery, każdy przez parser
+  /// i merge-apply. Streamingu (.snapshots) dorzuci Stage 3 w
+  /// `ListSyncService`; tu ta metoda nadal zostaje żeby pull-to-refresh
+  /// na home screen ściągnął aktualny stan synchronously.
   Future<void> getShoppingListsFromFirebase(
       bool shouldCompareCloudDataWithLocalOne) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
     if (_fetchingShoppingLists) return;
     _fetchingShoppingLists = true;
+    // Defensive: currentUserId steruje filterDisplayedShoppingLists(). Jeśli
+    // nie został jeszcze ustawiony (np. brak hydrate-from-cache na starcie),
+    // wszystkie listy trafiłyby do `shared` view.
+    _shoppingListsVM.currentUserId = uid;
     try {
-      // Clear OBYDWU bufferów ZAWSZE (poprzednio clear list był za if size>0,
-      // więc pusta odpowiedź zostawiała stare dane).
-      _shoppingListsFetchedFromFirebase.clear();
-      _sharedShoppingListsFetchedFromFirebase.clear();
-      await users.doc(uid).get().then((DocumentSnapshot snapshot) => {
-            if (snapshot.exists) {_cloudTimestamp = snapshot.get('timestamp')}
-          });
-      await users.doc(uid).collection('lists').get().then(
-          (QuerySnapshot? querySnapshot) {
-        if (querySnapshot != null && querySnapshot.size > 0) {
-          for (var doc in querySnapshot.docs) {
-            _shoppingListsFetchedFromFirebase.add(doc);
-          }
+      // 1) Własne listy
+      final ownSnap = await users.doc(uid).collection('lists').get();
+      for (final doc in ownSnap.docs) {
+        await applyDocToLocal(doc);
+      }
+
+      // 2) Shared pointery — dla każdego pobieramy cudzy doc
+      final sharedPointersSnap =
+          await users.doc(uid).collection('sharedLists').get();
+      for (final pointer in sharedPointersSnap.docs) {
+        final ownerId = (pointer.get(FirestoreFields.ownerId) as String?) ?? '';
+        final documentId =
+            (pointer.get(FirestoreFields.documentId) as String?) ?? pointer.id;
+        if (ownerId.isEmpty) continue;
+        try {
+          final ownerDoc = await users
+              .doc(ownerId)
+              .collection('lists')
+              .doc(documentId)
+              .get();
+          if (!ownerDoc.exists) continue;
+          await applyDocToLocal(ownerDoc);
+        } catch (error, stackTrace) {
+          _toolsVM.printWarning("Failed to fetch shared list $documentId: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
         }
-      }).catchError((error, stackTrace) {
-        final warning =
-            "Failed to fetch shopping lists data from Firebase: $error";
-        _toolsVM.printWarning(warning);
-        _shoppingListsVM.clearDisplayedData();
-        FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        _firebaseAuth.signOut();
-        return;
-      });
-      List<DocumentSnapshot> sharedListsReferences = [];
-      await users.doc(uid).collection('sharedLists').get().then(
-          (QuerySnapshot? querySnapshot) {
-        if (querySnapshot != null && querySnapshot.size > 0) {
-          for (var doc in querySnapshot.docs) {
-            sharedListsReferences.add(doc);
-          }
-        }
-      }).catchError((error, stackTrace) {
-        final warning =
-            "Failed to fetch informations about shared shopping lists from Firebase: $error";
-        _toolsVM.printWarning(warning);
-        FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      });
-      await getDocumentsFromReferences(sharedListsReferences);
-      if (shouldCompareCloudDataWithLocalOne) {
-        await compareDiscrepanciesBetweenCloudAndLocalData();
-      } else {
-        await addFetchedShoppingListsDataToLocalList();
       }
 
       if (_toolsVM.refreshStatus == RefreshStatus.duringRefresh) {
         _toolsVM.refreshStatus = RefreshStatus.refreshed;
       }
+      _toolsVM.fetchStatus = FetchStatus.fetched;
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed getShoppingListsFromFirebase: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     } finally {
       _fetchingShoppingLists = false;
     }
   }
 
-  Future<void> getDocumentsFromReferences(List<DocumentSnapshot> list) async {
-    _sharedShoppingListsFetchedFromFirebase.clear();
-    for (DocumentSnapshot doc in list) {
-      String ownerId = doc.get('ownerId');
-      String documentId = doc.get('documentId');
-      await users
-          .doc(ownerId)
-          .collection('lists')
-          .doc(documentId)
-          .get()
-          .then((DocumentSnapshot document) => {
-                if (document.exists)
-                  {_sharedShoppingListsFetchedFromFirebase.add(document)}
-              })
-          .catchError((error, stackTrace) {
-        final warning =
-            "Failed to fetch shared shopping lists data from Firebase: $error";
-        _toolsVM.printWarning(warning);
-        FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        return error;
-      });
-    }
-  }
-
+  /// Pobiera jedną listę (detail refresh). Używane przez pull-to-refresh w
+  /// ekranie listy. Flush + migrate + parse + merge.
   Future<void> fetchOneShoppingList(String documentId, String ownerId) async {
-    List<String> usersIdsWithAccess = [];
-    List<User> usersWithAccess = [];
-    ShoppingList? currentShoppingList;
-    String ownerName = '';
-    DocumentSnapshot? doc = await users
-        .doc(ownerId)
-        .collection('lists')
-        .doc(documentId)
-        .get()
-        .catchError((error, stackTrace) {
-      final warning =
-          "Failed to fetch shopping list [$documentId] data from Firebase: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      return error;
-    });
-    if (doc.exists) {
-      final ids = (doc.get('usersWithAccess') as List?)?.cast<String>() ?? const [];
-      usersIdsWithAccess.addAll(ids);
-      usersWithAccess
-          .addAll(await Future.wait(ids.map((id) => getUserById(id))));
-      List<ShoppingListItem> items = [];
-      for (int j = 0; j < doc.get('listContent').length; j++) {
-        items.add(
-          ShoppingListItem(doc.get('listContent')[j], doc.get('listState')[j],
-              doc.get('listFavorite')[j]),
-        );
-      }
+    await _tracker.flushList(documentId);
+    final ref = _listDocRef(documentId, ownerId);
 
-      ownerName = await getUserName(doc.get('ownerId'));
-      currentShoppingList = ShoppingList(
-          doc.get('name'),
-          items,
-          _toolsVM.getImportanceValueFromLabel(doc.get('importance')),
-          doc.get('id'),
-          doc.get('ownerId'),
-          ownerName,
-          usersWithAccess);
+    // Migrate jeśli to moja lista (shared userzy nie mają write perms).
+    final myUid = _firebaseAuth.auth.currentUser?.uid;
+    if (myUid != null && myUid == ownerId) {
+      await _migrator.migrateIfNeeded(ref);
     }
-    if (currentShoppingList != null) {
-      _shoppingListsVM.updateCurrentShoppingList(currentShoppingList);
+
+    try {
+      final snap = await ref.get();
+      if (!snap.exists) return;
+      await applyDocToLocal(snap);
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to fetch list $documentId: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     }
   }
 
-  void putLocalShoppingListsDataToFirebase() {
-    final uid = _firebaseAuth.auth.currentUser?.uid;
-
-    if (uid == null) return;
-    List<ShoppingList> localLists = _shoppingListsVM.getLocalShoppingList();
-    List<String> listContent = [];
-    List<bool> listFavorite = [];
-    List<bool> listState = [];
-    List<String> usersWithAccess = [];
-    for (ShoppingList localList in localLists) {
-      listContent.clear();
-      listFavorite.clear();
-      listState.clear();
-      if (localList.list.isNotEmpty && localList.usersWithAccess.isNotEmpty) {
-        for (var element in localList.list) {
-            listContent.add(element.itemName);
-            listFavorite.add(element.isFavorite);
-            listState.add(element.gotItem);
-          }
-        usersWithAccess.clear();
-        for (var user in localList.usersWithAccess) {
-            usersWithAccess.add(user.userId);
-          }
-        users
-            .doc(localList.ownerId)
-            .collection('lists')
-            .doc(localList.documentId)
-            .set({
-              'name': localList.name,
-              'importance': _toolsVM.getImportanceLabel(localList.importance),
-              'listContent': listContent,
-              'listState': listState,
-              'listFavorite': listFavorite,
-              'id': localList.documentId,
-              'ownerId': localList.ownerId,
-              'usersWithAccess': usersWithAccess
-            })
-            .then(
-              (value) => debugPrint(
-                "Updated list on Firebase",
-              ),
-            )
-            .catchError((error, stackTrace) {
-              final warning = "Failed to update list on Firebase: $error";
-              _toolsVM.printWarning(warning);
-              FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-            });
+  /// Publiczny helper — parse snapshot + rehydrate user metadata + merge.
+  /// Używany zarówno przez pull fetch'e jak i przez realtime listeners
+  /// (`ListSyncService`). Idempotentny: wielokrotne wywołania z tym samym
+  /// snapshotem są bez efektu (per-field timestampy monotonicznie rosną).
+  Future<void> applyDocToLocal(DocumentSnapshot doc) async {
+    final myUid = _firebaseAuth.auth.currentUser?.uid;
+    final parsed = ShoppingListDoc.fromSnapshot(doc, _toolsVM);
+    final ownerName = await _safeGetUserName(parsed.ownerId);
+    // usersWithAccess full hydration tylko dla własnych list (potrzebne
+    // w manage-access dialog). Dla cudzych shared list by default puste
+    // — nie tłukniemy N getUserById per każdy snapshot.
+    final fetchUsers = parsed.ownerId == myUid;
+    final accessUsers = <User>[];
+    if (fetchUsers) {
+      for (final uid in parsed.usersWithAccessIds) {
+        accessUsers.add(await getUserById(uid));
       }
     }
-    users
-        .doc(uid)
-        .update({'timestamp': _shoppingListsVM.getLocalTimestamp()});
-    _shoppingListsVM
-        .displayLocalShoppingLists(uid);
+    _shoppingListsVM.applyMergedSnapshot(
+      parsed,
+      ownerName: ownerName,
+      usersWithAccess: accessUsers,
+      tracker: _tracker,
+    );
   }
 
-  Future<void> addFetchedShoppingListsDataToLocalList() async {
-    final uid = _firebaseAuth.auth.currentUser?.uid;
-    if (uid == null) return;
-    List<ShoppingList> result = [];
-    List<String> usersIdsWithAccess = [];
-    List<User> usersWithAccess = [];
-    List<ShoppingList> shoppingLists = [];
-    String ownerName = "";
-    //Fetched Shopping lists to List<ShoppingList>
-    for (int i = 0; i < _shoppingListsFetchedFromFirebase.length; i++) {
-      usersIdsWithAccess.clear();
-      usersWithAccess.clear();
-      final ids = (_shoppingListsFetchedFromFirebase[i].get('usersWithAccess')
-                  as List?)
-              ?.cast<String>() ??
-          const [];
-      usersIdsWithAccess.addAll(ids);
-      usersWithAccess
-          .addAll(await Future.wait(ids.map((id) => getUserById(id))));
-      List<ShoppingListItem> items = [];
-      for (int j = 0;
-          j < _shoppingListsFetchedFromFirebase[i].get('listContent').length;
-          j++) {
-        items.add(
-          ShoppingListItem(
-              _shoppingListsFetchedFromFirebase[i].get('listContent')[j],
-              _shoppingListsFetchedFromFirebase[i].get('listState')[j],
-              _shoppingListsFetchedFromFirebase[i].get('listFavorite')[j]),
-        );
-      }
-      ownerName = await getUserName(
-          _shoppingListsFetchedFromFirebase[i].get('ownerId'));
-      shoppingLists.add(ShoppingList(
-          _shoppingListsFetchedFromFirebase[i].get('name'),
-          items,
-          _toolsVM.getImportanceValueFromLabel(
-              _shoppingListsFetchedFromFirebase[i].get('importance')),
-          _shoppingListsFetchedFromFirebase[i].get('id'),
-          _shoppingListsFetchedFromFirebase[i].get('ownerId'),
-          ownerName,
-          usersWithAccess));
-    }
-    //Fetched Shared Shopping lists to List<ShoppingList>
-    List<ShoppingList> sharedLists = [];
-    for (int i = 0; i < _sharedShoppingListsFetchedFromFirebase.length; i++) {
-      List<ShoppingListItem> sharedItems = [];
-      for (int j = 0;
-          j <
-              _sharedShoppingListsFetchedFromFirebase[i]
-                  .get('listContent')
-                  .length;
-          j++) {
-        sharedItems.add(
-          ShoppingListItem(
-              _sharedShoppingListsFetchedFromFirebase[i].get('listContent')[j],
-              _sharedShoppingListsFetchedFromFirebase[i].get('listState')[j],
-              _sharedShoppingListsFetchedFromFirebase[i]
-                  .get('listFavorite')[j]),
-        );
-      }
-      ownerName = await getUserName(
-          _sharedShoppingListsFetchedFromFirebase[i].get('ownerId'));
-
-      // usersWithAccess is intentionally not populated for shared lists — only
-      // the owner needs that metadata.
-      sharedLists.add(ShoppingList(
-          _sharedShoppingListsFetchedFromFirebase[i].get('name'),
-          sharedItems,
-          _toolsVM.getImportanceValueFromLabel(
-              _sharedShoppingListsFetchedFromFirebase[i].get('importance')),
-          _sharedShoppingListsFetchedFromFirebase[i].get('id'),
-          _sharedShoppingListsFetchedFromFirebase[i].get('ownerId'),
-          ownerName));
-    }
-    // Defense-in-depth: dedup po documentId. Firestore odpowiedzi powinny
-    // mieć unikalne ids, ale jakiekolwiek race między concurrent fetches
-    // nie zostawi duplikatów w final state.
-    final merged = [...shoppingLists, ...sharedLists];
-    final seen = <String>{};
-    result = [
-      for (final list in merged)
-        if (seen.add(list.documentId)) list
-    ];
-    _shoppingListsVM.overrideShoppingListsLocally(
-        result, _cloudTimestamp, uid);
-    _toolsVM.fetchStatus = FetchStatus.fetched;
-  }
+  // -- CREATE / UPDATE / DELETE list-level ------------------------------------
 
   Future<void> putShoppingListToFirebase(
       String name, Importance importance, String documentId) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
-
     if (uid == null) return;
-    users
-        .doc(uid)
-        .collection('lists')
-        .doc(documentId)
-        .set({
-          'name': name,
-          'importance': _toolsVM.getImportanceLabel(importance),
-          'listContent': [],
-          'listState': [],
-          'listFavorite': [],
-          'id': documentId,
-          'ownerId': uid,
-          'usersWithAccess': []
-        })
-        .then((value) => debugPrint("Created new List"))
-        .catchError((error, stackTrace) {
-          final warning = "Failed to create list: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        });
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    final payload = <String, dynamic>{
+      FirestoreFields.schemaVersion: FirestoreFields.currentSchemaVersion,
+      FirestoreFields.name: name,
+      FirestoreFields.nameUpdatedAt: nowMs,
+      FirestoreFields.importance: _toolsVM.getImportanceLabel(importance),
+      FirestoreFields.importanceUpdatedAt: nowMs,
+      FirestoreFields.id: documentId,
+      FirestoreFields.ownerId: uid,
+      FirestoreFields.items: <String, dynamic>{},
+      FirestoreFields.usersWithAccess: <String, dynamic>{},
+      FirestoreFields.usersWithAccessUpdatedAt: nowMs,
+      FirestoreFields.createdAt: nowMs,
+      FirestoreFields.updatedAt: nowMs,
+      // Shadow mirrors dla starych wersji apki shared userów (plan: drop
+      // po kolejnym release gdy wszyscy zaktualizują).
+      if (_writer.shadowWriteV1Mirrors) ...{
+        FirestoreFields.listContent: <String>[],
+        FirestoreFields.listState: <bool>[],
+        FirestoreFields.listFavorite: <bool>[],
+      },
+    };
+    try {
+      await users.doc(uid).collection('lists').doc(documentId).set(payload);
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to create list: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    }
   }
 
   Future<void> updateShoppingListToFirebase(
       String name, Importance importance, String documentId) async {
-    //ONLY FOR YOUR OWN LISTS, NOT SHARED ONE
     final uid = _firebaseAuth.auth.currentUser?.uid;
-
     if (uid == null) return;
-    users
-        .doc(uid)
-        .collection('lists')
-        .doc(documentId)
-        .update({
-          'name': name,
-          'importance': _toolsVM.getImportanceLabel(importance),
-        })
-        .then((value) => debugPrint("Updated list"))
-        .catchError((error, stackTrace) {
-          final warning = "Failed to update list: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        });
+    final ref = _listDocRef(documentId, uid);
+    await _migrator.migrateIfNeeded(ref);
+    try {
+      await _writer.setListName(ref: ref, newName: name);
+      await _writer.setListImportance(
+          ref: ref,
+          newImportanceLabel: _toolsVM.getImportanceLabel(importance));
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to update list meta: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    }
   }
 
   Future<void> deleteShoppingListOnFirebase(String documentId) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
-    //If this list was shared to someone, delete his reference to this list
     DocumentSnapshot document;
     try {
       document =
           await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
     } catch (error, stackTrace) {
-      final warning =
-          "Could not get document from Firebase during deleting a shopping list, error: $error";
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      return _toolsVM.printWarning(warning);
+      _toolsVM.printWarning(
+          "Could not fetch list before delete: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+      return;
     }
-    if (document.exists && document.get('usersWithAccess').isNotEmpty) {
-      document.get('usersWithAccess').forEach((user) async {
+    if (!document.exists) return;
+    // Zbierz aktywne uids z usersWithAccess (może być mapą v2 albo listą v1).
+    final accessRaw = document.data() is Map
+        ? (document.data() as Map)[FirestoreFields.usersWithAccess]
+        : null;
+    final activeUids = <String>[];
+    if (accessRaw is Map) {
+      accessRaw.forEach((k, v) {
+        if (v is Map) {
+          final granted = v[FirestoreFields.grantedAt] as int?;
+          final revoked = v[FirestoreFields.revokedAt] as int?;
+          if (granted != null && (revoked == null || revoked < granted)) {
+            activeUids.add(k as String);
+          }
+        }
+      });
+    } else if (accessRaw is List) {
+      activeUids.addAll(accessRaw.cast<String>());
+    }
+    // Usuń pointery u wszystkich shared userów.
+    for (final user in activeUids) {
+      try {
         await users
             .doc(user)
             .collection('sharedLists')
             .doc(documentId)
             .delete();
-      });
+      } catch (_) {
+        // best-effort; kontynuuj z resztą
+      }
     }
-    //Delete shopping list
-    await users
-        .doc(uid)
-        .collection('lists')
-        .doc(documentId)
-        .delete()
-        .then((value) => debugPrint("List Deleted"))
-        .catchError((error, stackTrace) {
-      final warning = "Failed to delete list: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-    });
+    try {
+      await users.doc(uid).collection('lists').doc(documentId).delete();
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to delete list: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    }
   }
 
   Future<DocumentSnapshot> getDocumentSnapshotFromFirebaseWithId(
@@ -414,202 +272,181 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(documentId)
         .get()
         .catchError((error, stackTrace) {
-      final warning = "Failed to get document snapshot: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+      _toolsVM.printWarning("Failed to get document snapshot: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
       return error;
     });
   }
 
-  Future<void> updateShoppingListItemNameOnFirebase(
-    String newName,
-    int itemIndex,
-    String documentId, [
-    String? ownerId,
-  ]) async {
-    DocumentSnapshot document;
-    try {
-      document = await getDocumentSnapshotFromFirebaseWithId(
-          documentId, 'lists', ownerId);
-    } catch (e) {
-      return _toolsVM.printWarning(
-        "Could not get document from Firebase during updating item name, error: $e",
-      );
-    }
-    final listContent = List<dynamic>.from(document.get('listContent'));
-    if (itemIndex < 0 || itemIndex >= listContent.length) return;
-    listContent[itemIndex] = newName;
-    await users
-        .doc(ownerId ?? _firebaseAuth.auth.currentUser?.uid)
+  DocumentReference<Map<String, dynamic>> _listDocRef(
+      String documentId, String? ownerId) {
+    final targetOwnerId = ownerId ?? _firebaseAuth.auth.currentUser?.uid;
+    return users
+        .doc(targetOwnerId)
         .collection('lists')
         .doc(documentId)
-        .update({'listContent': listContent}).catchError((error, stackTrace) {
-      final warning = "Failed to update item name: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-    });
+        .withConverter<Map<String, dynamic>>(
+          fromFirestore: (snap, _) => snap.data() ?? <String, dynamic>{},
+          toFirestore: (data, _) => data,
+        );
   }
 
-  Future<void> addNewItemToShoppingListOnFirebase(
-    String itemName,
-    String documentId, [
+  // -- ITEM MUTATIONS (v2, id-keyed, wrapped w tracker) -----------------------
+
+  Future<void> updateShoppingListItemNameOnFirebase({
+    required String itemId,
+    required String newName,
+    required String documentId,
     String? ownerId,
-  ]) async {
-    DocumentSnapshot document;
-    try {
-      document = await getDocumentSnapshotFromFirebaseWithId(
-          documentId, 'lists', ownerId);
-    } catch (e) {
-      return _toolsVM.printWarning(
-        "Could not get document from Firebase during adding new item to shopping list, error: $e",
-      );
-    }
-    List<dynamic> listContent = document.get('listContent');
-    listContent.add(itemName);
-    List<dynamic> listState = document.get('listState');
-    listState.add(false);
-    List<dynamic> listFavorite = document.get('listFavorite');
-    listFavorite.add(false);
-    await users
-        .doc(ownerId)
-        .collection('lists')
-        .doc(documentId)
-        .update({
-          'listContent': listContent,
-          'listState': listState,
-          'listFavorite': listFavorite
-        })
-        .then((value) => debugPrint("New item added"))
-        .catchError((error, stackTrace) {
-          final warning = "Failed to add new item: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        });
+  }) {
+    final ref = _listDocRef(documentId, ownerId);
+    return _tracker.track(
+      listId: documentId,
+      itemId: itemId,
+      op: () async {
+        try {
+          await _migrator.migrateIfNeeded(ref);
+          await _writer.setItemName(
+              ref: ref, itemId: itemId, newName: newName);
+        } catch (error, stackTrace) {
+          _toolsVM.printWarning("Failed to update item name: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
+          rethrow;
+        }
+      },
+    );
   }
 
-  Future<void> deleteShoppingListItemOnFirebase(
-    int itemIndex,
-    String documentId, [
+  Future<void> addNewItemToShoppingListOnFirebase({
+    required ShoppingListItem item,
+    required String documentId,
     String? ownerId,
-  ]) async {
-    DocumentSnapshot document;
-    try {
-      document = await getDocumentSnapshotFromFirebaseWithId(
-          documentId, 'lists', ownerId);
-    } catch (error, stackTrace) {
-      final warning =
-          "Could not get document from Firebase during deleting shopping list's item, error: $error";
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      return _toolsVM.printWarning(warning);
-    }
-    List<dynamic> listContent = document.get('listContent');
-    List<dynamic> listState = document.get('listState');
-    List<dynamic> listFavorite = document.get('listFavorite');
-    listContent.removeAt(itemIndex);
-    listState.removeAt(itemIndex);
-    listFavorite.removeAt(itemIndex);
-    await users
-        .doc(ownerId)
-        .collection('lists')
-        .doc(documentId)
-        .update({
-          'listContent': listContent,
-          'listState': listState,
-          'listFavorite': listFavorite
-        })
-        .then((value) => debugPrint("List item deleted"))
-        .catchError((error, stackTrace) {
-          final warning = "Failed to delete item: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        });
+  }) {
+    final ref = _listDocRef(documentId, ownerId);
+    final itemId = item.id;
+    return _tracker.track(
+      listId: documentId,
+      itemId: itemId,
+      op: () async {
+        if (itemId == null) throw StateError('Item missing id');
+        try {
+          await _migrator.migrateIfNeeded(ref);
+          await _writer.createItem(
+              ref: ref,
+              itemId: itemId,
+              itemFields: ShoppingListDoc.itemToFirestoreMap(item));
+        } catch (error, stackTrace) {
+          _toolsVM.printWarning("Failed to add new item: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
+          rethrow;
+        }
+      },
+    );
   }
 
-  Future<void> toggleStateOfShoppingListItemOnFirebase(
-    String documentId,
-    int itemIndex, [
+  Future<void> deleteShoppingListItemOnFirebase({
+    required String itemId,
+    required String documentId,
     String? ownerId,
-  ]) async {
-    DocumentSnapshot document;
-    try {
-      document = await getDocumentSnapshotFromFirebaseWithId(
-          documentId, 'lists', ownerId);
-    } catch (error, stackTrace) {
-      final warning =
-          "Could not get document from Firebase during toogling state of shopping list, error: $error";
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      return _toolsVM.printWarning(warning);
-    }
-    List<dynamic> listState = document.get('listState');
-    listState[itemIndex] = !listState[itemIndex];
-    await users
-        .doc(ownerId)
-        .collection('lists')
-        .doc(documentId)
-        .update({
-          'listState': listState,
-        })
-        .then((value) => debugPrint("Changed state of item"))
-        .catchError((error, stackTrace) {
-          final warning = "Failed to toggle item's state: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        });
+  }) {
+    final ref = _listDocRef(documentId, ownerId);
+    return _tracker.track(
+      listId: documentId,
+      itemId: itemId,
+      op: () async {
+        try {
+          await _migrator.migrateIfNeeded(ref);
+          await _writer.softDeleteItem(ref: ref, itemId: itemId);
+        } catch (error, stackTrace) {
+          _toolsVM.printWarning("Failed to delete item: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
+          rethrow;
+        }
+      },
+    );
   }
 
-  Future<void> toggleFavoriteOfShoppingListItemOnFirebase(
-    String documentId,
-    int itemIndex,
-    String ownerId,
-  ) async {
-    DocumentSnapshot document;
+  Future<void> toggleStateOfShoppingListItemOnFirebase({
+    required String itemId,
+    required bool newState,
+    required String documentId,
+    String? ownerId,
+  }) {
+    final ref = _listDocRef(documentId, ownerId);
+    return _tracker.track(
+      listId: documentId,
+      itemId: itemId,
+      op: () async {
+        try {
+          await _migrator.migrateIfNeeded(ref);
+          await _writer.setItemState(
+              ref: ref, itemId: itemId, newState: newState);
+        } catch (error, stackTrace) {
+          _toolsVM.printWarning("Failed to toggle item's state: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
+          rethrow;
+        }
+      },
+    );
+  }
+
+  Future<void> toggleFavoriteOfShoppingListItemOnFirebase({
+    required String itemId,
+    required bool newFavorite,
+    required String documentId,
+    String? ownerId,
+  }) {
+    final ref = _listDocRef(documentId, ownerId);
+    return _tracker.track(
+      listId: documentId,
+      itemId: itemId,
+      op: () async {
+        try {
+          await _migrator.migrateIfNeeded(ref);
+          await _writer.setItemFavorite(
+              ref: ref, itemId: itemId, newFavorite: newFavorite);
+        } catch (error, stackTrace) {
+          _toolsVM.printWarning("Failed to toggle item's favorite: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
+          rethrow;
+        }
+      },
+    );
+  }
+
+  // -- USERS helpers (used by friends + access) -------------------------------
+
+  Future<String> _safeGetUserName(String userId) async {
     try {
-      document = await getDocumentSnapshotFromFirebaseWithId(
-          documentId, 'lists', ownerId);
-    } catch (error, stackTrace) {
-      final warning =
-          "Could not get document from Firebase during toggling favorite of shopping list, error: $error";
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      return _toolsVM.printWarning(warning);
+      final doc = await users.doc(userId).get();
+      if (!doc.exists) return '';
+      return (doc.get(FirestoreFields.nickname) as String?) ?? '';
+    } catch (_) {
+      return '';
     }
-    if (!document.exists) return debugPrint('Document does not exist');
-    List<dynamic> listFavorite = document.get('listFavorite');
-    // When added to favorite last item in the list, there was an error related to index range - fix in future
-    listFavorite[itemIndex] = !listFavorite[itemIndex];
-    await users
-        .doc(ownerId)
-        .collection('lists')
-        .doc(documentId)
-        .update({
-          'listFavorite': listFavorite,
-        })
-        .then((value) => debugPrint("Changed state of item"))
-        .catchError((error, stackTrace) {
-          final warning = "Failed to toggle item's state: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-        });
   }
 
   Future<String> getUserName(String userId) async {
-    return await users.doc(userId).get().then((doc) => doc.get('nickname'));
+    return await users
+        .doc(userId)
+        .get()
+        .then((doc) => doc.get(FirestoreFields.nickname));
   }
 
   Future<User> getUserById(String userId) async {
     final doc = await users.doc(userId).get();
     if (!doc.exists) return User('', '', userId);
     return User(
-      (doc.get('nickname') as String?) ?? '',
-      (doc.get('email') as String?) ?? '',
+      (doc.get(FirestoreFields.nickname) as String?) ?? '',
+      (doc.get(FirestoreFields.email) as String?) ?? '',
       userId,
     );
   }
 
-  // -- LOYALTY CARDS
+  // -- LOYALTY CARDS ----------------------------------------------------------
   final List<QueryDocumentSnapshot> _loyaltyCardsFetchedFromFirebase = [];
   Future<void> getLoyaltyCardsFromFirebase(bool shouldUpdateLocalData) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
-
     if (uid == null) return;
     _loyaltyCardsFetchedFromFirebase.clear();
     await users
@@ -617,17 +454,14 @@ class FirebaseViewModel extends ChangeNotifier {
         .collection('loyaltyCards')
         .get()
         .then((QuerySnapshot querySnapshot) {
-          if (querySnapshot.size > 0) {
-            for (final doc in querySnapshot.docs) {
-              _loyaltyCardsFetchedFromFirebase.add(doc);
-            }
-          }
-        })
-        .catchError((error, stackTrace) {
-      final warning =
-          "Failed to fetch loyalty cards data from Firebase: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+      if (querySnapshot.size > 0) {
+        for (final doc in querySnapshot.docs) {
+          _loyaltyCardsFetchedFromFirebase.add(doc);
+        }
+      }
+    }).catchError((error, stackTrace) {
+      _toolsVM.printWarning("Failed to fetch loyalty cards data: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
       return error;
     });
     if (shouldUpdateLocalData) addFetchedLoyaltyCardsDataToLocalList();
@@ -650,7 +484,6 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> addNewLoyaltyCardToFirebase(
       String name, String barCode, String documentId, int colorValue) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
-
     if (uid == null) return;
     users
         .doc(uid)
@@ -665,27 +498,24 @@ class FirebaseViewModel extends ChangeNotifier {
         })
         .then((value) => debugPrint("Created new Loyalty card"))
         .catchError((error, stackTrace) {
-          final warning = "Failed to create Loyalty card: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+          _toolsVM.printWarning("Failed to create Loyalty card: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
         });
   }
 
   Future<void> updateLoyaltyCard(
       String name, String barCode, String documentId, int colorValue) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
-
     if (uid == null) return;
     users
         .doc(uid)
         .collection('loyaltyCards')
         .doc(documentId)
         .update({'name': name, 'barCode': barCode, 'color': colorValue})
-        .then((value) => debugPrint("Created new Loyalty card"))
+        .then((value) => debugPrint("Updated Loyalty card"))
         .catchError((error, stackTrace) {
-          final warning = "Failed to update [$documentId] Loyalty card: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+          _toolsVM.printWarning("Failed to update Loyalty card: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
         });
   }
 
@@ -699,9 +529,8 @@ class FirebaseViewModel extends ChangeNotifier {
         .delete()
         .then((value) => debugPrint("Loyalty card Deleted"))
         .catchError((error, stackTrace) {
-      final warning = "Failed to delete [$documentId] loyalty card: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+      _toolsVM.printWarning("Failed to delete Loyalty card: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     });
   }
 
@@ -713,10 +542,10 @@ class FirebaseViewModel extends ChangeNotifier {
       document = await getDocumentSnapshotFromFirebaseWithId(
           documentId, 'loyaltyCards');
     } catch (error, stackTrace) {
-      final warning =
-          "Could not get document from Firebase during toogling favorite of loyalty list, error: $error";
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      return _toolsVM.printWarning(warning);
+      _toolsVM.printWarning(
+          "Could not get loyalty card snapshot: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+      return;
     }
     bool isFavorite = document.get('isFavorite');
     isFavorite = !isFavorite;
@@ -724,18 +553,15 @@ class FirebaseViewModel extends ChangeNotifier {
         .doc(uid)
         .collection('loyaltyCards')
         .doc(documentId)
-        .update({
-          'isFavorite': isFavorite,
-        })
+        .update({'isFavorite': isFavorite})
         .then((value) => debugPrint("Changed favorite of loyalty card"))
         .catchError((error, stackTrace) {
-          final warning = "Failed to toggle loyalty card's favorite: $error";
-          _toolsVM.printWarning(warning);
-          FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+          _toolsVM.printWarning("Failed to toggle loyalty card favorite: $error");
+          FirebaseCrashlytics.instance.recordError(error, stackTrace);
         });
   }
 
-  // -- FRIENDS
+  // -- FRIENDS ----------------------------------------------------------------
 
   Future<void> searchForUser(String input) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
@@ -764,20 +590,15 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> fetchFriendsList() async {
     List<QueryDocumentSnapshot> friendsFetchedFromFirebase = [];
     final uid = _firebaseAuth.auth.currentUser?.uid;
-
     if (uid == null) return;
-    await users
-        .doc(uid)
-        .collection('friends')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
+    await users.doc(uid).collection('friends').get().then(
+        (QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         friendsFetchedFromFirebase.add(doc);
       }
     }).catchError((error, stackTrace) {
-      final warning = "Failed to fetch friends data from Firebase: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+      _toolsVM.printWarning("Failed to fetch friends: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     });
     addFetchedFriendsDataToLocalList(friendsFetchedFromFirebase);
   }
@@ -799,21 +620,15 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> fetchFriendRequestsList() async {
     List<QueryDocumentSnapshot> friendRequestsFetchedFromFirebase = [];
     final uid = _firebaseAuth.auth.currentUser?.uid;
-
     if (uid == null) return;
-    await users
-        .doc(uid)
-        .collection('friendRequests')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
+    await users.doc(uid).collection('friendRequests').get().then(
+        (QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         friendRequestsFetchedFromFirebase.add(doc);
       }
     }).catchError((error, stackTrace) {
-      final warning =
-          "Failed to fetch friend requests data from Firebase: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+      _toolsVM.printWarning("Failed to fetch friend requests: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     });
     addFetchedFriendRequestsDataToLocalList(friendRequestsFetchedFromFirebase);
   }
@@ -836,7 +651,6 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> sendFriendRequest(User friendRequestReceiver) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
-    //Add current user to friendRequestReceiver's friend requests list
     await users
         .doc(friendRequestReceiver.userId)
         .collection('friendRequests')
@@ -851,13 +665,11 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> acceptFriendRequest(User friendRequestSender) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
-    //Delete user from requests list
     await users
         .doc(uid)
         .collection('friendRequests')
         .doc(friendRequestSender.userId)
         .delete();
-    //Add user to currentUser's friends list
     await users
         .doc(uid)
         .collection('friends')
@@ -866,7 +678,6 @@ class FirebaseViewModel extends ChangeNotifier {
       'userId': friendRequestSender.userId,
       'email': friendRequestSender.email
     });
-    //Add currentUser to friendRequestSender's friends list
     await users
         .doc(friendRequestSender.userId)
         .collection('friends')
@@ -882,7 +693,6 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> declineFriendRequest(User friendRequestSender) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
-    //Delete user from requests list
     await users
         .doc(uid)
         .collection('friendRequests')
@@ -894,13 +704,11 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> removeFriendFromFriendsList(User friendToRemove) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
-    //Delete friendToRemove from current user's friends list
     await users
         .doc(uid)
         .collection('friends')
         .doc(friendToRemove.userId)
         .delete();
-    //Remove current user from friendToRemove's friends list
     await users
         .doc(friendToRemove.userId)
         .collection('friends')
@@ -909,145 +717,105 @@ class FirebaseViewModel extends ChangeNotifier {
     _friendsServiceVM.removeUserFromFriendsList(friendToRemove);
   }
 
-  /// Self-initiated "unshare from me": user rezygnuje z udostępnionej listy.
-  /// Usuwa mapping w OBU stronach — moje `sharedLists` + mój uid z ownera
-  /// `usersWithAccess`. Nie usuwa samej listy u ownera.
+  // -- LIST ACCESS (share/unshare, v2 per-uid map) ----------------------------
+
+  /// Self-initiated "unshare from me" — user rezygnuje z cudzej udostępnionej
+  /// listy. Kasuje mój pointer i ustawia revokedAt na ownera `usersWithAccess.<myUid>`.
   Future<void> unshareListFromMe(ShoppingList list) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null || list.ownerId == uid) return;
-    await users
-        .doc(uid)
-        .collection('sharedLists')
-        .doc(list.documentId)
-        .delete()
-        .catchError((error, stackTrace) {
-      final warning = "Failed to delete own sharedLists entry: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-    });
-    final ownerListDoc =
-        users.doc(list.ownerId).collection('lists').doc(list.documentId);
-    DocumentSnapshot snapshot;
     try {
-      snapshot = await ownerListDoc.get();
-    } catch (e) {
-      return _toolsVM.printWarning(
-          "Could not fetch owner list snapshot during unshare: $e");
+      await users
+          .doc(uid)
+          .collection('sharedLists')
+          .doc(list.documentId)
+          .delete();
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to delete sharedLists pointer: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     }
-    if (!snapshot.exists) return;
-    final data = snapshot.data() as Map<String, dynamic>?;
-    final currentAccess =
-        List<String>.from(data?['usersWithAccess'] ?? const <String>[]);
-    currentAccess.removeWhere((id) => id == uid);
-    await ownerListDoc
-        .update({'usersWithAccess': currentAccess}).catchError(
-            (error, stackTrace) {
-      final warning = "Failed to remove uid from owner usersWithAccess: $error";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-    });
+    final ref = _listDocRef(list.documentId, list.ownerId);
+    try {
+      await _writer.revokeAccess(ref: ref, uid: uid);
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to revoke my access on owner doc: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    }
   }
 
   Future<void> giveFriendAccessToYourShoppingList(
       User friend, String documentId) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null || friend.userId == uid) return;
-    //Add shopping list's data to friend's sharedLists
+    // 1) Pointer na friendzie
     await users
         .doc(friend.userId)
         .collection('sharedLists')
         .doc(documentId)
         .set({
-      'documentId': documentId,
-      'ownerId': uid,
+      FirestoreFields.documentId: documentId,
+      FirestoreFields.ownerId: uid,
     });
-    //Add friend's id to shopping list's usersWithAccess list
-    DocumentSnapshot document;
+    // 2) grantAccess na moim liście (per-uid map write)
+    final ref = _listDocRef(documentId, uid);
+    await _migrator.migrateIfNeeded(ref);
     try {
-      document =
-          await getDocumentSnapshotFromFirebaseWithId(documentId, 'lists');
+      await _writer.grantAccess(ref: ref, uid: friend.userId);
     } catch (error, stackTrace) {
-      final warning =
-          "Could not get document with friend's list data from Firebase, error: $error";
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
-      return _toolsVM.printWarning(warning);
+      _toolsVM.printWarning("Failed to grant access: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     }
-    List<dynamic> usersWithAccess = document.get('usersWithAccess');
-    usersWithAccess.add(friend.userId);
-    await users
-        .doc(uid)
-        .collection('lists')
-        .doc(documentId)
-        .update({'usersWithAccess': usersWithAccess});
   }
 
   Future<void> denyFriendAccessToYourShoppingList(
       User friend, String documentId, List<User> usersWithAccess) async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null || friend.userId == uid) return;
-    //Remove shopping list's data from friend's sharedLists
     await users
         .doc(friend.userId)
         .collection('sharedLists')
         .doc(documentId)
         .delete();
-    //Remove friend's id from shoppingList's usersWithAccess list
-    List<String> usersIdsWithAccess = [];
-    for (var user in usersWithAccess) {
-      if (user.userId != friend.userId) {
-        usersIdsWithAccess.add(user.userId);
-      }
+    final ref = _listDocRef(documentId, uid);
+    await _migrator.migrateIfNeeded(ref);
+    try {
+      await _writer.revokeAccess(ref: ref, uid: friend.userId);
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to revoke friend access: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
     }
-    await users
-        .doc(uid)
-        .collection('lists')
-        .doc(documentId)
-        .update({'usersWithAccess': usersIdsWithAccess});
   }
 
-  // -- SETTINGS
+  // -- SETTINGS ---------------------------------------------------------------
 
   Future<void> deleteEveryDataRelatedToCurrentUser() async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
-    //Go through shared lists and delete currentUserId from usersWithAccess
+    // Revoke swój dostęp na każdej cudzej udostępnionej nam liście.
     QuerySnapshot lists = await users
         .doc(uid)
         .collection('sharedLists')
         .get()
         .catchError((onError, stackTrace) {
-      final warning = "Failet to fetch sharedLists data: $onError";
-      _toolsVM.printWarning(warning);
-      FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+      _toolsVM.printWarning("Failed to fetch sharedLists: $onError");
+      FirebaseCrashlytics.instance.recordError(onError, stackTrace);
       return onError;
     });
     for (final list in lists.docs) {
       try {
-        DocumentSnapshot docSnap = await users
-            .doc(list.get('ownerId'))
-            .collection('lists')
-            .doc(list.get('documentId'))
-            .get();
-        if (docSnap.exists) {
-          List<dynamic> usersWithAccess = docSnap.get('usersWithAccess');
-          usersWithAccess.remove(uid);
-          await users
-              .doc(list.get('ownerId'))
-              .collection('lists')
-              .doc(list.get('documentId'))
-              .update({'usersWithAccess': usersWithAccess});
-        }
+        final ownerId = list.get(FirestoreFields.ownerId) as String;
+        final documentId = list.get(FirestoreFields.documentId) as String;
+        final ref = _listDocRef(documentId, ownerId);
+        await _writer.revokeAccess(ref: ref, uid: uid);
       } catch (error, stackTrace) {
-        final warning =
-            "Failed to delete current user's id from usersWithAccess list in sharedLists: $error";
-        _toolsVM.printWarning(warning);
-        FirebaseCrashlytics.instance.recordError(warning, stackTrace);
+        _toolsVM.printWarning("Failed to revoke my access: $error");
+        FirebaseCrashlytics.instance.recordError(error, stackTrace);
       }
     }
-    //Remove your friend's sharedLists data
+    // Usuń pointery na każdym friendzie którego ja udostępniam.
     _shoppingListsVM.currentlyDisplayedListType =
         ShoppingListType.ownShoppingLists;
-    for (var list in _shoppingListsVM.shoppingLists) {
+    for (final list in _shoppingListsVM.shoppingLists) {
       for (final user in list.usersWithAccess) {
         await users
             .doc(user.userId)
@@ -1056,13 +824,12 @@ class FirebaseViewModel extends ChangeNotifier {
             .delete();
       }
     }
-    //Remove all friends
-    for (var friend in _friendsServiceVM.friendsList) {
+    // Usuń znajomych
+    for (final friend in _friendsServiceVM.friendsList) {
       removeFriendFromFriendsList(friend);
     }
-
     _toolsVM.clearAuthenticationTextEditingControllers();
-    //Delete account and Sign-out
+    // Usuń dane lokalne + konto.
     await Hive.box<ShoppingList>('shopping_lists').clear();
     await Hive.box<int>('data_variables').clear();
     await users.doc(uid).delete();

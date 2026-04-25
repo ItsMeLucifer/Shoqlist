@@ -42,6 +42,7 @@
     "editItemTitle": "項目を編集",
     "ok": "OK",
     "copiedToClipboard": "クリップボードにコピーしました",
+    "syncFailed": "同期に失敗しました",
     "unshareListTitle": "{name} の共有を解除しますか？",
     "decline": "キャンセル",
     "yes": "はい",

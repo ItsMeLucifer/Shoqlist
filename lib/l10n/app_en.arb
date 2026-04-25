@@ -135,6 +135,10 @@
     "@copiedToClipboard":{
         "description": "Toast message after copying list text to clipboard"
     },
+    "syncFailed": "Couldn't sync — try again",
+    "@syncFailed":{
+        "description": "SnackBar shown when a write to Firestore fails and local state had to be reverted"
+    },
     "unshareListTitle": "Unshare {name}?",
     "@unshareListTitle":{
         "description": "Confirmation when user unshares themselves from a shared list",
