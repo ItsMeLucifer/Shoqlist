@@ -791,6 +791,14 @@ class FirebaseViewModel extends ChangeNotifier {
   Future<void> deleteEveryDataRelatedToCurrentUser() async {
     final uid = _firebaseAuth.auth.currentUser?.uid;
     if (uid == null) return;
+    // Konto recenzenta App Store: zamiast realnie usuwać konto+dane,
+    // robimy soft-disable z auto-wygaśnięciem. Patrz komentarz w
+    // [FirebaseAuthViewModel.reviewerEmail].
+    final email = _firebaseAuth.auth.currentUser?.email?.toLowerCase();
+    if (email == FirebaseAuthViewModel.reviewerEmail) {
+      await _softDisableReviewerAccount(uid);
+      return;
+    }
     // Revoke swój dostęp na każdej cudzej udostępnionej nam liście.
     QuerySnapshot lists = await users
         .doc(uid)
@@ -834,5 +842,30 @@ class FirebaseViewModel extends ChangeNotifier {
     await Hive.box<int>('data_variables').clear();
     await users.doc(uid).delete();
     await _firebaseAuth.deleteAccount();
+  }
+
+  /// Zapisuje `disabled_accounts/{uid}` z wygasającym `expiresAtMillis`
+  /// i wylogowuje. Nie usuwa user-doca, list, znajomych ani konta Auth —
+  /// reviewerowi App Store wygląda to jak skasowanie konta, a po
+  /// [FirebaseAuthViewModel.reviewerDisableDuration] konto wraca samo
+  /// (lazy cleanup w [FirebaseAuthViewModel._isAccountSoftDisabled]).
+  Future<void> _softDisableReviewerAccount(String uid) async {
+    final expiresAt = DateTime.now()
+        .add(FirebaseAuthViewModel.reviewerDisableDuration)
+        .millisecondsSinceEpoch;
+    try {
+      await FirebaseFirestore.instance
+          .collection(FirebaseAuthViewModel.disabledAccountsCollection)
+          .doc(uid)
+          .set({
+        'disabledAt': FieldValue.serverTimestamp(),
+        'expiresAtMillis': expiresAt,
+      });
+    } catch (error, stackTrace) {
+      _toolsVM.printWarning("Failed to soft-disable reviewer account: $error");
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    }
+    _toolsVM.clearAuthenticationTextEditingControllers();
+    await _firebaseAuth.signOut();
   }
 }

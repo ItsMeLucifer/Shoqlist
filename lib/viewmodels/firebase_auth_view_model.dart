@@ -14,6 +14,16 @@ class FirebaseAuthViewModel extends ChangeNotifier {
   FirebaseAuthViewModel() : _auth = FirebaseAuth.instance {
     _authSubscription = _auth.authStateChanges().listen(_onAuthStateChanged);
   }
+
+  // Konto recenzenta App Store: zamiast usuwać przy "Delete Account",
+  // robimy soft-disable przez doc `disabled_accounts/{uid}` z wygasającym
+  // `expiresAtMillis`. Po upływie [reviewerDisableDuration] konto aktywuje
+  // się samo przy najbliższej próbie logowania (lazy cleanup w
+  // [_isAccountSoftDisabled]). Dzięki temu nie muszę robić nowego testowego
+  // konta co cykl review.
+  static const String reviewerEmail = 'review@zajawa.eu';
+  static const Duration reviewerDisableDuration = Duration(hours: 1);
+  static const String disabledAccountsCollection = 'disabled_accounts';
   //AUTHENTICATION
   final FirebaseAuth _auth;
   late final StreamSubscription<User?> _authSubscription;
@@ -89,8 +99,42 @@ class FirebaseAuthViewModel extends ChangeNotifier {
 
   Future<void> _onAuthStateChanged(User? firebaseUser) async {
     if (firebaseUser == null) return;
+    if (await _isAccountSoftDisabled(firebaseUser)) {
+      await signOut();
+      _exceptionMessageIndex = 4; // user-disabled
+      notifyListeners();
+      return;
+    }
     status = Status.authenticated;
     setCurrentUserCredentials();
+  }
+
+  /// Zwraca `true` jeśli to konto recenzenta i ma aktywny wpis
+  /// `disabled_accounts/{uid}`. Wpis który wygasł kasujemy tu w locie —
+  /// to nasz lazy "re-enable" bez crona/Cloud Functions.
+  Future<bool> _isAccountSoftDisabled(User firebaseUser) async {
+    if ((firebaseUser.email?.toLowerCase() ?? '') != reviewerEmail) {
+      return false;
+    }
+    final docRef = FirebaseFirestore.instance
+        .collection(disabledAccountsCollection)
+        .doc(firebaseUser.uid);
+    try {
+      final snap = await docRef.get();
+      if (!snap.exists) return false;
+      final data = snap.data();
+      final expiresAtMillis =
+          (data?['expiresAtMillis'] as num?)?.toInt() ?? 0;
+      if (expiresAtMillis > DateTime.now().millisecondsSinceEpoch) {
+        return true;
+      }
+      // Wygasło — czyścimy doc i wpuszczamy.
+      await docRef.delete();
+      return false;
+    } catch (e) {
+      debugPrint('soft-disable check failed: $e');
+      return false;
+    }
   }
 
   Future<void> register(String email, String password) async {
