@@ -2,7 +2,7 @@ name: shoqlist
 description: A new Flutter project.
 publish_to: "none"
 
-version: 2.0.1+38
+version: 2.0.2+39
 
 environment:
   sdk: ^3.10.4
